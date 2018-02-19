@@ -15,8 +15,11 @@ tf.flags.DEFINE_string("train_data", default="toy_1D_ind_train_samples.npz",
                        help="path of the training data in npz format")
 tf.flags.DEFINE_string("model_dir", default="clf_dir/asimov_{}".format(timestr),
                        help="path to save checkpoints and results")
-tf.flags.DEFINE_integer("num_epochs", default=1,
-                       help="path to save checkpoints and results")
+tf.flags.DEFINE_integer("steps", default=1,
+                       help="number of steps for each train call")
+tf.flags.DEFINE_integer("n_train_eval", default=1,
+                       help="number of steps for each train call")
+tf.flags.DEFINE_integer("batch_size", default=4000, help="")
 
 
 flags = tf.flags.FLAGS
@@ -92,15 +95,24 @@ def main(_):
 
   clf = tf.estimator.Estimator(model_fn=asimov_model, model_dir=flags.model_dir)
 
+  train_sig, val_sig, train_bkg, val_bkg = train_test_split(data["sig"], data["bkg"])
+
   train_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"sig" : data["sig"], "bkg" : data["bkg"]},
-      y=np.ones(data["sig"].shape[0]),
+      x={"sig" : train_sig, "bkg" : train_bkg},
+      y=np.ones(train_sig.shape[0]),
       num_epochs=None,
-      batch_size=4000,
+      batch_size=flags.batch_size,
       shuffle=True)
 
-  for i in range(100):
-    clf.train(input_fn=train_input_fn, steps=1)
+  val_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"sig" : val_sig, "bkg" : val_bkg },
+      y=np.ones(val_sig.shape[0]),
+      batch_size=flags.batch_size,
+      shuffle=False)
+
+  for i in range(flags.n_train_eval):
+    clf.train(input_fn=train_input_fn, steps=flags.steps)
+    clf.evaluate(input_fn=val_input_fn)
 
 if __name__ == "__main__":
   tf.app.run()
