@@ -15,12 +15,11 @@ tf.flags.DEFINE_string("train_data", default="toy_1D_ind_train_samples.npz",
                        help="path of the training data in npz format")
 tf.flags.DEFINE_string("model_dir", default="clf_dir/asimov_{}".format(timestr),
                        help="path to save checkpoints and results")
-tf.flags.DEFINE_integer("steps", default=1,
-                       help="number of steps for each train call")
-tf.flags.DEFINE_integer("n_train_eval", default=1,
+tf.flags.DEFINE_integer("n_epochs", default=1,
                        help="number of steps for each train call")
 tf.flags.DEFINE_integer("batch_size", default=4000, help="")
 tf.flags.DEFINE_float("temperature", default=1.0, help="")
+tf.flags.DEFINE_boolean("use_cross_entropy", default=False, help="")
 
 
 flags = tf.flags.FLAGS
@@ -47,6 +46,7 @@ def asimov_model(features, labels, mode, params):
 
     temperature = tf.convert_to_tensor(params["temperature"], dtype=tf.float32) 
     c_interest  = params["c_interest"] 
+    use_cross_entropy  = params["use_cross_entropy"] 
 
     if "components" in features:
       # get name of each component
@@ -67,9 +67,11 @@ def asimov_model(features, labels, mode, params):
     inputs = tf.reshape(X, (-1,1))
 
     net = inputs
-    for layer in layers.values():
+    for name, layer in layers.items():
       net = layer(net) 
-    logits = net  
+      for var in layer.variables:
+        tf.summary.histogram("h_{}".format(var.name), var)
+    logits = net
 
     probs = tf.nn.softmax(logits/temperature)
 
@@ -83,14 +85,29 @@ def asimov_model(features, labels, mode, params):
     mu = tf.convert_to_tensor(1., name="mu")
     split_counts = [ mean*norm*mu if (c_name==c_interest) else mean*norm
         for c_name, mean, norm in zip(c_names, split_means, c_norms)]
+
+    for mean, count, c_name in zip(split_means, split_counts, c_names):
+      tf.summary.scalar("mean_{}_{}".format(c_name,1), mean[1])
+      tf.summary.scalar("count_{}_{}".format(c_name,1), count[1])
        
     exp_counts = sum(split_counts) 
 
-    # soft-loss
-    pois = ds.Poisson(exp_counts[1])
-    nll = - pois.log_prob(tf.stop_gradient(exp_counts[1]))
-    hess = batch_hessian(nll, [mu])
-    loss = tf.reduce_sum(tf.sqrt(1./hess[0][0]))
+    # asimov loss 
+    with tf.name_scope("compute_asimov_loss"):
+      pois = ds.Poisson(exp_counts, name="poisson")
+      asimov = tf.stop_gradient(exp_counts, name="asimov")
+      nll = - tf.reduce_sum(pois.log_prob(asimov))
+      hess = batch_hessian(nll, [mu])
+      cov = tf.matrix_inverse(hess[0])
+      asimov_loss = tf.sqrt(cov[0,0]) 
+
+    cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y,
+                                                           logits=logits)
+
+    tf.summary.scalar("asimov_loss", asimov_loss) 
+    tf.summary.scalar("cross_entropy", cross_entropy)
+
+    loss = cross_entropy if use_cross_entropy else asimov_loss 
 
     if mode == tf.estimator.ModeKeys.EVAL:
 
@@ -98,7 +115,7 @@ def asimov_model(features, labels, mode, params):
 
     assert mode == tf.estimator.ModeKeys.TRAIN
 
-    optimizer = tf.train.AdagradOptimizer(learning_rate=0.01)
+    optimizer = tf.train.AdagradOptimizer(learning_rate=0.001)
     train_op = optimizer.minimize(loss, global_step=tf.train.get_global_step())
 
     return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)    
@@ -108,10 +125,15 @@ def main(_):
   data = np.load(flags.train_data)
 
   params = { "temperature" : flags.temperature,
-             "c_interest" : "sig"}
+             "c_interest" : "sig",
+             "use_cross_entropy" : flags.use_cross_entropy}
+
+  config = tf.estimator.RunConfig(save_summary_steps=1)
 
   clf = tf.estimator.Estimator(model_fn=asimov_model, model_dir=flags.model_dir,
-                               params=params)
+                               params=params, config=config)
+
+  print(clf.model_dir)
 
   train_data = {}
   val_data = {}
@@ -120,27 +142,32 @@ def main(_):
 
   print(data.keys())
 
-  def train_input_fn():
+  def make_input_fn(data):
+    def input_fn():
 
-    components = {}
-    for key, value in train_data.items():
-      components[key] = tf.data.Dataset.from_tensor_slices(value)\
-                             .shuffle(buffer_size=10000)\
-                             .batch(flags.batch_size)
+      components = {}
+      for key, value in data.items():
+        components[key] = tf.data.Dataset.from_tensor_slices(value)\
+                               .shuffle(buffer_size=10000)\
+                               .batch(flags.batch_size)
 
-    c_norms = tf.data.Dataset.from_tensors({"sig" : 20., "bkg" : 400.}).repeat()
+      c_norms = tf.data.Dataset.from_tensors({"sig" : 20., "bkg" : 400.}).repeat()
 
-    dataset = tf.data.Dataset.zip({"components" : components, "c_norms" : c_norms})
+      dataset = tf.data.Dataset.zip({"components" : components, "c_norms" : c_norms})
 
-    dataset_it = dataset.make_one_shot_iterator()
-    next_batch = dataset_it.get_next()
+      dataset_it = dataset.make_one_shot_iterator()
+      next_batch = dataset_it.get_next()
 
-    return next_batch, None 
+      return next_batch, None 
+    return input_fn
+    
 
+  train_input_fn = make_input_fn(train_data)
+  val_input_fn = make_input_fn(val_data)
 
-  for i in range(flags.n_train_eval):
-    clf.train(input_fn=train_input_fn, steps=flags.steps)
-    clf.evaluate(input_fn=train_input_fn)
+  for i in range(flags.n_epochs):
+    clf.train(input_fn=train_input_fn)
+    clf.evaluate(input_fn=val_input_fn)
 
 if __name__ == "__main__":
   tf.app.run()
