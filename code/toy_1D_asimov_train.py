@@ -26,7 +26,7 @@ flags = tf.flags.FLAGS
 
 ds = tf.contrib.distributions
 
-def small_nn():
+def small_nn(n_logits=2):
   layers = OrderedDict() 
   activation = tf.nn.relu
   initializer = tf.glorot_normal_initializer
@@ -36,17 +36,20 @@ def small_nn():
   layers["dense_1"] = tf.layers.Dense(10, activation=activation,
                               kernel_initializer=initializer(),
                               name="dense_1")
-  layers["output"] = tf.layers.Dense(2, activation=None, name="output")
+  layers["output"] = tf.layers.Dense(n_logits, activation=None, name="output")
   return layers
 
 
 def asimov_model(features, labels, mode, params):
 
-    layers = small_nn()
+    n_logits = 2
+    layers = small_nn(n_logits)
 
     temperature = tf.convert_to_tensor(params["temperature"], dtype=tf.float32) 
     c_interest  = params["c_interest"] 
     use_cross_entropy  = params["use_cross_entropy"] 
+
+    c_norm_dists = {"bkg" : ds.Normal(loc=400., scale=20.)}
 
     if "components" in features:
       # get name of each component
@@ -87,17 +90,28 @@ def asimov_model(features, labels, mode, params):
         for c_name, mean, norm in zip(c_names, split_means, c_norms)]
 
     for mean, count, c_name in zip(split_means, split_counts, c_names):
-      tf.summary.scalar("mean_{}_{}".format(c_name,1), mean[1])
-      tf.summary.scalar("count_{}_{}".format(c_name,1), count[1])
+      for n in range(n_logits):
+        tf.summary.scalar("mean_{}_{}".format(c_name,n), mean[n])
+        tf.summary.scalar("count_{}_{}".format(c_name,n), count[n])
        
     exp_counts = sum(split_counts) 
 
-    # asimov loss 
+    # asimov loss
+    nuis_pars = [] 
     with tf.name_scope("compute_asimov_loss"):
       pois = ds.Poisson(exp_counts, name="poisson")
       asimov = tf.stop_gradient(exp_counts, name="asimov")
-      nll = - tf.reduce_sum(pois.log_prob(asimov))
-      hess = batch_hessian(nll, [mu])
+      ll = tf.reduce_sum(pois.log_prob(asimov), name="likelihood")
+      # add c_norm constrain terms
+      constraint_terms = [] 
+      for c_norm, c_name in zip(c_norms, c_names):
+        if c_name in c_norm_dists: 
+          nuis_pars.append(c_norm)
+          constraint = c_norm_dists[c_name]
+          constraint_terms.append(tf.reduce_sum(constraint.log_prob(c_norm),
+            name="c_norm_{}_log_prob".format(c_name)))
+      nll = - tf.reduce_sum([ll]+constraint_terms)
+      hess = batch_hessian(nll, [mu]+nuis_pars)
       cov = tf.matrix_inverse(hess[0])
       asimov_loss = tf.sqrt(cov[0,0]) 
 
@@ -115,7 +129,7 @@ def asimov_model(features, labels, mode, params):
 
     assert mode == tf.estimator.ModeKeys.TRAIN
 
-    optimizer = tf.train.AdagradOptimizer(learning_rate=0.001)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
     train_op = optimizer.minimize(loss, global_step=tf.train.get_global_step())
 
     return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)    
@@ -124,11 +138,12 @@ def main(_):
 
   data = np.load(flags.train_data)
 
+
   params = { "temperature" : flags.temperature,
              "c_interest" : "sig",
              "use_cross_entropy" : flags.use_cross_entropy}
 
-  config = tf.estimator.RunConfig(save_summary_steps=1)
+  config = tf.estimator.RunConfig(save_summary_steps=20)
 
   clf = tf.estimator.Estimator(model_fn=asimov_model, model_dir=flags.model_dir,
                                params=params, config=config)
