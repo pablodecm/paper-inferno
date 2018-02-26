@@ -35,8 +35,10 @@ def main(_):
 
   data = np.load(flags.train_data)
 
+  learning_rate=0.005
+  optimizer="SGD"
 
-  config = tf.estimator.RunConfig(save_summary_steps=21)
+  config = tf.estimator.RunConfig(save_summary_steps=100)
 
   def c_norm_dists_fn():
     norm_bkg =  nm.Normal(loc=400., scale=100., value=400.)
@@ -48,14 +50,28 @@ def main(_):
                  "c0_bkg" : norm_c0_bkg,
                  "c1_bkg" : norm_c1_bkg}
     nuis_pars = [norm_c0_bkg, norm_c1_bkg] 
+    nuis_pars = []
 
     return norm_dict, nuis_pars
 
+  def c_transforms_fn():
+    c0_shift = nm.Normal(loc=0.0,scale=0.05,value=0.0, name="c0_shift")
+    c1_shift = nm.Normal(loc=0.0,scale=0.05,value=0.0, name="c1_shift")
+    trans_dict = {"c0_bkg" : lambda t: t+c0_shift,
+                  "c1_bkg" : lambda t: t+c1_shift}
+    nuis_pars = [c1_shift]
+    #nuis_pars = []
+
+    return trans_dict, nuis_pars
+
   clf = InferenceEstimator(
       c_norm_dists_fn=c_norm_dists_fn,
+      c_transforms_fn=c_transforms_fn,
       temperature=flags.temperature,
       use_cross_entropy=flags.use_cross_entropy,
       model_dir=flags.model_dir,
+      learning_rate=learning_rate,
+      optimizer=optimizer,
       n_bins=None,
       config=config)
 
@@ -72,7 +88,7 @@ def main(_):
   np.random.shuffle(train_data["bkg"])
   np.random.shuffle(val_data["bkg"])
   
-  def make_input_fn(data, keys):
+  def make_input_fn(data, keys, batch_size):
     def input_fn():
 
       components = {}
@@ -80,7 +96,7 @@ def main(_):
         if key in keys:
           components[key] = tf.data.Dataset.from_tensor_slices(value)\
                                            .shuffle(buffer_size=10000)\
-                                           .batch(flags.batch_size)
+                                           .batch(batch_size)
 
       dataset = tf.data.Dataset.zip({"components" : components})
 
@@ -93,8 +109,8 @@ def main(_):
 
   keys = ["sig","c0_bkg", "c1_bkg"]
 #  keys = ["sig","bkg"]
-  train_input_fn = make_input_fn(train_data, keys)
-  val_input_fn = make_input_fn(val_data, keys)
+  train_input_fn = make_input_fn(train_data, keys, flags.batch_size)
+  val_input_fn = make_input_fn(val_data, keys, 10000)
 
   for i in range(flags.n_epochs):
     clf.train(input_fn=train_input_fn)
