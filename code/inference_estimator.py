@@ -26,8 +26,9 @@ def small_nn(n_logits=2):
 class InferenceEstimator(estimator.Estimator):
 
     def __init__(self,
+                 c_norm_dists_fn,
                  c_interest="sig",
-                 c_norm_dists_fn=None,
+                 c_transforms_fn=None,
                  temperature=1.0,
                  n_bins = None,
                  use_cross_entropy=False,
@@ -36,17 +37,20 @@ class InferenceEstimator(estimator.Estimator):
 
       def _model_fn(features, labels, mode):
 
-        
-
         if "components" in features:
            # get name of each component
            c_names = sorted(features["components"].keys())
            c_tensors = [features["components"][c_name] for c_name in c_names] 
            c_sizes = [tf.shape(c_tensor)[0] for c_tensor in c_tensors]
-           if "c_norms" in features:
-             c_norms = [features["c_norms"][c_name]  for c_name in c_names]
+           norm_dict, norm_nuis = c_norm_dists_fn()
+           c_norms = [norm_dict[c_name] for c_name in c_names]
            for c_name, c_size in zip(c_names, c_sizes):
              tf.summary.scalar("c_batch_size_{}".format(c_name), c_size)
+           if c_transforms_fn:
+             c_transforms, trans_nuis = c_transforms_fn()
+             for i, c_name in enumerate(c_names):
+               if c_name in c_transforms:
+                 c_tensors[i] = c_transforms[c_name](c_tensors[i])
            X = tf.concat(c_tensors, axis=0, name="concat_components")
            y = tf.concat([tf.ones((c_size,),dtype=tf.int32)*i 
              for i, c_size in enumerate(c_sizes)], axis=0) 
@@ -83,20 +87,18 @@ class InferenceEstimator(estimator.Estimator):
         exp_counts = sum(split_counts) 
 
         # asimov loss
-        nuis_pars = [] 
+        nuis_pars = norm_nuis 
         with tf.name_scope("compute_asimov_loss"):
-          c_norm_dists = c_norm_dists_fn() if c_norm_dists_fn else {}
           pois = ds.Poisson(exp_counts, name="poisson")
           asimov = tf.stop_gradient(exp_counts, name="asimov")
           ll = tf.reduce_sum(pois.log_prob(asimov), name="likelihood")
+
           # add c_norm constrain terms
           constraint_terms = [] 
-          for c_norm, c_name in zip(c_norms, c_names):
-            if c_name in c_norm_dists: 
-              nuis_pars.append(c_norm)
-              constraint = c_norm_dists[c_name]
-              constraint_terms.append(tf.reduce_sum(constraint.log_prob(c_norm),
-                name="c_norm_{}_log_prob".format(c_name)))
+          for rv in norm_nuis:
+            constraint_terms.append(tf.reduce_sum(rv.log_prob(rv),
+                name="c_norm_{}_log_prob".format(rv.name)))
+
           nll = - tf.reduce_sum([ll]+constraint_terms)
           hess = batch_hessian(nll, [mu]+nuis_pars)
           cov = tf.matrix_inverse(hess[0])
@@ -116,7 +118,7 @@ class InferenceEstimator(estimator.Estimator):
 
         assert mode == tf.estimator.ModeKeys.TRAIN
 
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01)
         train_op = optimizer.minimize(loss, global_step=tf.train.get_global_step())
 
         return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)    

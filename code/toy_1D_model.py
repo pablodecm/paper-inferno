@@ -72,24 +72,16 @@ def main(_):
                  rvs.c1_norm : 200.,
                  rvs.c0_shift : 0.}
 
+  s_tensors = { "sig" : rvs.mixture.components[2].sample(n_train_evs),
+                "c0_bkg" : rvs.mixture.components[0].sample(n_train_evs),
+                "c1_bkg" : rvs.mixture.components[1].sample(n_train_evs)
+              }
+
   with tf.Session() as sess:
-    bkg_nom_train = sess.run(rvs.mixture.sample(n_train_evs),
-                             merge(fixed_nuis, {rvs.mu: 0.}))
-    sig_nom_train = sess.run(rvs.mixture.components[2].sample(n_train_evs),
-                             fixed_nuis)
+    s_arrs = { k : sess.run(v, fixed_nuis)[:, np.newaxis]
+                 for k,v in s_tensors.items()}
 
-  bkg_nom_train = bkg_nom_train[:,np.newaxis]
-  sig_nom_train = sig_nom_train[:,np.newaxis]
-
-  np.savez("toy_1D_ind_train_samples.npz",
-           sig=sig_nom_train, bkg=bkg_nom_train)
-  
-  X_sample = np.vstack([bkg_nom_train,sig_nom_train])
-  y_sample = np.vstack([np.zeros(bkg_nom_train.shape, dtype=np.int32),
-                       np.ones(sig_nom_train.shape, dtype=np.int32)])
-
-  np.savez("toy_1D_cat_train_samples.npz",
-           X=X_sample, y=y_sample)
+  np.savez("toy_1D_train_samples.npz", **s_arrs)
 
 if __name__=="__main__":
   tf.app.run()
