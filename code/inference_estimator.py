@@ -34,6 +34,7 @@ class InferenceEstimator(estimator.Estimator):
                  learning_rate=0.05,
                  n_bins = None,
                  use_cross_entropy=False,
+                 epsilon=1.e-4,
                  model_dir=None,
                  config=None):
 
@@ -76,9 +77,9 @@ class InferenceEstimator(estimator.Estimator):
           predictions = {"probabilities" : probs}
           return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
-        epsilon = tf.convert_to_tensor(1e-5)
+        eps = tf.convert_to_tensor(epsilon)
         split_probs = tf.split(probs, c_sizes, name="split_probs")
-        split_means = [tf.reduce_mean(split_prob, axis=0)+epsilon for split_prob in split_probs]
+        split_means = [tf.reduce_mean(split_prob, axis=0)+eps for split_prob in split_probs]
 
         mu = tf.convert_to_tensor(1., name="mu")
         split_counts = [ mean*norm*mu if (c_name==c_interest) else mean*norm
@@ -103,6 +104,9 @@ class InferenceEstimator(estimator.Estimator):
           for rv in norm_nuis:
             constraint_terms.append(tf.reduce_sum(rv.log_prob(rv),
                 name="c_norm_{}_log_prob".format(rv.name)))
+          for rv in trans_nuis:
+            constraint_terms.append(tf.reduce_sum(rv.log_prob(rv),
+                name="c_transform_{}_log_prob".format(rv.name)))
 
           nll = - tf.reduce_sum([ll]+constraint_terms)
           hess = batch_hessian(nll, [mu]+nuis_pars)
