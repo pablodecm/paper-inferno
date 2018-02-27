@@ -47,7 +47,7 @@ class InferenceEstimator(estimator.Estimator):
            norm_dict, norm_nuis = c_norm_dists_fn()
            c_norms = [norm_dict[c_name] for c_name in c_names]
            for c_name, c_size in zip(c_names, c_sizes):
-             tf.summary.scalar("c_batch_size_{}".format(c_name), c_size)
+             tf.summary.scalar("c_batch_size/{}".format(c_name), c_size)
            if c_transforms_fn:
              c_transforms, trans_nuis = c_transforms_fn()
              for i, c_name in enumerate(c_names):
@@ -76,8 +76,9 @@ class InferenceEstimator(estimator.Estimator):
           predictions = {"probabilities" : probs}
           return tf.estimator.EstimatorSpec(mode, predictions=predictions)
 
+        epsilon = tf.convert_to_tensor(1e-5)
         split_probs = tf.split(probs, c_sizes, name="split_probs")
-        split_means = [tf.reduce_mean(split_prob, axis=0) for split_prob in split_probs]
+        split_means = [tf.reduce_mean(split_prob, axis=0)+epsilon for split_prob in split_probs]
 
         mu = tf.convert_to_tensor(1., name="mu")
         split_counts = [ mean*norm*mu if (c_name==c_interest) else mean*norm

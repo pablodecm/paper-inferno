@@ -35,8 +35,8 @@ def main(_):
 
   data = np.load(flags.train_data)
 
-  learning_rate=0.005
-  optimizer="SGD"
+  learning_rate=0.001
+  optimizer="Adam"
 
   config = tf.estimator.RunConfig(save_summary_steps=100)
 
@@ -50,16 +50,16 @@ def main(_):
                  "c0_bkg" : norm_c0_bkg,
                  "c1_bkg" : norm_c1_bkg}
     nuis_pars = [norm_c0_bkg, norm_c1_bkg] 
-    nuis_pars = []
+#    nuis_pars = []
 
     return norm_dict, nuis_pars
 
   def c_transforms_fn():
     c0_shift = nm.Normal(loc=0.0,scale=0.05,value=0.0, name="c0_shift")
-    c1_shift = nm.Normal(loc=0.0,scale=0.05,value=0.0, name="c1_shift")
+    c1_shift = nm.Normal(loc=0.0,scale=0.15,value=0.0, name="c1_shift")
     trans_dict = {"c0_bkg" : lambda t: t+c0_shift,
                   "c1_bkg" : lambda t: t+c1_shift}
-    nuis_pars = [c1_shift]
+    nuis_pars = [c0_shift, c1_shift]
     #nuis_pars = []
 
     return trans_dict, nuis_pars
@@ -72,7 +72,7 @@ def main(_):
       model_dir=flags.model_dir,
       learning_rate=learning_rate,
       optimizer=optimizer,
-      n_bins=None,
+      n_bins=5,
       config=config)
 
   print(clf.model_dir)
