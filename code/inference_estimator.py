@@ -36,6 +36,7 @@ class InferenceEstimator(estimator.Estimator):
                  use_cross_entropy=False,
                  epsilon=1.e-4,
                  model_dir=None,
+                 clip_gradients=None,
                  config=None):
 
       def _model_fn(features, labels, mode):
@@ -111,7 +112,7 @@ class InferenceEstimator(estimator.Estimator):
           nll = - tf.reduce_sum([ll]+constraint_terms)
           hess = batch_hessian(nll, [mu]+nuis_pars)
           cov = tf.matrix_inverse(hess[0])
-          asimov_loss = tf.sqrt(cov[0,0]) 
+          asimov_loss = cov[0,0] 
         
 
         cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y,
@@ -131,10 +132,14 @@ class InferenceEstimator(estimator.Estimator):
 
         assert mode == tf.estimator.ModeKeys.TRAIN
 
+        summaries = ["learning_rate", "loss", "gradients", "gradient_norm"]
+
         train_op = tf.contrib.layers.optimize_loss(loss=loss,
                       global_step=tf.train.get_global_step(),
                       learning_rate=learning_rate,
-                      optimizer=optimizer)
+                      optimizer=optimizer,
+                      summaries=summaries,
+                      clip_gradients=clip_gradients)
 
         return tf.estimator.EstimatorSpec(mode, loss=loss, train_op=train_op)    
 
