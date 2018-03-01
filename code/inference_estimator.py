@@ -134,9 +134,12 @@ class InferenceEstimator(estimator.Estimator):
 
         summaries = ["learning_rate", "loss", "gradients", "gradient_norm"]
 
+        # convert to tensor learning rate so it is not a variable
+        learning_rate_t=tf.convert_to_tensor(learning_rate)
+
         train_op = tf.contrib.layers.optimize_loss(loss=loss,
                       global_step=tf.train.get_global_step(),
-                      learning_rate=learning_rate,
+                      learning_rate=learning_rate_t,
                       optimizer=optimizer,
                       summaries=summaries,
                       clip_gradients=clip_gradients)
