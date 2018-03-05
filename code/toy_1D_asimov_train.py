@@ -23,6 +23,8 @@ tf.flags.DEFINE_float("learning_rate", default=1.e-4,
                        help="")
 tf.flags.DEFINE_integer("batch_size", default=128,
                        help="")
+tf.flags.DEFINE_boolean("use_cross_entropy", default=False, help="")
+
 
 
 flags = tf.flags.FLAGS
@@ -68,7 +70,7 @@ def main(_):
   batch_size = flags.batch_size 
 
   n_epochs = flags.n_epochs
-  use_cross_entropy=False
+  use_cross_entropy=flags.use_cross_entropy
 
   train_and_eval(use_cross_entropy, batch_size,
                  n_epochs,
