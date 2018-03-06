@@ -10,6 +10,7 @@ abstract: >-
   of the generative model parameters while taking into account model
   uncertainty or misspecification on the resulting interval estimation
   or hypothesis testing.
+bibliography: bibliography.bib
 ---
 
 # Introduction
@@ -22,3 +23,7 @@ stochastic and lacks a tractable probability density $p(x| \theta)$.
 # Problem statement
 
 # Related Work
+
+See [@Kingma2013-qd; @Louppe2017-br].
+
+# References

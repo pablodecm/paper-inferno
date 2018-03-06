@@ -1,1 +1,3 @@
-output: pdf_document
+output:
+  pdf_document:
+    number_sections: true
