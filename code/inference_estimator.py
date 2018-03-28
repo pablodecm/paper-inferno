@@ -66,7 +66,7 @@ class InferenceEstimator(estimator.Estimator):
 
         n_logits = n_bins if n_bins else len(c_names)
         layers = small_nn(n_logits)
-        inputs = tf.reshape(X, (-1,1))
+        inputs = tf.reshape(X, (-1,2))
         net = inputs
         for name, layer in layers.items():
           net = layer(net) 
