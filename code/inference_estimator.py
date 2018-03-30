@@ -80,7 +80,7 @@ class InferenceEstimator(estimator.Estimator):
 
         eps = tf.convert_to_tensor(epsilon)
         split_probs = tf.split(probs, c_sizes, name="split_probs")
-        split_means = [tf.reduce_mean(split_prob, axis=0)+eps for split_prob in split_probs]
+        split_means = [tf.reduce_mean(split_prob, axis=0) + eps for split_prob in split_probs]
 
         mu = tf.convert_to_tensor(1., name="mu")
         split_counts = [ mean*norm*mu if (c_name==c_interest) else mean*norm
@@ -91,14 +91,15 @@ class InferenceEstimator(estimator.Estimator):
             tf.summary.scalar("mean/{}/{}".format(c_name,n), mean[n])
             tf.summary.scalar("count/{}/{}".format(c_name,n), count[n])
           
-        exp_counts = sum(split_counts) 
+        exp_counts = tf.cast(sum(split_counts), dtype=tf.float64)
 
         # asimov loss
         nuis_pars = norm_nuis + trans_nuis
         with tf.name_scope("compute_asimov_loss"):
           pois = ds.Poisson(exp_counts, name="poisson")
           asimov = tf.stop_gradient(exp_counts, name="asimov")
-          ll = tf.reduce_sum(pois.log_prob(asimov), name="likelihood")
+          ll = tf.cast(tf.reduce_sum(pois.log_prob(asimov),
+                       name="likelihood"), dtype=tf.float32)
 
           # add c_norm constrain terms
           constraint_terms = [] 
