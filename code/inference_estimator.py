@@ -8,28 +8,31 @@ from collections import OrderedDict
 from neyman.inferences import batch_hessian
 
 ds = tf.contrib.distributions
+k = tf.keras
 
-def small_nn(n_logits=2):
-  layers = OrderedDict() 
-  activation = tf.nn.relu
-  initializer = tf.glorot_normal_initializer
-  layers["dense_0"] = tf.layers.Dense(10, activation=activation,
-                              kernel_initializer=initializer(),
-                              name="dense_0")
-  layers["dense_1"] = tf.layers.Dense(10, activation=activation,
-                              kernel_initializer=initializer(),
-                              name="dense_1")
-  layers["output"] = tf.layers.Dense(n_logits, activation=None, name="output")
-  return layers
+def small_nn(n_logits=2, softmax_output=False):
+  model = k.Sequential()
+  activation = "relu" 
+  initializer = "glorot_normal" 
+  model.add(k.layers.Dense(10, activation=activation,
+            kernel_initializer=initializer,
+            name="dense_0", input_shape=(2,)))
+  model.add(k.layers.Dense(10, activation=activation,
+            kernel_initializer=initializer,
+            name="dense_1"))
+  model.add(k.layers.Dense(n_logits, activation=None, name="output"))
+  if softmax_output:
+    model.add(k.layers(Activation("softmax")))
+  return model 
 
 
 class InferenceEstimator(estimator.Estimator):
 
     def __init__(self,
+                 network_fn,
                  c_norm_dists_fn,
                  c_interest="sig",
                  c_transforms_fn=None,
-                 temperature=1.0,
                  optimizer="SGD",
                  learning_rate=0.05,
                  n_bins = None,
@@ -65,14 +68,11 @@ class InferenceEstimator(estimator.Estimator):
           y = labels 
 
         n_logits = n_bins if n_bins else len(c_names)
-        layers = small_nn(n_logits)
         inputs = tf.reshape(X, (-1,2))
-        net = inputs
-        for name, layer in layers.items():
-          net = layer(net) 
-        logits = net
+        model = network_fn(n_logits)
+        logits = model(inputs)
 
-        probs = tf.nn.softmax(logits/temperature)
+        probs = tf.nn.softmax(logits)
 
         if mode == tf.estimator.ModeKeys.PREDICT:
           predictions = {"probabilities" : probs}
