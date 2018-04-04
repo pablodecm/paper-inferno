@@ -22,7 +22,7 @@ def small_nn(n_logits=2, softmax_output=False):
             name="dense_1"))
   model.add(k.layers.Dense(n_logits, activation=None, name="output"))
   if softmax_output:
-    model.add(k.layers(Activation("softmax")))
+    model.add(k.layers.Activation("softmax"))
   return model 
 
 
