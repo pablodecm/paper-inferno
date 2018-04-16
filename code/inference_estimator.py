@@ -8,6 +8,7 @@ from collections import OrderedDict
 from neyman.inferences import batch_hessian
 
 ds = tf.contrib.distributions
+ge = tf.contrib.graph_editor
 k = tf.keras
 
 def small_nn(n_logits=2, softmax_output=False):
@@ -92,11 +93,12 @@ class InferenceEstimator(estimator.Estimator):
             tf.summary.scalar("count/{}/{}".format(c_name,n), count[n])
           
         exp_counts = tf.cast(sum(split_counts), dtype=tf.float64)
-
         # asimov loss
         nuis_pars = norm_nuis + trans_nuis
+
         with tf.name_scope("compute_asimov_loss"):
           pois = ds.Poisson(exp_counts, name="poisson")
+
           asimov = tf.stop_gradient(exp_counts, name="asimov")
           ll = tf.cast(tf.reduce_sum(pois.log_prob(asimov),
                        name="likelihood"), dtype=tf.float32)
@@ -114,7 +116,9 @@ class InferenceEstimator(estimator.Estimator):
           hess = batch_hessian(nll, [mu]+nuis_pars)
           cov = tf.matrix_inverse(hess[0])
           asimov_loss = cov[0,0] 
-        
+
+        # remove stop gradient after loss is computed
+        ge.edit.bypass(asimov.op)
 
         cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y,
                                                                logits=logits)
