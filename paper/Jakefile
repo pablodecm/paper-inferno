@@ -15,7 +15,6 @@ async function main() {
  	// pandoc export
   await engine.pandocExport({runAllCodeChunks: false})
 
-  return process.exit()
 }
 
 desc('This is the default task.');
