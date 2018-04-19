@@ -1,0 +1,5 @@
+build_pdf:
+  image: jujiyangasli/pandoc-nodejs
+  script:
+    - npm install --save @shd101wyy/mume
+    - node paper/make_pdf.js
