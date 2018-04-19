@@ -2,6 +2,7 @@ build_pdf:
   image: pablodecm/pandoc-nodejs:0.0.1
   script:
     - npm install --save @shd101wyy/mume
+    - cabal install pandoc-citeproc
     - cd paper
     - node make_pdf.js
   artifacts:
