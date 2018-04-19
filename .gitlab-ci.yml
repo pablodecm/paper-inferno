@@ -2,7 +2,8 @@ build_pdf:
   image: pablodecm/pandoc-nodejs:0.0.1
   script:
     - npm install --save @shd101wyy/mume
-    - node paper/make_pdf.js
+    - cd paper
+    - node make_pdf.js
   artifacts:
     paths:
      - paper/paper.pdf
