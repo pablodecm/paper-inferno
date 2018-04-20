@@ -11,9 +11,14 @@ async function main() {
   })
 
  	// pandoc export
-  await engine.pandocExport({runAllCodeChunks: false})
+  try {
+    await engine.pandocExport({runAllCodeChunks: false});
+  } catch (error)  {
+    console.log("error", error);
+  }
 
   return process.exit();
+
 }
 
 main();

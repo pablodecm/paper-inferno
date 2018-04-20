@@ -71,11 +71,23 @@ methods can be applied efficiently.
 
 
 # Method
-Let us assume we have a large simulated dataset $G=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
+Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
 for a certain instantiation of the simulator parameters
-$\boldsymbol{\theta}_0$.
-
+$\boldsymbol{\theta}_0$, where $\boldsymbol{z} \in \mathcal{Z}$ are
+known latent variables per observation known in the simulation and $w \in \mathcal{W} \subseteq \mathbb{R}$ are
+frequency weights, which are commonly produced during the
+simulation in many scientific
+disciplines.
+For applying the method described
+in this work, we will need a differentiable transformation
+$\boldsymbol{t}_{\boldsymbol{\theta}}:
+(\mathcal{X},\mathcal{Z},\mathcal{W})\rightarrow
+(\mathcal{X},\mathcal{Z},\mathcal{W})$
+that when applied over each
+observation of $G_0$ the produced set of observations $G_1$
+that approximates a sample of the simulator under a new
+parameter instantiation $\boldsymbol{\theta}_1$.
 
 
 # Related Work
