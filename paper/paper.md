@@ -67,10 +67,27 @@ $\boldsymbol{s} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
 of the dataset and reduces its dimensionality so likelihood-free inference
 methods can be applied efficiently.
 <!---TODO: mention hierarchical model--->
-<!---TODO: talk about statistical efficiency--->
+<!---TODO: talk about statistical sufficiency--->
 
 
 # Method
+
+In this section a general procedure to learn non-linear
+sample summary statistics based on minimizing the expected variance of
+the parameters of interest obtained via a non-parametric
+simulation-based synthetic likelihood is described.
+
+The family of summary statistics $\boldsymbol{s}(D)$ considered in this
+work will
+be partially composed by a neural network model applied over each dataset
+observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$
+whose parameters $\boldsymbol{\phi}$ will be learned during training.
+
+\[
+s_i (D) = \sum_{\boldsymbol{x} \in D }
+\]
+
+
 Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
 for a certain instantiation of the simulator parameters
@@ -88,6 +105,8 @@ that when applied over each
 observation of $G_0$ the produced set of observations $G_1$
 that approximates a sample of the simulator under a new
 parameter instantiation $\boldsymbol{\theta}_1$.
+
+
 
 
 # Related Work
