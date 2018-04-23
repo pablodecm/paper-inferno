@@ -58,8 +58,8 @@ in favour of the alternate hypothesis at a certain confidence level $\alpha$,
 ($\alpha=3\times10^{7}$ is commonly required
 for claiming discovery) also known as Type I error rate. Because $\alpha$ is
 fixed, the sensibility of an analysis is determined by the power of the test
-which corresponds to $1-\beta$, where $\beta$ is the Type II error rate or the
-probability of reject a false null hypothesis.
+which corresponds to $1-\beta$, where $\beta$ is the
+probability of reject a false null hypothesis, also known as Type II error rate.
 
 Due to the high-dimensionality of the observed data, a low-dimensional summary
 statistic has to be constructed in order to perform inference. A
@@ -89,7 +89,7 @@ in place of current classification-based or domain-motivated summary statistics
 in current scientific analyses.
 
 
-# Problem statement
+# Problem Statement
 
 Let us consider a set of i.i.d. observations $D =
 \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$ where $\boldsymbol{x} \in \mathcal{X}
@@ -102,13 +102,31 @@ $\boldsymbol{s} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
 \mathcal{S} \subseteq \mathbb{R}^{b}$ that computes a summary statistic
 of the dataset and reduces its dimensionality so likelihood-free inference
 methods can be applied efficiently.
-<!---TODO: mention hierarchical model--->
-<!---TODO: talk about statistical sufficiency--->
 
+<!---TODO (maybe): mention hierarchical model--->
+
+While there might be infinite ways to construct $\boldsymbol{s} (D)$, we are interested in those summary statistics that are informative
+about the subset of interest $\boldsymbol{\omega} \in \mathcal{\Omega}
+\subseteq \mathcal{\Theta}$ of the model parameters. The concept of statistical
+sufficiency is specially useful to evaluate wether
+summary statistics are informative,
+which can be characterised by means of the factorisation
+criterion:
+\[
+p(D| \boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
+\]
+where $h$ and $g$ are non-negative functions. In the case of sufficiency, the
+summary statistic will yield the same inference about the parameters of
+interest $\boldsymbol{\omega}$ than the full set of observations $D$. However,
+because the probability density is not even tractable in our problem,
+the general task of finding a sufficient summary statistic cannot be tackled
+directly, so alternative evaluation metrics have to be specified.
+
+<!--TODO: link to evaluation metric-->
 
 # Method
 
-In this section a general procedure to learn non-linear
+In this section a machine-learning method to learn non-linear
 sample summary statistics based on minimising the expected variance of
 the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood is described.
