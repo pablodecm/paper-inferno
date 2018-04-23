@@ -38,15 +38,34 @@ $\boldsymbol{s}(D)$ are used instead of the raw data
 for tractability. The choice of summary statistics is quite important because
 will likely lead to a loss of information relevant for statistical inference.
 
-We can consider data analyses at the Large Hadron Collider (LHC) as a concrete
-example.
-<!--- TODO: maybe this can go in experiments--->
+As a motivating example, we can consider data analyses at the Large
+Hadron Collider (LHC), like those carried out to establish the
+discovery of the Higgs boson.
+In this case, the ultimate aim is to extract information
+about Nature from the large amounts of high-dimensional
+data are acquired by complex detectors setup around the collision points.
+Accurate data modeling is only available via stochastic simulation
+of the underlying physical processes, particle interactions and detector
+readout so $p(\boldsymbol{x}| \boldsymbol{\theta})$ cannot be analytically
+computed.
 
+The inference problem in particle physics is commonly posed as hypothesis
+testing based on the acquired data. An alternate hypothesis $H_1$ (e.g. a
+new theory that predicts that a new fundamental particle) is tested against
+a null hypothesis $H_0$ (e.g. existing theory that explain previous
+observed phenomena). The aim is checking wether the null can be rejected
+in favour of the alternate hypothesis at a certain confidence level $\alpha$,
+($\alpha=3\times10^{7}$ is commonly required
+for claiming discovery) also known as Type I error rate. Because $\alpha$ is
+fixed, the sensibility of an analysis is determined by the power of the test
+which corresponds to $1-\beta$, where $\beta$ is the Type II error rate or the
+probability of reject a false null hypothesis.
 
 In this work, we present a new machine-learning method to
 learn non-linear sample summary statistics that directly
 optimize the expected amount of information about the subset of
-parameters of interest using simulated samples.
+parameters of interest using simulated samples, taking into account
+the effect of nuisance parameters.
 In addition, the learned
 summary statistics can be trivially used to build a synthetic
 sample-based likelihood and perform robust and efficient classical or
@@ -87,7 +106,10 @@ whose parameters $\boldsymbol{\phi}$ will be learned during training.
 s_i (D) = \sum_{\boldsymbol{x} \in D }
 \]
 
-
+\[
+\mathcal{L}(B; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
+             \textrm{Pois}(n_\textrm{c}| \mu \cdot s_\textrm{c} + b_\textrm{c})
+\]
 Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
 for a certain instantiation of the simulator parameters
@@ -105,8 +127,6 @@ that when applied over each
 observation of $G_0$ the produced set of observations $G_1$
 that approximates a sample of the simulator under a new
 parameter instantiation $\boldsymbol{\theta}_1$.
-
-
 
 
 # Related Work
