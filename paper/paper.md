@@ -44,7 +44,7 @@ discovery of the Higgs boson.
 In this case, the ultimate aim is to extract information
 about Nature from the large amounts of high-dimensional
 data are acquired by complex detectors setup around the collision points.
-Accurate data modeling is only available via stochastic simulation
+Accurate data modelling is only available via stochastic simulation
 of the underlying physical processes, particle interactions and detector
 readout so $p(\boldsymbol{x}| \boldsymbol{\theta})$ cannot be analytically
 computed.
@@ -61,15 +61,32 @@ fixed, the sensibility of an analysis is determined by the power of the test
 which corresponds to $1-\beta$, where $\beta$ is the Type II error rate or the
 probability of reject a false null hypothesis.
 
+Due to the high-dimensionality of the observed data, a low-dimensional summary
+statistic has to be constructed in order to perform inference. A
+classical statistical results establishes that the likelihood-ratio
+$\Lambda(\boldsymbol{x})=p(\boldsymbol{x}| H_0)/p(\boldsymbol{x}| H_1)$ is
+the most powerful test at a fixed confidence level for two simple hypotheses
+[@NeymanPearson1933]. While $p(\boldsymbol{x}| H_0)$ and
+$p(\boldsymbol{x}| H_1)$ are not available, simulated samples can be used to
+obtain an approximation of this ratio by casting the problem as supervised
+learning classification. While this approach can be effective and
+increase the discovery sensibility, simulations often depend on additional
+uncertain parameters that are not of immediate interest but have to be accounted
+for. Classification-based summary statistics cannot easily account for this
+effects, so the inference power is degraded when these additional parameters
+are taken into account.
+
 In this work, we present a new machine-learning method to
 learn non-linear sample summary statistics that directly
-optimize the expected amount of information about the subset of
+optimise the expected amount of information about the subset of
 parameters of interest using simulated samples, taking into account
 the effect of nuisance parameters.
 In addition, the learned
-summary statistics can be trivially used to build a synthetic
+summary statistics can be used to build a synthetic
 sample-based likelihood and perform robust and efficient classical or
-Bayesian inference from the observed data.
+Bayesian inference from the observed data, so they can be readily applied
+in place of current classification-based or domain-motivated summary statistics
+in current scientific analyses.
 
 
 # Problem statement
@@ -92,7 +109,7 @@ methods can be applied efficiently.
 # Method
 
 In this section a general procedure to learn non-linear
-sample summary statistics based on minimizing the expected variance of
+sample summary statistics based on minimising the expected variance of
 the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood is described.
 
