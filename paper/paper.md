@@ -11,6 +11,18 @@ abstract: >-
   uncertainty or misspecification on the resulting interval estimation
   or hypothesis testing.
 bibliography: bibliography.bib
+header-includes: |
+  \DeclareMathSymbol{\Gamma}{\mathord}{operators}{"00}
+  \DeclareMathSymbol{\Delta}{\mathord}{operators}{"01}
+  \DeclareMathSymbol{\Theta}{\mathord}{operators}{"02}
+  \DeclareMathSymbol{\Lambda}{\mathord}{operators}{"03}
+  \DeclareMathSymbol{\Xi}{\mathord}{operators}{"04}
+  \DeclareMathSymbol{\Pi}{\mathord}{operators}{"05}
+  \DeclareMathSymbol{\Sigma}{\mathord}{operators}{"06}
+  \DeclareMathSymbol{\Upsilon}{\mathord}{operators}{"07}
+  \DeclareMathSymbol{\Phi}{\mathord}{operators}{"08}
+  \DeclareMathSymbol{\Psi}{\mathord}{operators}{"09}
+  \DeclareMathSymbol{\Omega}{\mathord}{operators}{"0A}
 ---
 
 # Introduction
@@ -76,7 +88,7 @@ for. Classification-based summary statistics cannot easily account for this
 effects, so the inference power is degraded when these additional parameters
 are taken into account.
 
-In this work, we present a new machine-learning method to
+In this work, we present a new machine learning method to
 learn non-linear sample summary statistics that directly
 optimise the expected amount of information about the subset of
 parameters of interest using simulated samples, taking into account
@@ -86,7 +98,7 @@ summary statistics can be used to build a synthetic
 sample-based likelihood and perform robust and efficient classical or
 Bayesian inference from the observed data, so they can be readily applied
 in place of current classification-based or domain-motivated summary statistics
-in current scientific analyses.
+in current scientific data analysis workflows.
 
 
 # Problem Statement
@@ -122,24 +134,32 @@ because the probability density is not even tractable in our problem,
 the general task of finding a sufficient summary statistic cannot be tackled
 directly, so alternative evaluation metrics have to be specified.
 
-<!--TODO: link to evaluation metric-->
+An alternative metric can be specified via a unbiased interval estimation
+rule or an approximation of it, which is the path taken in this work.
+<!--TODO: expand more on this-->
 
 # Method
 
-In this section a machine-learning method to learn non-linear
+In this section a machine learning method to learn non-linear
 sample summary statistics based on minimising the expected variance of
 the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood is described.
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
-work will
-be partially composed by a neural network model applied over each dataset
-observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$
-whose parameters $\boldsymbol{\phi}$ will be learned during training.
-
+work will composed by a neural network model applied over each dataset
+observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi}) :
+\mathcal{X} \subseteq \mathbb{R}^{d} \rightarrow
+\mathcal{Y} \subseteq \mathbb{R}^{b}$
+whose parameters $\boldsymbol{\phi}$ will be learned during training. Therefore,
+using set-builder notation the family of summary statistics considered
+can be denoted as:
 \[
-s_i (D) = \sum_{\boldsymbol{x} \in D }
+\boldsymbol{s} (D) = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
+  | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
 \]
+where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
+reduce will the dimensionality from the input observations space
+$\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
 
 \[
 \mathcal{L}(B; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
@@ -170,7 +190,8 @@ See [@Kingma2013-qd; @Louppe2017-br].
 
 # Experiments
 
-
 # Conclusions
+
+# Acknowledgments {.unnumbered}
 
 # References
