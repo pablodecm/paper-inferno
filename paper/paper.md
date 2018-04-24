@@ -1,6 +1,13 @@
 ---
 title: Likelihood-free Inference through Sample Summary Statistics Learning
-author: Pablo de Castro, Tommaso Dorigo
+author: |
+ Pablo de Castro \
+ INFN - Sezione di Padova \
+ \texttt{pablo.de.castro@cern.ch}
+ \And
+ Tommaso Dorigo \
+ INFN - Sezione di Padova \
+ \texttt{tommaso.dorigo@cern.ch}
 numbersections: true
 abstract: >-
   Complex computer simulations are commonly required for accurate
@@ -197,6 +204,6 @@ See [@Kingma2013-qd; @Louppe2017-br].
 
 # Conclusions
 
-# Acknowledgments {.unnumbered}
+## Acknowledgments {.unnumbered}
 
 # References
