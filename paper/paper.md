@@ -172,10 +172,35 @@ $$
 where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 reduce will the dimensionality from the input observations space
 $\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
+The next step is to map observation outputs to a sample
+sample summary statistics via a non-parametric likelihood
+$\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})$
+created using a set of simulated observations $G_s=
+\{\boldsymbol{x}_0,...,\boldsymbol{x}_g\}$ generated at
+a certain instantiation of the simulator parameters
+$\boldsymbol{\theta}_s$.
 
+In experimental high energy physics experiments, which is the scientific
+context which initially motivated this work, histograms are the most
+common non-parametric density estimator because the resulting likelihoods
+can be expressed as the product of Poisson counts for each of the bins. A naive
+sample summary statistic can be built from the output of the neural network
+simply by assigning each observation $\boldsymbol{x}$ to a bin corresponding
+to the cardinality of the maximum element of
+$\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ so each element of the
+sample summary will correspond to the following sum:
 $$
-\mathcal{L}(B; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
-             \textrm{Pois}(n_\textrm{c}| \mu \cdot s_\textrm{c} + b_\textrm{c})
+s_i(D;\boldsymbol{\phi})=\sum_{x \in D}
+\begin{cases}
+      1 & i = {argmax}_{i=\{0,...,b\}}(f_i(D, \phi)) \\
+      0 & i \neq {argmax}_{i=\{0,...,b\}}(f_i(D, \phi)) \\
+   \end{cases}
+$$
+which can in turn be used to build the following likelihood, where the
+expectation for each bin is taken from the simulated sample $G_s$:
+$$
+\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
+             \textrm{Pois}(s_i (D; \boldsymbol{\phi}) \:  | \: \frac{n}{g} \times s_i (G_s,\boldsymbol{\phi}))
 $$
 Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
