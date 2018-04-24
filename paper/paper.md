@@ -1,6 +1,7 @@
 ---
 title: Likelihood-free Inference through Sample Summary Statistics Learning
 author: Pablo de Castro, Tommaso Dorigo
+numbersections: true
 abstract: >-
   Complex computer simulations are commonly required for accurate
   data modelling in many scientific disciplines, making statistical
@@ -10,8 +11,10 @@ abstract: >-
   of the generative model parameters while taking into account model
   uncertainty or misspecification on the resulting interval estimation
   or hypothesis testing.
-bibliography: bibliography.bib
 header-includes: |
+  \usepackage[nonatbib,preprint]{nips_2018}
+  \usepackage{lineno}
+  \linenumbers
   \DeclareMathSymbol{\Gamma}{\mathord}{operators}{"00}
   \DeclareMathSymbol{\Delta}{\mathord}{operators}{"01}
   \DeclareMathSymbol{\Theta}{\mathord}{operators}{"02}
@@ -23,6 +26,7 @@ header-includes: |
   \DeclareMathSymbol{\Phi}{\mathord}{operators}{"08}
   \DeclareMathSymbol{\Psi}{\mathord}{operators}{"09}
   \DeclareMathSymbol{\Omega}{\mathord}{operators}{"0A}
+bibliography: bibliography.bib
 ---
 
 # Introduction
@@ -118,15 +122,16 @@ methods can be applied efficiently.
 <!---TODO (maybe): mention hierarchical model--->
 
 While there might be infinite ways to construct $\boldsymbol{s} (D)$, we are interested in those summary statistics that are informative
-about the subset of interest $\boldsymbol{\omega} \in \mathcal{\Omega}
-\subseteq \mathcal{\Theta}$ of the model parameters. The concept of statistical
+about the subset of interest
+$\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$
+of the model parameters. The concept of statistical
 sufficiency is specially useful to evaluate wether
 summary statistics are informative,
 which can be characterised by means of the factorisation
 criterion:
-\[
-p(D| \boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
-\]
+$$
+p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
+$$
 where $h$ and $g$ are non-negative functions. In the case of sufficiency, the
 summary statistic will yield the same inference about the parameters of
 interest $\boldsymbol{\omega}$ than the full set of observations $D$. However,
@@ -153,18 +158,18 @@ observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi}) :
 whose parameters $\boldsymbol{\phi}$ will be learned during training. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
-\[
+$$
 \boldsymbol{s} (D) = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
-\]
+$$
 where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 reduce will the dimensionality from the input observations space
 $\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
 
-\[
+$$
 \mathcal{L}(B; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois}(n_\textrm{c}| \mu \cdot s_\textrm{c} + b_\textrm{c})
-\]
+$$
 Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
 for a certain instantiation of the simulator parameters
