@@ -166,7 +166,8 @@ whose parameters $\boldsymbol{\phi}$ will be learned during training. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
 $$
-\boldsymbol{s} (D) = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
+\boldsymbol{s} (D, \boldsymbol{\phi})
+ = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
 $$
 where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
@@ -192,16 +193,39 @@ sample summary will correspond to the following sum:
 $$
 s_i(D;\boldsymbol{\phi})=\sum_{x \in D}
 \begin{cases}
-      1 & i = {argmax}_{i=\{0,...,b\}}(f_i(D, \phi)) \\
-      0 & i \neq {argmax}_{i=\{0,...,b\}}(f_i(D, \phi)) \\
+      1 & i = {argmax}_{j=\{0,...,b\}}
+        (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
+      0 & i \neq {argmax}_{j=\{0,...,b\}}
+        (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
    \end{cases}
 $$
 which can in turn be used to build the following likelihood, where the
 expectation for each bin is taken from the simulated sample $G_s$:
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
-             \textrm{Pois}(s_i (D; \boldsymbol{\phi}) \:  | \: \frac{n}{g} \times s_i (G_s,\boldsymbol{\phi}))
+             \textrm{Pois}(s_i (D; \boldsymbol{\phi}) \:  | \: \frac{n}{g} \times s_i (G_s;\boldsymbol{\phi}))
 $$
+where the $n/g$ factor is to account for the different number of
+observations in the simulated samples. In cases where the number of
+observations is in itself a random variable providing information about
+the parameters of interest or the simulated samples are weighted the
+choice of normalisation factor can be a bit more involved. The chosen
+family of summary statistics is however non-differentiable due to
+the $argmax$ operation, so for training a differentiable
+approximation is considered $\hat{\boldsymbol{s}}(D; \boldsymbol{\phi})$
+by means of a $softmax$ operator:
+$$
+\hat{s}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
+  \frac{e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
+  {\sum_{j=0}^{b} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
+$$
+where the temperature $\tau$ will regulate the softness of the operator.
+In the limit of $\tau \rightarrow 0^{+}$, the probability of the highest
+component will tend to 1 while others to 0 and therefore
+$\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})
+\rightarrow \boldsymbol{s}(D; \boldsymbol{\phi})$.
+
+
 Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
 for a certain instantiation of the simulator parameters
