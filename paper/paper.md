@@ -223,8 +223,18 @@ where the temperature $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the highest
 component will tend to 1 while others to 0 and therefore
 $\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})
-\rightarrow \boldsymbol{s}(D; \boldsymbol{\phi})$.
-
+\rightarrow \boldsymbol{s}(D; \boldsymbol{\phi})$. Similarly, let us
+denote the differentiable approximation of the non-parametric likelihood
+as $\hat{\mathcal{L}}(D; \boldsymbol{\theta}, \boldsymbol{\phi})$. Instead
+of using the observed data $D$, the value of $\hat{\mathcal{L}}$
+can also be computed
+when the observation for each bins is equal to the expectation based on
+the simulated sample $G_s$, which will denote as the
+Asimov likelihood $\hat{\mathcal{L}}_A$:
+$$
+\hat{\mathcal{L}}_A(\boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
+             \textrm{Pois} (\frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}))
+$$
 
 Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
 w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
