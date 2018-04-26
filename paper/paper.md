@@ -246,7 +246,7 @@ the Fisher information matrix [@fisher_1925] for the
 Asimov likelihood:
 $$
 {\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
-= \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}} - \log \mathcal{L}_A(\boldsymbol{\theta};
+= \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}} - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
  \boldsymbol{\phi})
 $$
 which can be computed via automatic differentiation
@@ -262,6 +262,38 @@ main nuisance parameters over a sample can be
 approximated such as the change of mixture coefficients
 for mixture models, translations of a subset of features
 or conditional density ratio re-weighting.
+
+From the Fisher information, if $\hat{\boldsymbol{\theta}}$
+is an unbiased estimator of the values of $\boldsymbol{\theta}$,
+the covariance matrix using the Cramér-Rao lower bound
+[@cramer2016mathematical; @rao1992information]:
+$$
+\textrm{cov}_{\boldsymbol{\theta}}(\hat{\boldsymbol{\theta}}) \geq
+I(\boldsymbol{\theta})^{-1}
+$$
+so the inverse of the Fisher information can be used as an estimator
+of the expected variance. If some of the parameters
+$\boldsymbol{\theta}$ are constrained by independent measurements
+characterised by their likelihoods
+$\{\mathcal{L_C^0}(\boldsymbol{\theta}), ...,
+\mathcal{L_C^c}(\boldsymbol{\theta})\}$,
+those constraints can also be easily included in the covariance
+estimation simply by considering the product of likelihoods
+instead $\mathcal{L}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
+\mathcal{L}_A(\boldsymbol{\theta} ; \boldsymbol{\phi})
+\prod_{i=0}^{c}\mathcal{L_C^i}(\boldsymbol{\theta})$. In Bayesian
+terminology, this approach is referred as the Laplace approximation
+[@laplace1986memoir] where the log joint density (including the priors)
+is expanded around the MAP to an normal approximation of the posterior
+density:
+$$
+p(\boldsymbol{\theta}|D) \approx \textrm{Normal}(
+\boldsymbol{\theta} ; \hat{\boldsymbol{\theta}},
+I(\boldsymbol{\theta})^{-1} )
+$$
+which has already been tackled by automatic differentiation in
+probabilistic programming frameworks [@tran2016edward].
+
 
 
 # Related Work
