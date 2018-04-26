@@ -33,6 +33,8 @@ header-includes: |
   \DeclareMathSymbol{\Phi}{\mathord}{operators}{"08}
   \DeclareMathSymbol{\Psi}{\mathord}{operators}{"09}
   \DeclareMathSymbol{\Omega}{\mathord}{operators}{"0A}
+  \usepackage{algorithm}
+  \usepackage{algpseudocode}
 bibliography: bibliography.bib
 ---
 
@@ -296,9 +298,22 @@ probabilistic programming frameworks [@tran2016edward]. While a
 Poisson count likelihood based on a histogram has been used in the
 previous derivation, other non-parametric density estimation techniques
 can be used to construct a likelihood based the neural network
-output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ on instead, kernel density estimation (KDE) being specially
+output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ instead, kernel density estimation (KDE) being specially
 promising because it is intrinsically differentiable.
 
+<!-- algorithm -->
+\begin{algorithm}[H]
+  \caption{Sample Summary Statistics Learning.}
+  \begin{flushleft}
+    {\it Inputs:} \\
+    {\it Outputs:} \\
+    {\it Hyper-parameters:}
+    \end{flushleft}
+ \begin{algorithmic}[1]
+ \For{$i=1$ to $n_{steps}$}
+ \EndFor
+ \end{algorithmic}
+\end{algorithm}
 
 
 # Related Work
