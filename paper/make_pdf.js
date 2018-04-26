@@ -7,6 +7,7 @@ async function main() {
   const engine = new mume.MarkdownEngine({
     filePath: "paper.md",
     config: {
+      pandocArguments: ["--filter=pandoc-crossref"]
     }
   })
 

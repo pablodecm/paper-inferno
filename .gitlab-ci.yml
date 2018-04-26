@@ -2,9 +2,9 @@ build_pdf:
   image: pablodecm/pandoc-nodejs:0.0.1
   script:
     - npm install --save @shd101wyy/mume
-    - cabal install pandoc-citeproc
+    - cabal install pandoc-citeproc pandoc-crossref
     - cd paper
-    - node make_pdf.js
+    - pandoc paper.md -o paper.pdf --filter=pandoc-crossref --filter=pandoc-citeproc
   artifacts:
     paths:
      - paper/paper.pdf

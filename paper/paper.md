@@ -140,7 +140,7 @@ which can be characterised by means of the factorisation
 criterion:
 $$
 p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
-$$
+$${#eq:sufficiency}
 where $h$ and $g$ are non-negative functions. In the case of sufficiency, the
 summary statistic will yield the same inference about the parameters of
 interest $\boldsymbol{\omega}$ than the full set of observations $D$. However,
@@ -171,7 +171,7 @@ $$
 \boldsymbol{s} (D, \boldsymbol{\phi})
  = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
-$$
+$${#eq:summary}
 where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 reduce will the dimensionality from the input observations space
 $\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
@@ -200,13 +200,13 @@ s_i(D;\boldsymbol{\phi})=\sum_{x \in D}
       0 & i \neq {argmax}_{j=\{0,...,b\}}
         (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
    \end{cases}
-$$
+$${#eq:argmax}
 which can in turn be used to build the following likelihood, where the
 expectation for each bin is taken from the simulated sample $G_s$:
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois}(s_i (D; \boldsymbol{\phi}) \:  | \: \frac{n}{g} \times s_i (G_s;\boldsymbol{\phi}))
-$$
+$${#eq:}
 where the $n/g$ factor is to account for the different number of
 observations in the simulated samples. In cases where the number of
 observations is in itself a random variable providing information about
@@ -220,7 +220,7 @@ $$
 \hat{s}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
   \frac{e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
   {\sum_{j=0}^{b} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
-$$
+$${#eq:soft_summary}
 where the temperature $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the highest
 component will tend to 1 while others to 0 and therefore
@@ -250,7 +250,7 @@ $$
 {\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
 = \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}} - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
  \boldsymbol{\phi})
-$$
+$${#eq:fisher_info}
 which can be computed via automatic differentiation
 if the simulation is differentiable and included in
 the computation graph or alternatively if the effect
@@ -272,7 +272,7 @@ the covariance matrix using the Cramér-Rao lower bound
 $$
 \textrm{cov}_{\boldsymbol{\theta}}(\hat{\boldsymbol{\theta}}) \geq
 I(\boldsymbol{\theta})^{-1}
-$$
+$${#eq:CRB}
 so the inverse of the Fisher information can be used as an estimator
 of the expected variance. If some of the parameters
 $\boldsymbol{\theta}$ are constrained by independent measurements
@@ -292,7 +292,7 @@ $$
 p(\boldsymbol{\theta}|D) \approx \textrm{Normal}(
 \boldsymbol{\theta} ; \hat{\boldsymbol{\theta}},
 I(\boldsymbol{\theta})^{-1} )
-$$
+$${#eq:normal_approx}
 which has already been already approached by automatic differentiation in
 probabilistic programming frameworks [@tran2016edward]. While a
 Poisson count likelihood based on a histogram has been used in the
