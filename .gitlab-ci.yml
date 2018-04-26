@@ -1,7 +1,7 @@
 build_pdf:
   image: pablodecm/pandoc-nodejs:0.0.1
   script:
-    - npm install --save @shd101wyy/mume
+    - apt-get install -y texlive-science
     - cabal install pandoc-citeproc pandoc-crossref
     - cd paper
     - pandoc paper.md -o paper.pdf --filter=pandoc-crossref --filter=pandoc-citeproc

@@ -206,7 +206,7 @@ expectation for each bin is taken from the simulated sample $G_s$:
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois}(s_i (D; \boldsymbol{\phi}) \:  | \: \frac{n}{g} \times s_i (G_s;\boldsymbol{\phi}))
-$${#eq:}
+$${#eq:likelihood}
 where the $n/g$ factor is to account for the different number of
 observations in the simulated samples. In cases where the number of
 observations is in itself a random variable providing information about
@@ -236,7 +236,7 @@ Asimov likelihood $\hat{\mathcal{L}}_A$:
 $$
 \hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois} (\frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}))
-$$
+$${#eq:likelihood_asimov}
 for which it can be easily proven that
 $argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
 \boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$, so
