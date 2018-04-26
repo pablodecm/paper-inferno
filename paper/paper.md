@@ -291,8 +291,13 @@ p(\boldsymbol{\theta}|D) \approx \textrm{Normal}(
 \boldsymbol{\theta} ; \hat{\boldsymbol{\theta}},
 I(\boldsymbol{\theta})^{-1} )
 $$
-which has already been tackled by automatic differentiation in
-probabilistic programming frameworks [@tran2016edward].
+which has already been already approached by automatic differentiation in
+probabilistic programming frameworks [@tran2016edward]. While a
+Poisson count likelihood based on a histogram has been used in the
+previous derivation, other non-parametric density estimation techniques
+can be used to construct a likelihood based the neural network
+output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ on instead, kernel density estimation (KDE) being specially
+promising because it is intrinsically differentiable.
 
 
 
