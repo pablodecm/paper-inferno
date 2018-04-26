@@ -232,27 +232,36 @@ when the observation for each bins is equal to the expectation based on
 the simulated sample $G_s$, which will denote as the
 Asimov likelihood $\hat{\mathcal{L}}_A$:
 $$
-\hat{\mathcal{L}}_A(\boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
+\hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois} (\frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}))
 $$
-
-Let us assume we already have or can create on demand a large simulated dataset $G_0=\{(\boldsymbol{x}_0,\boldsymbol{z}_0,
-w_0), ..., (\boldsymbol{x}_g,\boldsymbol{z}_g,w_g)\}$ generated
-for a certain instantiation of the simulator parameters
-$\boldsymbol{\theta}_0$, where $\boldsymbol{z} \in \mathcal{Z}$ are
-known latent variables per observation known in the simulation and $w \in \mathcal{W} \subseteq \mathbb{R}$ are
-frequency weights, which are commonly produced during the
-simulation in many scientific
-disciplines.
-For applying the method described
-in this work, we will need a differentiable transformation
-$\boldsymbol{t}_{\boldsymbol{\theta}}:
-(\mathcal{X},\mathcal{Z},\mathcal{W})\rightarrow
-(\mathcal{X},\mathcal{Z},\mathcal{W})$
-that when applied over each
-observation of $G_0$ the produced set of observations $G_1$
-that approximates a sample of the simulator under a new
-parameter instantiation $\boldsymbol{\theta}_1$.
+for which it can be easily proven that
+$argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
+\boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$, so
+the maximum likelihood (or the MAP if priors are flat) for the
+Asimov likelihood are the parameter use to generate the simulated
+dataset $G_s$. By means taking the minus logarithm and expanding in
+$\boldsymbol{\theta}$ around $\boldsymbol{\theta}_s$, we can compute
+the Fisher information matrix [@fisher_1925] for the
+Asimov likelihood:
+$$
+{\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
+= \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}} - \log \mathcal{L}_A(\boldsymbol{\theta};
+ \boldsymbol{\phi})
+$$
+which can be computed via automatic differentiation
+if the simulation is differentiable and included in
+the computation graph or alternatively if the effect
+of varying $\boldsymbol{\theta}$ over the simulated
+dataset $G_s$ can be approximated. While this
+requirement does constrain the application of this
+technique to a subset of likelihood-free inference
+problems, it is quite common in scientific domains
+that the effect of the parameters of interest and the
+main nuisance parameters over a sample can be
+approximated such as the change of mixture coefficients
+for mixture models, translations of a subset of features
+or conditional density ratio re-weighting.
 
 
 # Related Work
