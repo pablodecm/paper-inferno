@@ -286,20 +286,40 @@ instead $\mathcal{L}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
 \prod_{i=0}^{c}\mathcal{L}_C^i(\boldsymbol{\theta})$. In Bayesian
 terminology, this approach is referred as the Laplace approximation
 [@laplace1986memoir] where the log joint density (including the priors)
-is expanded around the MAP to an normal approximation of the posterior
+is expanded around the MAP to an multi-dimensional normal
+approximation of the posterior
 density:
 $$
 p(\boldsymbol{\theta}|D) \approx \textrm{Normal}(
 \boldsymbol{\theta} ; \hat{\boldsymbol{\theta}},
-I(\boldsymbol{\theta})^{-1} )
+I(\hat{\boldsymbol{\theta})}^{-1} )
 $${#eq:normal_approx}
 which has already been already approached by automatic differentiation in
 probabilistic programming frameworks [@tran2016edward]. While a
 Poisson count likelihood based on a histogram has been used in the
 previous derivation, other non-parametric density estimation techniques
 can be used to construct a likelihood based the neural network
-output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ instead, kernel density estimation (KDE) being specially
+output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ instead,
+kernel density estimation (KDE) being specially
 promising because it is intrinsically differentiable.
+
+The loss function used for stochastic optimisation of the neural network
+parameters $\boldsymbol{\phi}$ can be any function of the inverse
+of the Fisher information matrix at $\boldsymbol{\theta}_s$, depending on the
+ultimate inference aim. The diagonal
+elements $I_{ii}^{-1}(\boldsymbol{\theta}_s)$ correspond to the expected
+variance of each of the $\phi_i$ under the normal approximation mentioned
+before, so if the aim is efficient inference about one of parameter
+$\omega_0 = \theta_k$ a candidate loss function could be:
+$$
+U = I_{kk}^{-1}(\boldsymbol{\theta}_s)
+$$ {#eq:example_loss}
+which corresponds to the expected width of the confidence interval
+for $\omega_0$ accounting also for the effect of the other nuisance
+parameters in $\boldsymbol{\theta}$. This approach can also be extended
+when the goal is inference over several parameters of interest
+$\boldsymbol{\omega} \subseteq \boldsymbol{\theta}$ (e.g. considering a weighted sum of the
+relevant variances).
 
 <!-- algorithm -->
 \begin{algorithm}[H]
@@ -307,7 +327,8 @@ promising because it is intrinsically differentiable.
   \begin{flushleft}
     {\it Input 1:} differentiable simulator or variational
     approximation $g(\boldsymbol{\theta})$. \\
-    {\it Input 2:} parameter values to optimise at $\boldsymbol{\theta}_s.$
+    {\it Input 2:} initial parameter values $\boldsymbol{\theta}_s.$ \\
+    {\it Input 3:} parameter of interest $\omega_0=\theta_k$.
      \\
     {\it Output:} learned summary statistic
       $\boldsymbol{s}(D; \boldsymbol{\phi})$.\\
@@ -324,8 +345,7 @@ promising because it is intrinsically differentiable.
   = \boldsymbol{H}_{\boldsymbol{\theta}}^{-1}(\log
   \mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi}))$.}
   \State{Obtain loss
-    $U=\sum_{i=0}^{i=p} I_{ii}^{-1}(\boldsymbol{\theta}_s) \:
-    \textrm{if} \: \theta_i \in \mathcal{\Omega}$.}
+    $U= I_{kk}^{-1}(\boldsymbol{\theta}_s)$}
   \State{$\boldsymbol{\phi} \rightarrow
   \textrm{SGD}(\nabla_{\boldsymbol{\phi}} U)$}  
  \EndFor
