@@ -4,7 +4,7 @@ build_pdf:
     - apt-get install -y texlive-science
     - cabal install pandoc-citeproc pandoc-crossref
     - cd paper
-    - pandoc paper.md -o paper.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
+    - pandoc paper.md -s -o paper.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
     - pdflatex paper.tex  
     - biber paper.bcf  
     - pdflatex paper.tex  
