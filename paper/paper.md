@@ -277,13 +277,13 @@ so the inverse of the Fisher information can be used as an estimator
 of the expected variance. If some of the parameters
 $\boldsymbol{\theta}$ are constrained by independent measurements
 characterised by their likelihoods
-$\{\mathcal{L_C^0}(\boldsymbol{\theta}), ...,
-\mathcal{L_C^c}(\boldsymbol{\theta})\}$,
+$\{\mathcal{L}_C^{0}(\boldsymbol{\theta}), ...,
+\mathcal{L}_{C}^{c}(\boldsymbol{\theta})\}$,
 those constraints can also be easily included in the covariance
 estimation simply by considering the product of likelihoods
 instead $\mathcal{L}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
 \mathcal{L}_A(\boldsymbol{\theta} ; \boldsymbol{\phi})
-\prod_{i=0}^{c}\mathcal{L_C^i}(\boldsymbol{\theta})$. In Bayesian
+\prod_{i=0}^{c}\mathcal{L}_C^i(\boldsymbol{\theta})$. In Bayesian
 terminology, this approach is referred as the Laplace approximation
 [@laplace1986memoir] where the log joint density (including the priors)
 is expanded around the MAP to an normal approximation of the posterior
@@ -305,16 +305,32 @@ promising because it is intrinsically differentiable.
 \begin{algorithm}[H]
   \caption{Sample Summary Statistics Learning.}
   \begin{flushleft}
-    {\it Inputs:} \\
-    {\it Outputs:} \\
-    {\it Hyper-parameters:}
-    \end{flushleft}
+    {\it Input 1:} differentiable simulator or variational
+    approximation $g(\boldsymbol{\theta})$. \\
+    {\it Input 2:} parameter values to optimise at $\boldsymbol{\theta}_s.$
+     \\
+    {\it Output:} learned summary statistic
+      $\boldsymbol{s}(D; \boldsymbol{\phi})$.\\
+ \end{flushleft}
  \begin{algorithmic}[1]
- \For{$i=1$ to $n_{steps}$}
+ \For{$i=1$ to $N$}
+  \State{Sample representative mini-batch $G_s$ from
+  $g(\boldsymbol{\theta}_s)$.}
+  \State{Compute differentiable summary statistic
+    $\hat{\boldsymbol{s}}(G_s;\boldsymbol{\phi})$.}
+  \State{Construct Asimov likelihood
+    $\mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi})$.}
+  \State{Get information matrix inverse $I(\boldsymbol{\theta})^{-1}
+  = \boldsymbol{H}_{\boldsymbol{\theta}}^{-1}(\log
+  \mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi}))$.}
+  \State{Obtain loss
+    $U=\sum_{i=0}^{i=p} I_{ii}^{-1}(\boldsymbol{\theta}_s) \:
+    \textrm{if} \: \theta_i \in \mathcal{\Omega}$.}
+  \State{$\boldsymbol{\phi} \rightarrow
+  \textrm{SGD}(\nabla_{\boldsymbol{\phi}} U)$}  
  \EndFor
  \end{algorithmic}
 \end{algorithm}
-
 
 # Related Work
 
