@@ -232,7 +232,7 @@ of using the observed data $D$, the value of $\hat{\mathcal{L}}$
 can also be computed
 when the observation for each bins is equal to the expectation based on
 the simulated sample $G_s$, which will denote as the
-Asimov likelihood $\hat{\mathcal{L}}_A$:
+Asimov likelihood $\hat{\mathcal{L}}_A$ [@cowan2011asymptotic]:
 $$
 \hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois} (\frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}))
