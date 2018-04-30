@@ -1,13 +1,10 @@
 build_pdf:
-  image: pablodecm/pandoc-nodejs:0.0.1
+  image: pablodecm/pandoc-nodejs:0.0.2
   script:
     - apt-get install -y texlive-science
     - cabal install pandoc-citeproc pandoc-crossref
     - cd paper
-    - pandoc paper.md -s -o paper.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
-    - pdflatex paper.tex  
-    - biber paper.bcf  
-    - pdflatex paper.tex  
+    - make  
   artifacts:
     paths:
      - paper/paper.pdf
