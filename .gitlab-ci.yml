@@ -1,5 +1,5 @@
 build_pdf:
-  image: pablodecm/pandoc-nodejs:0.0.2
+  image: pablodecm/pandoc-nodejs:0.0.3
   script:
     - apt-get install -y texlive-science
     - cabal install pandoc-citeproc pandoc-crossref
