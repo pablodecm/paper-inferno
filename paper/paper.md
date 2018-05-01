@@ -50,8 +50,8 @@ observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
 a problem of special relevance for many of these
 disciplines is statistical inference on a subset of model parameters
 $\boldsymbol{\theta}$, which can be approached via likelihood-free inference
-algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate], simplified
-synthetic likelihoods or density estimation-by-comparison approaches.
+algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate],
+simplified synthetic likelihoods or density estimation-by-comparison approaches.
 <!--- TODO: add references-->
 
 Because the relation between the parameters of the model and the data is
@@ -60,42 +60,49 @@ tend to be computationally expensive due to the need of repeated simulations
 required to cover the parameter space. Furthermore, when data is high-dimensional, likelihood-free
 inference can rapidly become inefficient, so low-dimensional summary statistics
 $\boldsymbol{s}(D)$ are used instead of the raw data
-for tractability. The choice of summary statistics is quite important because
-will likely lead to a loss of information relevant for statistical inference.
+for tractability. The choice of summary statistics in this cases becomes
+of the utmost importance,
+given that naive choices might cause loss of information
+relevant for statistical inference.
 
 As a motivating example, we can consider data analyses at the Large
 Hadron Collider (LHC), like those carried out to establish the
 discovery of the Higgs boson.
 In this case, the ultimate aim is to extract information
 about Nature from the large amounts of high-dimensional
-data are acquired by complex detectors setup around the collision points.
+data are acquired by complex detectors around the collision of energetic
+protons.
 Accurate data modelling is only available via stochastic simulation
 of the underlying physical processes, particle interactions and detector
-readout so $p(\boldsymbol{x}| \boldsymbol{\theta})$ cannot be analytically
-computed.
+readout. As a result, the density $p(\boldsymbol{x}| \boldsymbol{\theta})$
+cannot be analytically computed.
 
 The inference problem in particle physics is commonly posed as hypothesis
 testing based on the acquired data. An alternate hypothesis $H_1$ (e.g. a
 new theory that predicts that a new fundamental particle) is tested against
 a null hypothesis $H_0$ (e.g. existing theory that explain previous
-observed phenomena). The aim is checking wether the null can be rejected
-in favour of the alternate hypothesis at a certain confidence level $\alpha$,
+observed phenomena). The aim is checking whether the null hypothesis can be rejected
+in favour of the alternate hypothesis at a certain confidence level $\alpha$
 ($\alpha=3\times10^{7}$ is commonly required
-for claiming discovery) also known as Type I error rate. Because $\alpha$ is
-fixed, the sensibility of an analysis is determined by the power of the test
+for claiming discovery), also known as Type I error rate. Because $\alpha$ is
+fixed, the sensitivity of an analysis is determined by the power of the test
 which corresponds to $1-\beta$, where $\beta$ is the
-probability of reject a false null hypothesis, also known as Type II error rate.
+probability of rejecting
+a false null hypothesis, also known as Type II error rate.
 
-Due to the high-dimensionality of the observed data, a low-dimensional summary
+Due to the high dimensionality of the observed data, a low-dimensional summary
 statistic has to be constructed in order to perform inference. A
-classical statistical results establishes that the likelihood-ratio
+well-known result of classical statistics establishes that the likelihood-ratio
 $\Lambda(\boldsymbol{x})=p(\boldsymbol{x}| H_0)/p(\boldsymbol{x}| H_1)$ is
-the most powerful test at a fixed confidence level for two simple hypotheses
-[@NeymanPearson1933]. While $p(\boldsymbol{x}| H_0)$ and
-$p(\boldsymbol{x}| H_1)$ are not available, simulated samples can be used to
-obtain an approximation of this ratio by casting the problem as supervised
-learning classification. While this approach can be effective and
-increase the discovery sensibility, simulations often depend on additional
+the most powerful test  when two simple hypotheses are considered
+[@NeymanPearson1933]. As $p(\boldsymbol{x}| H_0)$ and
+$p(\boldsymbol{x}| H_1)$ are not available, simulated samples are used in
+practise to obtain an approximation of the likelihood ratio by casting
+the problem as supervised learning classification.
+
+<!-- TODO: review -->
+While this approach can be effective and
+increase the discovery sensitivity, simulations often depend on additional
 uncertain parameters that are not of immediate interest but have to be accounted
 for. Classification-based summary statistics cannot easily account for this
 effects, so the inference power is degraded when these additional parameters
@@ -116,7 +123,7 @@ in current scientific data analysis workflows.
 
 # Problem Statement
 
-Let us consider a set of i.i.d. observations $D =
+Let us consider a set of $n$ i.i.d. observations $D =
 \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$ where $\boldsymbol{x} \in \mathcal{X}
 \subseteq \mathbb{R}^d$ and a generative model
 which implicitly defines a
@@ -125,8 +132,9 @@ parametrized by $\boldsymbol{\theta} \in \mathcal{\Theta} \subseteq
 \mathbb{R}^p$ used to model the data. We want to learn a function
 $\boldsymbol{s} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
 \mathcal{S} \subseteq \mathbb{R}^{b}$ that computes a summary statistic
-of the dataset and reduces its dimensionality so likelihood-free inference
-methods can be applied efficiently.
+of the dataset and reduces its dimensionality to so likelihood-free inference
+methods can be applied efficiently. From here onwards, $b$ will be used to
+denote the dimensionality of the summary statistic $\boldsymbol{s}(D)$.
 
 <!---TODO (maybe): mention hierarchical model--->
 
@@ -134,41 +142,43 @@ While there might be infinite ways to construct $\boldsymbol{s} (D)$, we are int
 about the subset of interest
 $\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$
 of the model parameters. The concept of statistical
-sufficiency is specially useful to evaluate wether
-summary statistics are informative,
-which can be characterised by means of the factorisation
-criterion:
+sufficiency is especially useful to evaluate whether
+summary statistics are informative. Classical sufficiency
+can be characterised by means of the factorisation criterion:
 $$
 p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
 $${#eq:sufficiency}
-where $h$ and $g$ are non-negative functions. In the case of sufficiency, the
-summary statistic will yield the same inference about the parameters of
-interest $\boldsymbol{\omega}$ than the full set of observations $D$. However,
-because the probability density is not even tractable in our problem,
+where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
+can be factorised as indicated, the
+summary statistic $\boldsymbol{s}(D)$ will yield the same inference about the parameters of
+interest $\boldsymbol{\omega}$ than the full set of observations $D$. For the problems
+of interest of this work, the probability density is not explicit b so
 the general task of finding a sufficient summary statistic cannot be tackled
-directly, so alternative evaluation metrics have to be specified.
+directly, so alternative methods to build summary statistics have to be specified.
 
-An alternative metric can be specified via a unbiased interval estimation
+An alternative metric can be specified via an unbiased interval estimation
 rule or an approximation of it, which is the path taken in this work.
 <!--TODO: expand more on this-->
 
 # Method
 
-In this section a machine learning method to learn non-linear
-sample summary statistics based on minimising the expected variance of
-the parameters of interest obtained via a non-parametric
-simulation-based synthetic likelihood is described.
+In this section we describe a machine learning method to learn non-linear
+sample summary statistics. The method is based on minimising the expected variance
+of the parameters of interest obtained via a non-parametric
+simulation-based synthetic likelihood.
+<!-- TODO: also expand -->
 
 ![Diagram of a training step for learning systematics-aware
 summary statistics.](diagram.pdf){#fig:diagram}
 
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
-work will composed by a neural network model applied over each dataset
+work is composed by a neural network model applied over each dataset
 observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi}) :
 \mathcal{X} \subseteq \mathbb{R}^{d} \rightarrow
 \mathcal{Y} \subseteq \mathbb{R}^{b}$
-whose parameters $\boldsymbol{\phi}$ will be learned during training. Therefore,
+whose parameters $\boldsymbol{\phi}$ will be learned during training; by means of
+stochastic gradients descent as it will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
 $$
@@ -177,27 +187,28 @@ $$
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
 $${#eq:summary}
 where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
-reduce will the dimensionality from the input observations space
+will reduce the dimensionality from the input observations space
 $\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
-The next step is to map observation outputs to a sample
-sample summary statistics via a non-parametric likelihood
+The next step is to map observation outputs to a
+dataset summary statistic, which will in turn be calibrated
+and optimised via a non-parametric likelihood
 $\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})$
 created using a set of simulated observations $G_s=
-\{\boldsymbol{x}_0,...,\boldsymbol{x}_g\}$ generated at
+\{\boldsymbol{x}_0,...,\boldsymbol{x}_g\}$, generated at
 a certain instantiation of the simulator parameters
 $\boldsymbol{\theta}_s$.
 
-In experimental high energy physics experiments, which is the scientific
-context which initially motivated this work, histograms are the most
+In experimental high energy physics experiments, which are the scientific
+context that initially motivated this work, histograms are the most
 common non-parametric density estimator because the resulting likelihoods
-can be expressed as the product of Poisson counts for each of the bins. A naive
+can be expressed as the product of Poisson counts in each of the bins. A naive
 sample summary statistic can be built from the output of the neural network
-simply by assigning each observation $\boldsymbol{x}$ to a bin corresponding
+by simply assigning each observation $\boldsymbol{x}$ to a bin corresponding
 to the cardinality of the maximum element of
-$\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ so each element of the
+$\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$, so each element of the
 sample summary will correspond to the following sum:
 $$
-s_i(D;\boldsymbol{\phi})=\sum_{x \in D}
+s_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
 \begin{cases}
       1 & i = {argmax}_{j=\{0,...,b\}}
         (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
@@ -209,13 +220,14 @@ which can in turn be used to build the following likelihood, where the
 expectation for each bin is taken from the simulated sample $G_s$:
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
-             \textrm{Pois}(s_i (D; \boldsymbol{\phi}) \:  | \: \frac{n}{g} \times s_i (G_s;\boldsymbol{\phi}))
+             \textrm{Pois} \left ( s_i (D; \boldsymbol{\phi}) \:  |
+             \: \left ( \frac{n}{g} \right ) s_i (G_s;\boldsymbol{\phi}) \right )
 $${#eq:likelihood}
-where the $n/g$ factor is to account for the different number of
+where the $n/g$ factor accounts for the different number of
 observations in the simulated samples. In cases where the number of
-observations is in itself a random variable providing information about
-the parameters of interest or the simulated samples are weighted the
-choice of normalisation factor can be a bit more involved. The chosen
+observations is itself a random variable providing information about
+the parameters of interest, or if the simulated observation are weighted the
+choice of normalisation of $\mathcal{L}$ may be a bit more involved. The chosen
 family of summary statistics is however non-differentiable due to
 the $argmax$ operation, so for training a differentiable
 approximation is considered $\hat{\boldsymbol{s}}(D; \boldsymbol{\phi})$
@@ -233,27 +245,31 @@ $\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})
 denote the differentiable approximation of the non-parametric likelihood
 as $\hat{\mathcal{L}}(D; \boldsymbol{\theta}, \boldsymbol{\phi})$. Instead
 of using the observed data $D$, the value of $\hat{\mathcal{L}}$
-can also be computed
-when the observation for each bins is equal to the expectation based on
-the simulated sample $G_s$, which will denote as the
-Asimov likelihood $\hat{\mathcal{L}}_A$ [@cowan2011asymptotic]:
+may be computed
+when the observation for each bin is equal to the expectation based on
+the simulated sample $G_s$, which is commonly denoted as the
+Asimov likelihood $\hat{\mathcal{L}}_A$:
 $$
 \hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^b
-             \textrm{Pois} (\frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \frac{n}{g} \times \hat{s}_i (G_s;\boldsymbol{\phi}))
+             \textrm{Pois} \left ( \left ( \frac{n}{g} \right )
+            \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{g} \right )
+             \hat{s}_i (G_s;\boldsymbol{\phi}) \right )
 $${#eq:likelihood_asimov}
 for which it can be easily proven that
 $argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
-\boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$, so
-the maximum likelihood (or the MAP if priors are flat) for the
-Asimov likelihood are the parameter use to generate the simulated
-dataset $G_s$. By means taking the minus logarithm and expanding in
-$\boldsymbol{\theta}$ around $\boldsymbol{\theta}_s$, we can compute
+\boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$ [@cowan2011asymptotic],
+so the maximum likelihood for the Asimov likelihood are the parameters used to generate
+the simulated dataset $G_s$. In Bayesian terms, if the prior over the parameters
+is flat $\boldsymbol{\theta}_s$ is also the maximum a posteriori (MAP) estimator.
+By taking the negative logarithm and expanding in
+$\boldsymbol{\theta}$ around $\boldsymbol{\theta}_s$, we can obtain
 the Fisher information matrix [@fisher_1925] for the
 Asimov likelihood:
 $$
 {\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
-= \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}} - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
- \boldsymbol{\phi})
+= \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}}
+ \left ( - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
+ \boldsymbol{\phi}) \right )
 $${#eq:fisher_info}
 which can be computed via automatic differentiation
 if the simulation is differentiable and included in
@@ -261,7 +277,7 @@ the computation graph or alternatively if the effect
 of varying $\boldsymbol{\theta}$ over the simulated
 dataset $G_s$ can be approximated. While this
 requirement does constrain the application of this
-technique to a subset of likelihood-free inference
+technique to a subset of inference
 problems, it is quite common in scientific domains
 that the effect of the parameters of interest and the
 main nuisance parameters over a sample can be
