@@ -3,7 +3,7 @@ PANDOC=pandoc
 LATEX2PDF=pdflatex
 BIBER=biber
 
-pdf: diagram.pdf paper.tex
+pdf: diagram.pdf
 	$(PANDOC) paper.md -s -o paper.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
 	$(LATEX2PDF) paper.tex
 	$(BIBER) paper.bcf
