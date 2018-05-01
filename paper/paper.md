@@ -50,7 +50,7 @@ observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
 a problem of special relevance for many of these
 disciplines is statistical inference on a subset of model parameters
 $\boldsymbol{\theta}$, which can be approached via likelihood-free inference
-algorithms such as Approximate Bayesian Computation (ABC), simplified
+algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate], simplified
 synthetic likelihoods or density estimation-by-comparison approaches.
 <!--- TODO: add references-->
 
@@ -158,6 +158,10 @@ In this section a machine learning method to learn non-linear
 sample summary statistics based on minimising the expected variance of
 the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood is described.
+
+![Diagram of a training step for learning systematics-aware
+summary statistics.](diagram.pdf){#fig:diagram}
+
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
 work will composed by a neural network model applied over each dataset
