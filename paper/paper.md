@@ -35,6 +35,7 @@ header-includes: |
   \DeclareMathSymbol{\Omega}{\mathord}{operators}{"0A}
   \usepackage{algorithm}
   \usepackage{algpseudocode}
+  \PassOptionsToPackage{sorting=none}{biblatex}
 bibliography: bibliography.bib
 ---
 
@@ -51,7 +52,9 @@ a problem of special relevance for many of these
 disciplines is statistical inference on a subset of model parameters
 $\boldsymbol{\theta}$, which can be approached via likelihood-free inference
 algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate],
-simplified synthetic likelihoods or density estimation-by-comparison approaches.
+simplified synthetic likelihoods [@wood2010statistical]
+or density estimation-by-comparison approaches
+[@cranmer2015approximating].
 <!--- TODO: add references-->
 
 Because the relation between the parameters of the model and the data is
@@ -165,11 +168,13 @@ rule or an approximation of it, which is the path taken in this work.
 In this section we describe a machine learning method to learn non-linear
 sample summary statistics. The method is based on minimising the expected variance
 of the parameters of interest obtained via a non-parametric
-simulation-based synthetic likelihood.
-<!-- TODO: also expand -->
+simulation-based synthetic likelihood and it is depicted on [@Fig:diagram].
+The parameters of a neural network are
+optimised by stochastic gradient descent within an automatic differentiation
+framework, however the family of loss function used account for the details of
+the statistical model and the expected effect of nuisance parameters.
 
-![Diagram of a training step for learning systematics-aware
-summary statistics.](diagram.pdf){#fig:diagram}
+![**Learning summary systematic-aware summary statistics.**](diagram.pdf){#fig:diagram}
 
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
@@ -178,7 +183,7 @@ observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi}) :
 \mathcal{X} \subseteq \mathbb{R}^{d} \rightarrow
 \mathcal{Y} \subseteq \mathbb{R}^{b}$
 whose parameters $\boldsymbol{\phi}$ will be learned during training; by means of
-stochastic gradients descent as it will be discussed later. Therefore,
+stochastic gradient descent as it will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
 $$
@@ -227,9 +232,10 @@ where the $n/g$ factor accounts for the different number of
 observations in the simulated samples. In cases where the number of
 observations is itself a random variable providing information about
 the parameters of interest, or if the simulated observation are weighted the
-choice of normalisation of $\mathcal{L}$ may be a bit more involved. The chosen
-family of summary statistics is however non-differentiable due to
-the $argmax$ operation, so for training a differentiable
+choice of normalisation of $\mathcal{L}$ may be a bit more involved.
+In the above construction, the chosen
+family of summary statistics is non-differentiable due to
+the $argmax$ operator. To work around this problem, for training a differentiable
 approximation is considered $\hat{\boldsymbol{s}}(D; \boldsymbol{\phi})$
 by means of a $softmax$ operator:
 $$
@@ -272,8 +278,9 @@ $$
  \boldsymbol{\phi}) \right )
 $${#eq:fisher_info}
 which can be computed via automatic differentiation
-if the simulation is differentiable and included in
-the computation graph or alternatively if the effect
+if the simulation is differentiable and
+included in
+the computation graph or if the effect
 of varying $\boldsymbol{\theta}$ over the simulated
 dataset $G_s$ can be approximated. While this
 requirement does constrain the application of this
