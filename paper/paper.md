@@ -410,7 +410,42 @@ relevant variances).
 
 # Related Work
 
-See [@Kingma2013-qd; @Louppe2017-br].
+Classification or regression models have been implicitly used
+to construct summary statistics for inference in several
+scientific disciplines. For example, in experimental particle physics, the
+mixture model structure of the problem makes it amenable to supervised
+classification based on simulated datasets
+[@hocker2007tmva; @baldi2014searching]. While a classification objective
+can be used to learn powerful feature representations and increase
+the sensitivity of an analysis, it does not take into account the
+details of the inference procedure or the effect of nuisance
+parameters like the solution proposed in this work.
+
+The first known effort to include the effect of nuisance parameters
+in classification and explain the relation between classification
+and the likelihood ratio was by Neal [@neal2008computing]. In the mentioned
+work, Neal proposes training of classifier including a function of
+nuisance parameter as additional input together with a per-observation
+regression model of the expectation value for inference. Cranmer et al.
+[@cranmer2015approximating] improved on this concept
+by embedding a parametrised calibrated classifier in the likelihood evaluation.
+
+
+Recently, Brehmer et al. [@brehmer2018constraining; @brehmer2018guide] further
+extended the approach of parametrised classifiers to better exploit the
+latent-space space structure of particle physics experiments generative models
+and consider the addition of a regression of the likelihood ratio and likelihood
+score in the training losses.
+
+Within the field of Approximate Bayesian Computation (ABC), there have been
+some attempts to use neural network as a dimensionality reduction step to
+generate summary statistics. For example, Jiang et al. [@jiang2015learning]
+learn a summary statistic by regressing the posterior mean of
+the parameters of interest.
+
+A completely different path is taken by Louppe et al. [@louppe2017learning],
+where the authors present a training procedure to enforce a pivotal property on
+a predictive model.
 
 # Experiments
 
