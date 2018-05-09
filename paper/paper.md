@@ -1,5 +1,6 @@
 ---
-title: Likelihood-free Inference through Sample Summary Statistics Learning
+title: |
+  INFERNO: Inference-Aware Neural Optimisation
 author: |
  Pablo de Castro \
  INFN - Sezione di Padova \
