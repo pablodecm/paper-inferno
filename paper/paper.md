@@ -428,24 +428,48 @@ work, Neal proposes training of classifier including a function of
 nuisance parameter as additional input together with a per-observation
 regression model of the expectation value for inference. Cranmer et al.
 [@cranmer2015approximating] improved on this concept
-by embedding a parametrised calibrated classifier in the likelihood evaluation.
-
+by using a parametrised classifier to approximate the
+likelihood ratio which is then calibrated to perform statistical inference.
+In this work, we do not consider a classification objective at all and
+the neural network is directly optimised based on an inference-loss.
+Additionally, once the summary statistic has been learnt the likelihood can
+be trivially constructed and used for classical or Bayesian inference
+without a dedicated calibration step. Furthermore, the approach presented
+in this work can also be extended as done by Baldi et al
+[@baldi2016parameterized] by a subset of the inference parameters
+to obtain a parametrised family of summary statistics with a single model.
 
 Recently, Brehmer et al. [@brehmer2018constraining; @brehmer2018guide] further
 extended the approach of parametrised classifiers to better exploit the
-latent-space space structure of particle physics experiments generative models
-and consider the addition of a regression of the likelihood ratio and likelihood
-score in the training losses.
+latent-space space structure of generative models from particle physics
+experiments. Additionally they propose a family of approaches that include
+a direct regression of the likelihood ratio
+and/or likelihood score in the training losses.
+While extremely promising, the most performing solutions are designed for
+a subset inference problems at the LHC and require considerable changes
+in the way the inference is carried out. The aim of this work is different,
+we try to learn sample summary statistics that be a plug-in replacement of
+classifier-based dimensionality reduction and can be applied to general
+likelihood-free problems where the effect of the parameters can be
+model or approximated.
 
 Within the field of Approximate Bayesian Computation (ABC), there have been
 some attempts to use neural network as a dimensionality reduction step to
 generate summary statistics. For example, Jiang et al. [@jiang2015learning]
-learn a summary statistic by regressing the posterior mean of
-the parameters of interest.
+successfully  a summary statistic by directly regressing the parameters of
+interest and therefore approximating the posterior mean given the data, which
+then can be used directly as a summary statistic.
 
-A completely different path is taken by Louppe et al. [@louppe2017learning],
-where the authors present a training procedure to enforce a pivotal property on
-a predictive model.
+A different path is taken by Louppe et al. [@louppe2017learning],
+where the authors present a adversarial training procedure to enforce a
+pivotal property on a predictive model. The main concern of this
+approach is that a classifier which is pivotal with respect
+to nuisance parameters might not be optimal, neither for classification
+nor for statistical inference. Instead of aiming for pivotal models, the
+summary statistics learnt by our algorithm attempts to find a transformation
+that direct reduce the expected effect of nuisance parameters
+over the parameters of interest.
+
 
 # Experiments
 
