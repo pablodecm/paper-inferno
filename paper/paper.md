@@ -17,7 +17,7 @@ abstract: >-
   evaluation for the observed data.
   Furthermore, sometimes we are interested on inference drawn over
   a subset of the generative model parameters while taking into account model
-  uncertainty or misspecification on the remaining nuisance parameter.
+  uncertainty or misspecification on the remaining nuisance parameters.
   In this work, we show how non-linear
   summary statistics can be constructed by minimising
   inference-motivated losses via stochastic gradient descent.
@@ -49,11 +49,14 @@ fields, such as population genetics, epidemiology or experimental
 particle physics.
 In many cases, the implicit generative procedure defined in the simulation is
 stochastic and/or lacks a tractable probability density
-$p(\boldsymbol{x}| \boldsymbol{\theta})$. Given some experimental
+$p(\boldsymbol{x}| \boldsymbol{\theta})$, where
+$\boldsymbol{\theta} \in \mathcal{\Theta}$
+is the vector of model parameters. Given some experimental
 observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
 a problem of special relevance for many of these
-disciplines is statistical inference on a subset of model parameters
-$\boldsymbol{\theta}$, which can be approached via likelihood-free inference
+disciplines is statistical inference on a subset of model parameter
+$\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$.
+This can be approached via likelihood-free inference
 algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate],
 simplified synthetic likelihoods [@wood2010statistical]
 or density estimation-by-comparison approaches
@@ -62,21 +65,22 @@ or density estimation-by-comparison approaches
 Because the relation between the parameters of the model and the data is
 only available via forward simulation, most likelihood-free inference algorithms
 tend to be computationally expensive due to the need of repeated simulations
-required to cover the parameter space. Furthermore, when data is high-dimensional, likelihood-free
+required to cover the parameter space. Furthermore, when data are
+high-dimensional, likelihood-free
 inference can rapidly become inefficient, so low-dimensional summary statistics
 $\boldsymbol{s}(D)$ are used instead of the raw data
 for tractability. The choice of summary statistics for such cases becomes
 of the utmost importance,
-given that naive choices might cause loss of information
-relevant information and the corresponding degraded
-of the resulting statistical inference.
+given that naive choices might cause loss of
+relevant information and a corresponding degradation of the power
+of resulting statistical inference.
 
 As a motivating example, we can consider data analyses at the Large
-Hadron Collider (LHC), like those carried out to establish the
-discovery of the Higgs boson.
+Hadron Collider (LHC), such as those carried out to establish the
+discovery of the Higgs boson [@higgs2012cms; @higgs2012atlas].
 In this framework, the ultimate aim is to extract information
 about Nature from the large amounts of high-dimensional
-data on the particle produced by energetic collision of protons,
+data on the subatomic particles produced by energetic collision of protons,
 and acquired by highly complex detectors built around the collision
 point.
 Accurate data modelling is only available via stochastic simulation
@@ -94,34 +98,37 @@ observed phenomena). The aim is checking whether the null hypothesis can be reje
 in favour of the alternate hypothesis at a certain confidence level $\alpha$
 ($\alpha=3\times10^{-7}$ is commonly required
 for claiming discovery), also known as Type I error rate. Because $\alpha$ is
-fixed, the sensitivity of an analysis is determined by the power of the test
-which corresponds to $1-\beta$. Here $\beta$ is the
-probability of rejecting
+fixed, the sensitivity of an analysis is determined by the power $1-\beta$ of
+the test, where $\beta$ is the probability of rejecting
 a false null hypothesis, also known as Type II error rate.
 
 Due to the high dimensionality of the observed data, a low-dimensional summary
 statistic has to be constructed in order to perform inference. A
-well-known result of classical statistics establishes that the likelihood-ratio
+well-known result of classical statistics,
+the Neyman-Pearson lemma[@NeymanPearson1933],
+establishes that the likelihood-ratio
 $\Lambda(\boldsymbol{x})=p(\boldsymbol{x}| H_0)/p(\boldsymbol{x}| H_1)$ is
-the most powerful test  when two simple hypotheses are considered
-[@NeymanPearson1933]. As $p(\boldsymbol{x}| H_0)$ and
+the most powerful test  when two simple hypotheses are considered.
+ As $p(\boldsymbol{x}| H_0)$ and
 $p(\boldsymbol{x}| H_1)$ are not available, simulated samples are used in
 practice to obtain an approximation of the likelihood ratio by casting
 the problem as supervised learning classification.
 
-In some cases,
+In many cases,
 the mixture structure of
 the generative model allows the treatment of the problem as
 signal (S) vs background (B) classification [@adam2015higgs],
 effectively estimating
-an approximation of $p_{S}(\boldsymbol{x})/p_{b}(\boldsymbol{B})$ which will
+an approximation of $p_{S}(\boldsymbol{x})/p_{B}(\boldsymbol{x})$ which will
 vary monotonically with the likelihood ratio.
-While this approach can be effective and
-increase the discovery sensitivity, simulations often depend on additional
-uncertain parameters that are not of immediate interest but have to be accounted
-for. Classification-based summary statistics cannot easily account for these
-effects, so the inference power is degraded when these additional parameters
-are taken into account.
+While the use of classifiers to learn a summary statistic can be effective and
+increase the discovery sensitivity, the simulations used to generate
+the samples for the classifier often depend on additional
+uncertain parameters. These parameters are not of immediate interest but
+have to be accounted for in order to make quantitative statements about the
+model parameters based on the data. Classification-based summary statistics
+cannot easily account for these effects, so the inference power is degraded
+when these additional parameters are taken into account.
 
 In this work, we present a new machine learning method to
 construct non-linear sample summary statistics that directly
@@ -143,8 +150,10 @@ Let us consider a set of $n$ i.i.d. observations $D =
 \subseteq \mathbb{R}^d$ and a generative model
 which implicitly defines a
 probability density $p(\boldsymbol{x} | \boldsymbol{\theta})$
-parametrized by $\boldsymbol{\theta} \in \mathcal{\Theta} \subseteq
-\mathbb{R}^p$ used to model the data. We want to learn a function
+used to model the data. The generative model is a function of
+the vector of parameters $\boldsymbol{\theta} \in \mathcal{\Theta} \subseteq
+\mathbb{R}^p$, which includes both interest and nuisance parameters.
+We want to learn a function
 $\boldsymbol{s} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
 \mathcal{S} \subseteq \mathbb{R}^{b}$ that computes a summary statistic
 of the dataset and reduces its dimensionality so likelihood-free inference
@@ -152,7 +161,7 @@ methods can be applied effectively. From here onwards, $b$ will be used to
 denote the dimensionality of the summary statistic $\boldsymbol{s}(D)$.
 
 While there might be infinite ways to construct $\boldsymbol{s} (D)$, we are
-interested in those summary statistics that are informative
+only interested in those summary statistics that are informative
 about the subset of interest
 $\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$
 of the model parameters. The concept of statistical
@@ -165,16 +174,16 @@ $${#eq:sufficiency}
 where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
 can be factorised as indicated, the
 summary statistic $\boldsymbol{s}(D)$ will yield the same inference about the parameters of
-interest $\boldsymbol{\omega}$ than the full set of observations $D$. For the problems
+interest $\boldsymbol{\omega}$ as the full set of observations $D$. For the problems
 of interest of this work, the probability density is not explicit so
 the general task of finding a sufficient summary statistic cannot be tackled
 directly. Hence, alternative methods to build summary statistics have
 to be specified.
 
-For simplicity, let us consider a problem with
-single one-dimensional parameter of interest
-$\boldsymbol{\omega} = \{ \omega_0\}$, which we want to infer about given
-some data.
+For simplicity, let us consider a problem where we are only interested on
+statistical inference on a
+single one-dimensional parameter $\boldsymbol{\omega} = \{ \omega_0\}$ of
+the model given some observed data.
 Be given a summary statistic $\boldsymbol{s}$ and a statistical procedure
 to obtain an unbiased interval estimate of the parameter of interest
 which accounts for the effect of nuisance parameters. The resulting interval
@@ -210,15 +219,15 @@ optimised by stochastic gradient descent within an automatic differentiation
 framework, where the considered loss function accounts for the details of
 the statistical model as well as the expected effect of nuisance parameters.
 
-![**Learning summary systematic-aware summary statistics.**](diagram.pdf){#fig:diagram}
+![**Learning inference-aware summary statistics.**](diagram.pdf){#fig:diagram}
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
-work is composed by a neural network model applied over each dataset
+work is composed by a neural network model applied to each dataset
 observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi}) :
 \mathcal{X} \subseteq \mathbb{R}^{d} \rightarrow
-\mathcal{Y} \subseteq \mathbb{R}^{b}$
-whose parameters $\boldsymbol{\phi}$ will be learned during training, by means of
-stochastic gradient descent as will be discussed later. Therefore,
+\mathcal{Y} \subseteq \mathbb{R}^{b}$,
+whose parameters $\boldsymbol{\phi}$ will be learned during training by means of
+stochastic gradient descent, as will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
 $$
@@ -284,7 +293,7 @@ $${#eq:soft_summary}
 where the temperature hyper-parameter
 $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the largest
-component will tend to 1 while others to 0 and therefore
+component will tend to 1 while others to 0, and therefore
 $\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})
 \rightarrow \boldsymbol{s}(D; \boldsymbol{\phi})$. Similarly, let us
 denote by $\hat{\mathcal{L}}(D; \boldsymbol{\theta}, \boldsymbol{\phi})$
@@ -307,10 +316,11 @@ for which it can be easily proven that
 $argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
 \boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$ [@cowan2011asymptotic],
 so the maximum likelihood estimator (MLE)
-for the Asimov likelihood is parameter vector $\boldsymbol{\theta}_s$
+for the Asimov likelihood is the parameter vector $\boldsymbol{\theta}_s$
 used to generate
 the simulated dataset $G_s$. In Bayesian terms, if the prior over the parameters
-is flat, then $\boldsymbol{\theta}_s$ is also the maximum a posteriori
+is flat in the chosen metric,
+then $\boldsymbol{\theta}_s$ is also the maximum a posteriori
 (MAP) estimator.
 By taking the negative logarithm and expanding in
 $\boldsymbol{\theta}$ around $\boldsymbol{\theta}_s$, we can obtain
@@ -327,10 +337,10 @@ if the simulation is differentiable and
 included in
 the computation graph or if the effect
 of varying $\boldsymbol{\theta}$ over the simulated
-dataset $G_s$ can be approximated. While this
+dataset $G_s$ can be effectively approximated. While this
 requirement does constrain the applicability of the proposed
 technique to a subset of inference
-problems, it is quite common for physical sciences
+problems, it is quite common for e.g. physical sciences
 that the effect of the parameters of interest and the
 main nuisance parameters over a sample can be
 approximated by the changes of mixture coefficients
@@ -352,10 +362,10 @@ characterised by their likelihoods
 $\{\mathcal{L}_C^{0}(\boldsymbol{\theta}), ...,
 \mathcal{L}_{C}^{c}(\boldsymbol{\theta})\}$,
 those constraints can also be easily included in the covariance
-estimation, simply by considering the product of likelihoods
-instead
-$$\mathcal{L}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
-\mathcal{L}_A(\boldsymbol{\theta} ; \boldsymbol{\phi})
+estimation, simply by considering the augmented likelihood
+$\hat{\mathcal{L}}_A'$ instead of $\hat{\mathcal{L}}_A$ in [@Eq:fisher_info]:
+$$\hat{\mathcal{L}}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
+\hat{\mathcal{L}}_A(\boldsymbol{\theta} ; \boldsymbol{\phi})
 \prod_{i=0}^{c}\mathcal{L}_C^i(\boldsymbol{\theta}).$$ {#eq:add_constraint}
 In Bayesian
 terminology, this approach is referred as the Laplace approximation
@@ -370,11 +380,14 @@ I(\hat{\boldsymbol{\theta})}^{-1} )
 $${#eq:normal_approx}
 which has already been already approached by automatic differentiation in
 probabilistic programming frameworks [@tran2016edward]. While a
-Poisson count likelihood based on a histogram has been used in the
-present derivation, other non-parametric density estimation techniques
-can be used in its place to construct a likelihood based the neural network
-output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ instead,
-such as kernel density estimation (KDE), being intrinsically differentiable.
+histogram has been used to construct a Poisson count sample likelihood,
+non-parametric density estimation techniques
+can be used in its place to construct a
+product of observation likelihoods based on the neural network
+output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ instead.
+For example, an extension of this technique to use
+kernel density estimation (KDE) should be straightforward, given its
+intrinsic differentiability.
 
 The loss function used for stochastic optimisation of the neural network
 parameters $\boldsymbol{\phi}$ can be any function of the inverse
@@ -393,13 +406,13 @@ parameters in $\boldsymbol{\theta}$. This approach can also be extended
 when the goal is inference over several parameters of interest
 $\boldsymbol{\omega} \subseteq \boldsymbol{\theta}$ (e.g. when
 considering a weighted sum of the relevant variances). A simple version
-of approach just described to learn a neural-network based summary statistic
+of the approach just described to learn a neural-network based summary statistic
 based on an inference-aware loss is summarised in Algorithm
 \autoref{alg:simple_algorithm}.
 
 <!-- algorithm -->
 \begin{algorithm}[H]
-  \caption{Inferece-Aware Neural Optimisation.}
+  \caption{Inference-Aware Neural Optimisation.}
   \begin{flushleft}
     {\it Input 1:} differentiable simulator or variational
     approximation $g(\boldsymbol{\theta})$. \\
@@ -451,12 +464,13 @@ regression model of the expectation value for inference. Cranmer et al.
 [@cranmer2015approximating] improved on this concept
 by using a parametrised classifier to approximate the
 likelihood ratio which is then calibrated to perform statistical inference.
-In this work, we do not consider a classification objective at all and
+At variance with the mentioned works, we do not consider a classification
+objective at all and
 the neural network is directly optimised based on an inference-loss.
 Additionally, once the summary statistic has been learnt the likelihood can
 be trivially constructed and used for classical or Bayesian inference
 without a dedicated calibration step. Furthermore, the approach presented
-in this work can also be extended as done by Baldi et al
+in this work can also be extended as done by Baldi et al.
 [@baldi2016parameterized] by a subset of the inference parameters
 to obtain a parametrised family of summary statistics with a single model.
 
@@ -469,7 +483,7 @@ and/or likelihood score in the training losses.
 While extremely promising, the most performing solutions are designed for
 a subset inference problems at the LHC and require considerable changes
 in the way the inference is carried out. The aim of this work is different,
-we try to learn sample summary statistics that be a plug-in replacement of
+we try to learn sample summary statistics that may act as a plug-in replacement of
 classifier-based dimensionality reduction and can be applied to general
 likelihood-free problems where the effect of the parameters can be
 modelled or approximated.
@@ -477,7 +491,7 @@ modelled or approximated.
 Within the field of Approximate Bayesian Computation (ABC), there have been
 some attempts to use neural network as a dimensionality reduction step to
 generate summary statistics. For example, Jiang et al. [@jiang2015learning]
-successfully  a summary statistic by directly regressing the parameters of
+successfully employ a summary statistic by directly regressing the parameters of
 interest and therefore approximating the posterior mean given the data, which
 then can be used directly as a summary statistic.
 
