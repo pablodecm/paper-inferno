@@ -472,7 +472,7 @@ in the way the inference is carried out. The aim of this work is different,
 we try to learn sample summary statistics that be a plug-in replacement of
 classifier-based dimensionality reduction and can be applied to general
 likelihood-free problems where the effect of the parameters can be
-model or approximated.
+modelled or approximated.
 
 Within the field of Approximate Bayesian Computation (ABC), there have been
 some attempts to use neural network as a dimensionality reduction step to
@@ -486,16 +486,22 @@ where the authors present a adversarial training procedure to enforce a
 pivotal property on a predictive model. The main concern of this
 approach is that a classifier which is pivotal with respect
 to nuisance parameters might not be optimal, neither for classification
-nor for statistical inference. Instead of aiming for pivotal models, the
+nor for statistical inference. Instead of aiming for being pivotal, the
 summary statistics learnt by our algorithm attempts to find a transformation
-that direct reduce the expected effect of nuisance parameters
+that directly reduces the expected effect of nuisance parameters
 over the parameters of interest.
-
 
 # Experiments
 
+In this section, we first study the effectiveness of the inference-aware
+optimisation in a synthetic problem where the likelihood is known and compare
+with the results against classification-based summary statistics.
+
+## 2D Mixture of Gaussians
+
+
+
+
 # Conclusions
 
-## Acknowledgments {.unnumbered}
-
-# References
+<!-- ## Acknowledgments {.unnumbered} -->
