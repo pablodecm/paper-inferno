@@ -513,8 +513,39 @@ with the results against classification-based summary statistics.
 
 ## 2D Mixture of Gaussians
 
-
-
+In order to exemplify the usage of the proposed approach, evaluate its
+viability and compare against using a classification model proxy,
+a two-dimensional
+Gaussian mixture example with two-components is considered, respectively
+referred as background $b(\boldsymbol{x} | \lambda)$ and signal
+$s(\boldsymbol{x})$, with probability densities:
+$$
+b(\boldsymbol{x} | \lambda) =
+\mathcal{N} \left ( (2+\lambda, 0),
+  \begin{bmatrix}
+    5 & 0 \\
+    0 & 9 \\
+   \end{bmatrix}
+\right)
+$${#eq:bkg_toy_pdf}
+$$
+s(\boldsymbol{x}) =
+\mathcal{N} \left ( (1,1),
+  \begin{bmatrix}
+    1 & 0 \\
+    0 & 1 \\
+   \end{bmatrix}
+\right)
+$${#eq:sig_toy_pdf}
+where $\lambda$, a nuisance parameter that
+shifts the mean of the background, is unknown. Hence, the probability density
+function of observations as the following the mixture:
+$$
+p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) b(\boldsymbol{x}) + \mu s(\boldsymbol{x})
+$${#eq:mixture_eq}
+where $\mu$ is parameter corresponding to the mixture weight
+for the signal and consequently $(1-\mu)$ is the mixture weight for the
+background.
 
 # Conclusions
 
