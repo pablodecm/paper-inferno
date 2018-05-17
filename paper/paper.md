@@ -516,11 +516,12 @@ with the results against classification-based summary statistics.
 In order to exemplify the usage of the proposed approach, evaluate its
 viability and compare against using a classification model proxy,
 a two-dimensional
-Gaussian mixture example with two-components is considered, respectively
-referred as background $b(\boldsymbol{x} | \lambda)$ and signal
-$s(\boldsymbol{x})$, with probability densities:
+Gaussian mixture example with two-components is considered. One component
+will be
+referred as background $b(\boldsymbol{x} | \lambda)$ and the other signal
+$s(\boldsymbol{x})$, whose probability densities correspond respectively to:
 $$
-b(\boldsymbol{x} | \lambda) =
+f_b(\boldsymbol{x} | \lambda) =
 \mathcal{N} \left ( (2+\lambda, 0),
   \begin{bmatrix}
     5 & 0 \\
@@ -529,7 +530,7 @@ b(\boldsymbol{x} | \lambda) =
 \right)
 $${#eq:bkg_toy_pdf}
 $$
-s(\boldsymbol{x}) =
+f_s(\boldsymbol{x}) =
 \mathcal{N} \left ( (1,1),
   \begin{bmatrix}
     1 & 0 \\
@@ -541,11 +542,28 @@ where $\lambda$, a nuisance parameter that
 shifts the mean of the background, is unknown. Hence, the probability density
 function of observations as the following the mixture:
 $$
-p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) b(\boldsymbol{x}) + \mu s(\boldsymbol{x})
+p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) f_b(\boldsymbol{x} | \lambda) + \mu f_s(\boldsymbol{x})
 $${#eq:mixture_eq}
 where $\mu$ is parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
-background.
+background. Let us assume that we want to carry out inference based
+on $n$ i.i.d. observations, so $\mathbb{E}[n_s]=\mu n$ observations of signal
+and $\mathbb{E}[n_b] = (1-\mu)n$ observations of background
+are expected respectively. While the mixture model
+parametrisation shown in [@Eq:mixture_eq] is correct, the underlying model
+could also give information on the expected number of observations as a function
+of the model parameters. In this example, we will assume that the underlying model
+predicts that number of background and signal observations are Poisson distributed
+with means $b$ and $s$, so the following parametrisation will be
+more convenient for creating sample likelihoods:
+$$
+p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b} f_b(\boldsymbol{x} | \lambda) +
+ \frac{\nu s}{\nu s+b} f_s(\boldsymbol{x})
+$${#eq:mixture_alt}
+where $\nu$ is the amount of signal relative to the model expectation. This
+parametrisation is common for the most common for physics analyses at the LHC,
+because theoretical calculations provide information about the expected number
+of observations.
 
 # Conclusions
 
