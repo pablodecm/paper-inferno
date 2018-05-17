@@ -206,7 +206,7 @@ interest by considering the
 interval volume or any other function of the resulting
 confidence or credible regions.
 
-# Method
+# Method {#sec:method}
 
 In this section, a machine learning technique to learn non-linear
 sample summary statistics is described in detail.
@@ -555,15 +555,42 @@ could also give information on the expected number of observations as a function
 of the model parameters. In this example, we will assume that the underlying model
 predicts that number of background and signal observations are Poisson distributed
 with means $b$ and $s$, so the following parametrisation will be
-more convenient for creating sample likelihoods:
+more convenient for creating sample-based likelihoods:
 $$
 p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b} f_b(\boldsymbol{x} | \lambda) +
  \frac{\nu s}{\nu s+b} f_s(\boldsymbol{x})
 $${#eq:mixture_alt}
 where $\nu$ is the amount of signal relative to the model expectation. This
-parametrisation is common for the most common for physics analyses at the LHC,
+parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
 of observations.
+<!-- add extended likelihood and link to figure -->
+
+While the synthetic nature of this example allows to rapidly generate training data
+on demand, to study how the proposed method performs when training data is limited,
+a training dataset 125000 simulated observations has been considered. Half of the
+observation simulated correspond to the signal component and half to the background
+component when $\lambda=0$. A validation holdout from the training dataset of 50000
+observations is only used for computing relevant metrics during training and control
+over-fitting. The final figures of merit to compare different approaches are computed
+using a larger dataset of 500000 observations.
+For simplicity, mini-batches for each of the components
+are sampled independently for each training step training both when using
+classification or inference-aware losses.
+
+The resulting statistical model has two unknown parameters: the relative
+signal strength $\nu$ and the background mean shift $\lambda$. The former
+is the parameter of interest and its effect is can be easily included in
+in the computation graph by
+weighting the signal observations, which is equivalent to scaling
+the resulting vector of Poisson counts (or its differentiable approximation)
+if a non-parametric counting model as the one described in [@Sec:method] is used.
+The latter, referred as $\lambda$, is a nuisance parameter that causes a shift on
+the background and its effect can accounted for in the computation graph
+by simply adding $(\lambda,0)$ to each observation in the mini-batch. The effect
+of other transformations depending on parameters such could also be accounted
+as long as they are differentiable or substituted by a differentiable approximation.
+
 
 # Conclusions
 
