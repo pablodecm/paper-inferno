@@ -563,8 +563,29 @@ $${#eq:mixture_alt}
 where $\nu$ is the amount of signal relative to the model expectation. This
 parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
-of observations.
-<!-- add extended likelihood and link to figure -->
+of observations. If the probability density is known, but the expectation for
+the number of observed events depends on the model parameters the likelihood
+can be extended [@barlow1990extended] with a Poisson count term as:
+$$
+\mathcal{L}(\nu, \lambda) = \textrm{Pois}(n | \nu s+b) \sum^{n}
+p(\boldsymbol{x}| \nu, \lambda)
+$${#eq:ext_ll}
+which will be used to provide an optimal inference reference when benchmarking
+the different approaches.
+
+::: {#fig:subfigs_likelihoods .subfigures}
+![$\ln \frac{p(\boldsymbol{x} | v = 0.04, \lambda = 0)}
+            {p(\boldsymbol{x} | v = 0, \lambda = 0)}$
+ ](placeholder.pdf){#fig:subfigure_a width=32%}
+![$\ln \frac{f_s(\boldsymbol{x})}
+            {f_b(\boldsymbol{x} | \lambda = 0)}$
+ ](placeholder.pdf){#fig:subfigure_a width=32%}
+ ![$\ln \frac{c_s(\boldsymbol{x})}
+             {c_b(\boldsymbol{x} | \lambda = 0)}$
+  ](placeholder.pdf){#fig:subfigure_a width=32%}
+
+**Likelihood ratio contours**
+:::
 
 While the synthetic nature of this example allows to rapidly generate training data
 on demand, to study how the proposed method performs when training data is limited,
@@ -589,7 +610,8 @@ The latter, referred as $\lambda$, is a nuisance parameter that causes a shift o
 the background and its effect can accounted for in the computation graph
 by simply adding $(\lambda,0)$ to each observation in the mini-batch. The effect
 of other transformations depending on parameters such could also be accounted
-as long as they are differentiable or substituted by a differentiable approximation.
+as long as they are differentiable or substituted by a differentiable
+approximation.
 
 
 # Conclusions
