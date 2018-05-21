@@ -613,6 +613,21 @@ of other transformations depending on parameters such could also be accounted
 as long as they are differentiable or substituted by a differentiable
 approximation.
 
+The same basic network architecture is used both for cross-entropy and
+inference-aware training: two hidden layers of 10 nodes followed by
+ReLU activations. The number of layer of the output layer is two when
+classification proxies are used, matching the total number of mixture classes
+in the problem considered. Instead, for inference-aware classification the
+the number of output nodes can be arbitrary and will be denoted with $b$,
+and corresponds to the dimensionality of the sample summary statistic.
+The final layer is followed by a softmax activation function and
+a temperature $\tau \leq 1$ for inference-aware learning to ensure
+that the differentiable approximations are closer to the true
+expectations. Standard
+mini-batch stochastic gradient descent (SGD) is used for training and
+the optimal learning rate is decided by means of a simple scan and the best
+choice found will be specified together with the results.
+
 
 # Conclusions
 
