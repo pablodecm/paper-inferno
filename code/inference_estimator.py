@@ -25,7 +25,7 @@ def small_nn(n_logits=2, softmax_output=False):
   model.add(k.layers.Dense(n_logits, activation=None,
             kernel_initializer=initializer,name="output"))
   if softmax_output:
-    model.add(k.layers.Activation("softmax"))
+    model.add(k.layers.Activation("softmax", name="softmax"))
   return model 
 
 
@@ -184,7 +184,7 @@ class InferenceEstimator(estimator.Estimator):
 
         assert mode == tf.estimator.ModeKeys.TRAIN
 
-        summaries = ["learning_rate", "loss", "gradients", "gradient_norm"]
+        summaries = ["learning_rate"]
 
         # convert to tensor learning rate so it is not a variable
         learning_rate_t=tf.convert_to_tensor(learning_rate)
