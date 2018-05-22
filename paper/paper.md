@@ -570,19 +570,23 @@ $$
 \mathcal{L}(\nu, \lambda) = \textrm{Pois}(n | \nu s+b) \sum^{n}
 p(\boldsymbol{x}| \nu, \lambda)
 $${#eq:ext_ll}
-which will be used to provide an optimal inference reference when benchmarking
-the different approaches.
+which will be used to provide an optimal inference baseline when benchmarking
+the different approaches. The analytical likelihood ratio
+per observation as a function of the value of $\boldsymbol{x}$ is shown in
+[@Fig:subfigure_a] when $\nu=0.04$ and $\lambda=0$, while the density ratio between
+the signal and background densities when $\lambda=0$
+is shown in [@Fig:subfigure_b].
 
 ::: {#fig:subfigs_likelihoods .subfigures}
 ![$\ln \frac{p(\boldsymbol{x} | v = 0.04, \lambda = 0)}
             {p(\boldsymbol{x} | v = 0, \lambda = 0)}$
- ](placeholder.pdf){#fig:subfigure_a width=32%}
+ ](gfx/lr_hypothesis.pdf){#fig:subfigure_a width=32%}
 ![$\ln \frac{f_s(\boldsymbol{x})}
             {f_b(\boldsymbol{x} | \lambda = 0)}$
- ](placeholder.pdf){#fig:subfigure_a width=32%}
+ ](gfx/lr_density.pdf){#fig:subfigure_b width=32%}
  ![$\ln \frac{c_s(\boldsymbol{x})}
              {c_b(\boldsymbol{x} | \lambda = 0)}$
-  ](placeholder.pdf){#fig:subfigure_a width=32%}
+  ](gfx/lr_approx_ratio.pdf){#fig:subfigure_c width=32%}
 
 **Likelihood ratio contours**
 :::
@@ -627,6 +631,7 @@ expectations. Standard
 mini-batch stochastic gradient descent (SGD) is used for training and
 the optimal learning rate is decided by means of a simple scan and the best
 choice found will be specified together with the results.
+
 
 
 # Conclusions
