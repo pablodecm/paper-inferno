@@ -632,7 +632,19 @@ mini-batch stochastic gradient descent (SGD) is used for training and
 the optimal learning rate is decided by means of a simple scan and the best
 choice found will be specified together with the results.
 
-
+This toy problem can be posed as classification based on a simulated dataset and
+a supervised machine learning model such an neural network can be trained
+to discriminate signal and background
+observations, considering a fixed $\lambda$.
+The output of such a model will consist on class probabilities
+$c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which can
+be used to approximate the likelihood ratio as shown in [@Fig:subfigure_c].
+The likelihood ratio (or directly the class probabilities) are powerful
+learned features, however their construction is did not account
+for the fact that the nuisance parameter
+$\lambda$ is unknown. Furthermore, some kind non-parametric density estimation
+has to be considered in order to build a calibrated statistical model
+using the classification-based learned features.
 
 # Conclusions
 
