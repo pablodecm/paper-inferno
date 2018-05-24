@@ -508,18 +508,20 @@ over the parameters of interest.
 # Experiments
 
 In this section, we first study the effectiveness of the inference-aware
-optimisation in a synthetic problem where the likelihood is known and compare
-with the results against classification-based summary statistics.
+optimisation in a synthetic mixture problem where the likelihood is known. We then
+compare the results with those obtained by standard classification-based
+summary statistics.
 
 ## 2D Mixture of Gaussians
 
 In order to exemplify the usage of the proposed approach, evaluate its
-viability and compare against using a classification model proxy,
-a two-dimensional
+viability and test its performance by comparing to the use of
+a classification model proxy, a two-dimensional
 Gaussian mixture example with two-components is considered. One component
 will be
-referred as background $b(\boldsymbol{x} | \lambda)$ and the other signal
-$s(\boldsymbol{x})$, whose probability densities correspond respectively to:
+referred as background $b(\boldsymbol{x} | \lambda)$ and the other as signal
+$s(\boldsymbol{x})$; their probability densities are taken to
+correspond respectively to:
 $$
 f_b(\boldsymbol{x} | \lambda) =
 \mathcal{N} \left ( (2+\lambda, 0),
@@ -539,23 +541,29 @@ f_s(\boldsymbol{x}) =
 \right)
 $${#eq:sig_toy_pdf}
 where $\lambda$, a nuisance parameter that
-shifts the mean of the background, is unknown. Hence, the probability density
-function of observations as the following the mixture:
+shifts the mean of the background density, is unknown.
+Hence, the probability density
+function of observations has the following mixture structure:
 $$
 p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) f_b(\boldsymbol{x} | \lambda) + \mu f_s(\boldsymbol{x})
 $${#eq:mixture_eq}
 where $\mu$ is parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
 background. Let us assume that we want to carry out inference based
-on $n$ i.i.d. observations, so $\mathbb{E}[n_s]=\mu n$ observations of signal
+on $n$ i.i.d. observations, such that $\mathbb{E}[n_s]=\mu n$ observations
+of signal
 and $\mathbb{E}[n_b] = (1-\mu)n$ observations of background
-are expected respectively. While the mixture model
+are expected, respectively.
+While the mixture model
 parametrisation shown in [@Eq:mixture_eq] is correct, the underlying model
 could also give information on the expected number of observations as a function
-of the model parameters. In this example, we will assume that the underlying model
-predicts that number of background and signal observations are Poisson distributed
-with means $b$ and $s$, so the following parametrisation will be
-more convenient for creating sample-based likelihoods:
+of the model parameters.
+
+In this toy problem, we consider a case where the underlying model
+predicts that the total number of observations are Poisson distributed with
+a mean $\nu s+b$, where $s$ and $b$ are the expected number of signal
+and background observations. Thus the following parametrisation will be
+more convenient for building sample-based likelihoods:
 $$
 p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b} f_b(\boldsymbol{x} | \lambda) +
  \frac{\nu s}{\nu s+b} f_s(\boldsymbol{x})
@@ -567,11 +575,12 @@ of observations. If the probability density is known, but the expectation for
 the number of observed events depends on the model parameters the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
 $$
-\mathcal{L}(\nu, \lambda) = \textrm{Pois}(n | \nu s+b) \sum^{n}
+\mathcal{L}(\nu, \lambda) = \textrm{Pois}(n | \nu s+b) \prod^{n}
 p(\boldsymbol{x}| \nu, \lambda)
 $${#eq:ext_ll}
 which will be used to provide an optimal inference baseline when benchmarking
-the different approaches. The analytical likelihood ratio
+the different approaches.
+The analytical likelihood ratio
 per observation as a function of the value of $\boldsymbol{x}$ is shown in
 [@Fig:subfigure_a] when $\nu=0.04$ and $\lambda=0$, while the density ratio between
 the signal and background densities when $\lambda=0$
@@ -593,58 +602,65 @@ is shown in [@Fig:subfigure_b].
 
 While the synthetic nature of this example allows to rapidly generate training data
 on demand, to study how the proposed method performs when training data is limited,
-a training dataset 125000 simulated observations has been considered. Half of the
-observation simulated correspond to the signal component and half to the background
-component when $\lambda=0$. A validation holdout from the training dataset of 50000
-observations is only used for computing relevant metrics during training and control
+a training dataset of 125.000 simulated observations has been considered. Half
+of simulated the
+observation correspond to the signal component and half to the background
+component. The latter is generated with $\lambda=0$.
+A validation holdout from the training dataset of 50.000
+observations is only used for computing relevant metrics during training and
+to control
 over-fitting. The final figures of merit to compare different approaches are computed
-using a larger dataset of 500000 observations.
-For simplicity, mini-batches for each of the components
-are sampled independently for each training step training both when using
+using a larger dataset of 500.000 observations.
+For simplicity, mini-batches for each training step are balanced so the same
+number of events from each component is taken both when using
 classification or inference-aware losses.
 
-The resulting statistical model has two unknown parameters: the relative
+The statistical model described above has two unknown parameters: the relative
 signal strength $\nu$ and the background mean shift $\lambda$. The former
-is the parameter of interest and its effect is can be easily included in
-in the computation graph by
-weighting the signal observations, which is equivalent to scaling
+is the parameter of interest and its effect can be easily included in
+the computation graph by
+weighting the signal observations. This is equivalent to scaling
 the resulting vector of Poisson counts (or its differentiable approximation)
 if a non-parametric counting model as the one described in [@Sec:method] is used.
 The latter, referred as $\lambda$, is a nuisance parameter that causes a shift on
-the background and its effect can accounted for in the computation graph
+the background; its effect can accounted for in the computation graph
 by simply adding $(\lambda,0)$ to each observation in the mini-batch. The effect
-of other transformations depending on parameters such could also be accounted
+of other transformations depending on parameters could also be accounted
 as long as they are differentiable or substituted by a differentiable
 approximation.
 
 The same basic network architecture is used both for cross-entropy and
 inference-aware training: two hidden layers of 10 nodes followed by
-ReLU activations. The number of layer of the output layer is two when
+ReLU activations. The number of layers on the output layer is two when
 classification proxies are used, matching the total number of mixture classes
 in the problem considered. Instead, for inference-aware classification the
 the number of output nodes can be arbitrary and will be denoted with $b$,
-and corresponds to the dimensionality of the sample summary statistic.
+corresponding to the dimensionality of the sample summary statistic.
 The final layer is followed by a softmax activation function and
 a temperature $\tau \leq 1$ for inference-aware learning to ensure
 that the differentiable approximations are closer to the true
 expectations. Standard
 mini-batch stochastic gradient descent (SGD) is used for training and
-the optimal learning rate is decided by means of a simple scan and the best
+the optimal learning rate is decided by means of a simple scan, the best
 choice found will be specified together with the results.
 
 This toy problem can be posed as classification based on a simulated dataset and
 a supervised machine learning model such an neural network can be trained
 to discriminate signal and background
 observations, considering a fixed $\lambda$.
-The output of such a model will consist on class probabilities
+The output of such a model consist on class probabilities
 $c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which can
-be used to approximate the likelihood ratio as shown in [@Fig:subfigure_c].
+be used to approximate the
+$f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$
+ratio as shown in [@Fig:subfigure_c],
+which can be compared with the true density ratio in [@Fig:subfigure_b].
 The likelihood ratio (or directly the class probabilities) are powerful
-learned features, however their construction is did not account
+learned features, however their construction did not account
 for the fact that the nuisance parameter
 $\lambda$ is unknown. Furthermore, some kind non-parametric density estimation
-has to be considered in order to build a calibrated statistical model
-using the classification-based learned features.
+(e.g. histogram) has to be considered in order to build a calibrated statistical
+model using the classification-based learned features which smooth and reduce
+the information available for inference.
 
 # Conclusions
 
