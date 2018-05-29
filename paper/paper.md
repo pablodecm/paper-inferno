@@ -662,6 +662,21 @@ $\lambda$ is unknown. Furthermore, some kind non-parametric density estimation
 model using the classification-based learned features which smooth and reduce
 the information available for inference.
 
+::: {#fig:subfigs_results .subfigures}
+![inference-aware training loss
+ ](gfx/training_dynamics.pdf){#fig:training_dynamics width=40%}
+![profile-likelihood comparison
+ ](gfx/profile_likelihood.pdf){#fig:profile_likelihood width=40%}
+
+**Dynamics and results of inference-aware optimisation**: (a) inference-loss
+(i.e. approximated variance of the parameter of interest) as a function of
+the training step for 10 different random initialisations of the neural
+network parameters (b) profiled likelihood around the expectation for the 10
+trained inference-aware models and 10 trained cross-entropy loss based models,
+building a likelihood by uniformly binning the signal probability with 10 bins.
+
+:::
+
 # Conclusions
 
 <!-- ## Acknowledgments {.unnumbered} -->
