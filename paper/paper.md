@@ -659,8 +659,8 @@ learned features, however their construction did not account
 for the fact that the nuisance parameter
 $\lambda$ is unknown. Furthermore, some kind non-parametric density estimation
 (e.g. histogram) has to be considered in order to build a calibrated statistical
-model using the classification-based learned features which smooth and reduce
-the information available for inference.
+model using the classification-based learned features, which  will in term
+smooth and reduce the information available for inference.
 
 ::: {#fig:subfigs_results .subfigures}
 ![inference-aware training loss
@@ -677,6 +677,41 @@ building a likelihood by uniformly binning the signal probability with 10 bins.
 
 :::
 
+In [@Fig:training_dynamics], the dynamics of systematic-aware optimisation
+are shown by the validation loss, which corresponds
+to the approximate expected variance
+of parameter $\nu$, as a function of the training step.
+A total 10 random initialisations are used to study the convergence
+and variability of the resulting model. All inference-aware were trained
+with SGD using mini-batches of 1024 observations, each half subsampled from
+each mixture component, and a learning rate
+$\gamma=0.0001$. In [@Fig:profile_likelihood], the Asimov profile likelihood
+is obtained for each model to estimate the expected uncertainty if trained model
+are used for subsequent inference on the value of $\nu$. The width of the profile
+likelihood of the inference-aware can be compared with that obtained by
+uniformly binning
+the output of classification-based models in 10 bins. The models based
+on cross-entropy were trained during 100 epochs using a mini-batch size
+of 256 and a fixed learning rate of $\gamma=0.01$.
+
 # Conclusions
 
-<!-- ## Acknowledgments {.unnumbered} -->
+We have described a new approach for building non-linear summary statistics for
+likelihood-free inference that directly minimise the expected
+variance of the parameters of interest.
+
+
+## Acknowledgments {.unnumbered}
+
+Pablo de Castro would like to thank Daniel Whiteson, Peter Sadowski and
+the other members of their ML for HEP meeting at UCI for the initial feedback
+and support of the idea presented in this paper, and Edward Goul for
+his interest when the project was in early stages. The authors would also
+like to acknowledge Gilles Louppe and Joeri Hermans for some useful discussions
+directly related to this work.
+
+This work is part of a more general effort to develop new statistical techniques
+to use in High Energy Physics analyses within within the  AMVA4NewPhysics
+project, which is supported by the European Union's Horizon 2020 research
+and innovation programme under Grant Agreement number 675440. CloudVeneto
+is also acknowledged for the use of computing and storage facilities provided.
