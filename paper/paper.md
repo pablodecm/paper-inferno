@@ -547,18 +547,19 @@ function of observations has the following mixture structure:
 $$
 p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) f_b(\boldsymbol{x} | \lambda) + \mu f_s(\boldsymbol{x})
 $${#eq:mixture_eq}
-where $\mu$ is parameter corresponding to the mixture weight
+where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
-background. Let us assume that we want to carry out inference based
+background.
+
+Let us assume that we want to carry out inference based
 on $n$ i.i.d. observations, such that $\mathbb{E}[n_s]=\mu n$ observations
 of signal
 and $\mathbb{E}[n_b] = (1-\mu)n$ observations of background
 are expected, respectively.
 While the mixture model
-parametrisation shown in [@Eq:mixture_eq] is correct, the underlying model
+parametrisation shown in [@Eq:mixture_eq] is correct as is, the underlying model
 could also give information on the expected number of observations as a function
 of the model parameters.
-
 In this toy problem, we consider a case where the underlying model
 predicts that the total number of observations are Poisson distributed with
 a mean $\nu s+b$, where $s$ and $b$ are the expected number of signal
@@ -568,11 +569,12 @@ $$
 p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b} f_b(\boldsymbol{x} | \lambda) +
  \frac{\nu s}{\nu s+b} f_s(\boldsymbol{x})
 $${#eq:mixture_alt}
-where $\nu$ is the amount of signal relative to the model expectation. This
+where $\nu$ is the amount of signal corresponding
+to the model expectation. This
 parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
 of observations. If the probability density is known, but the expectation for
-the number of observed events depends on the model parameters the likelihood
+the number of observed events depends on the model parameters, the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
 $$
 \mathcal{L}(\nu, \lambda) = \textrm{Pois}(n | \nu s+b) \prod^{n}
@@ -600,22 +602,27 @@ is shown in [@Fig:subfigure_b].
 **Likelihood ratio contours**
 :::
 
-While the synthetic nature of this example allows to rapidly generate training data
-on demand, to study how the proposed method performs when training data is limited,
-a training dataset of 125.000 simulated observations has been considered. Half
+While the synthetic nature of this example allows to rapidly generate
+training data
+on demand,
+a training dataset of 125,000 simulated observations has been considered,
+in order
+to study how the proposed method performs when training data is limited.
+Half
 of simulated the
-observation correspond to the signal component and half to the background
+observations correspond to the signal component and half to the background
 component. The latter is generated with $\lambda=0$.
-A validation holdout from the training dataset of 50.000
+A validation holdout from the training dataset of 50,000
 observations is only used for computing relevant metrics during training and
 to control
-over-fitting. The final figures of merit to compare different approaches are computed
-using a larger dataset of 500.000 observations.
+over-fitting. The final figures of merit that allow to
+compare different approaches are computed
+using a larger dataset of 500,000 observations.
 For simplicity, mini-batches for each training step are balanced so the same
 number of events from each component is taken both when using
 classification or inference-aware losses.
 
-The statistical model described above has two unknown parameters: the relative
+The statistical model described above has two unknown parameters: the
 signal strength $\nu$ and the background mean shift $\lambda$. The former
 is the parameter of interest and its effect can be easily included in
 the computation graph by
@@ -623,17 +630,18 @@ weighting the signal observations. This is equivalent to scaling
 the resulting vector of Poisson counts (or its differentiable approximation)
 if a non-parametric counting model as the one described in [@Sec:method] is used.
 The latter, referred as $\lambda$, is a nuisance parameter that causes a shift on
-the background; its effect can accounted for in the computation graph
+the background along variable 1 with respect to the densities shown
+in [@Fig:subfigure_b]; its effect can accounted for in the computation graph
 by simply adding $(\lambda,0)$ to each observation in the mini-batch. The effect
-of other transformations depending on parameters could also be accounted
-as long as they are differentiable or substituted by a differentiable
+of alternative transformations depending on parameters could also be accounted
+for as long as they are differentiable or substituted by a differentiable
 approximation.
 
 The same basic network architecture is used both for cross-entropy and
 inference-aware training: two hidden layers of 10 nodes followed by
 ReLU activations. The number of layers on the output layer is two when
-classification proxies are used, matching the total number of mixture classes
-in the problem considered. Instead, for inference-aware classification the
+classification proxies are used, matching the number of mixture classes
+in the problem considered. Instead, for inference-aware classification
 the number of output nodes can be arbitrary and will be denoted with $b$,
 corresponding to the dimensionality of the sample summary statistic.
 The final layer is followed by a softmax activation function and
@@ -641,24 +649,26 @@ a temperature $\tau \leq 1$ for inference-aware learning to ensure
 that the differentiable approximations are closer to the true
 expectations. Standard
 mini-batch stochastic gradient descent (SGD) is used for training and
-the optimal learning rate is decided by means of a simple scan, the best
-choice found will be specified together with the results.
+the optimal learning rate is decided by means of a simple scan; the best
+choice found is specified together with the results.
 
-This toy problem can be posed as classification based on a simulated dataset and
-a supervised machine learning model such an neural network can be trained
+The considered toy problem can be posed as classification based on a simulated
+dataset. A supervised machine learning model such an neural network can
+be trained
 to discriminate signal and background
 observations, considering a fixed $\lambda$.
 The output of such a model consist on class probabilities
-$c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which can
+$c_s$ and $c_b$ given an observation $\boldsymbol{x}$. The class probabilities
+can
 be used to approximate the
 $f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$
 ratio as shown in [@Fig:subfigure_c],
 which can be compared with the true density ratio in [@Fig:subfigure_b].
 The likelihood ratio (or directly the class probabilities) are powerful
-learned features, however their construction did not account
-for the fact that the nuisance parameter
-$\lambda$ is unknown. Furthermore, some kind non-parametric density estimation
-(e.g. histogram) has to be considered in order to build a calibrated statistical
+learned features, however their construction
+ignores the effect of the nuisance parameter $\lambda$ on the
+background distribution. . Furthermore, some kind non-parametric density estimation
+(e.g. a histogram) has to be considered in order to build a calibrated statistical
 model using the classification-based learned features, which  will in term
 smooth and reduce the information available for inference.
 
@@ -671,9 +681,11 @@ smooth and reduce the information available for inference.
 **Dynamics and results of inference-aware optimisation**: (a) inference-loss
 (i.e. approximated variance of the parameter of interest) as a function of
 the training step for 10 different random initialisations of the neural
-network parameters (b) profiled likelihood around the expectation for the 10
-trained inference-aware models and 10 trained cross-entropy loss based models,
-building a likelihood by uniformly binning the signal probability with 10 bins.
+network parameters (b) profiled likelihood around the expectation value
+for the parameter of interest of 10
+trained inference-aware models and 10 trained cross-entropy loss based models.
+The latter are constructed by building a binned likelihood by uniformly
+signal probability in 10 uniform intervals.
 
 :::
 
@@ -685,26 +697,38 @@ A total 10 random initialisations are used to study the convergence
 and variability of the resulting model. All inference-aware were trained
 with SGD using mini-batches of 1024 observations, each half subsampled from
 each mixture component, and a learning rate
-$\gamma=0.0001$. In [@Fig:profile_likelihood], the Asimov profile likelihood
+$\gamma=0.0001$. The models based
+on cross-entropy were trained during 100 epochs using a mini-batch size
+of 256 and a fixed learning rate of $\gamma=0.01$.
+In [@Fig:profile_likelihood], the Asimov profile likelihood
 is obtained for each model to estimate the expected uncertainty if trained model
 are used for subsequent inference on the value of $\nu$. The width of the profile
 likelihood of the inference-aware can be compared with that obtained by
 uniformly binning
-the output of classification-based models in 10 bins. The models based
-on cross-entropy were trained during 100 epochs using a mini-batch size
-of 256 and a fixed learning rate of $\gamma=0.01$.
+the output of classification-based models in 10 bins.
 
 # Conclusions
 
-We have described a new approach for building non-linear summary statistics for
-likelihood-free inference that directly minimise the expected
-variance of the parameters of interest.
+Classification-based summary statistics often suffer from the need of specifying
+a fixed model of the data, thus neglecting the effect of nuisance parameters
+in the learning process. The effect of nuisance parameters is only considered
+downstream of the learning phase, resulting in sub-optimal inference on
+ the parameters of interest.
 
+In this work we have described a new approach for building
+non-linear summary statistics for
+likelihood-free inference that directly minimise the expected
+variance of the parameters of interest. In this first version of the article
+we show the results of this strategy on a very simple toy problem, allowing
+to focus on the technical aspects of the procedure. A later version will
+include a discussion of examples more similar to the use cases of parameter
+estimation in High Energy Physics analyses, which the proposed
+technique is targeting.
 
 ## Acknowledgments {.unnumbered}
 
 Pablo de Castro would like to thank Daniel Whiteson, Peter Sadowski and
-the other members of their ML for HEP meeting at UCI for the initial feedback
+the attendants of their ML for HEP meeting at UCI for the initial feedback
 and support of the idea presented in this paper, and Edward Goul for
 his interest when the project was in early stages. The authors would also
 like to acknowledge Gilles Louppe and Joeri Hermans for some useful discussions
