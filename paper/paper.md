@@ -15,7 +15,7 @@ abstract: >-
   data modelling in many scientific disciplines, making statistical
   inference challenging due to the intractability of the likelihood
   evaluation for the observed data.
-  Furthermore, sometimes we are interested on inference drawn over
+  Furthermore, sometimes one is interested on inference drawn over
   a subset of the generative model parameters while taking into account model
   uncertainty or misspecification on the remaining nuisance parameters.
   In this work, we show how non-linear
@@ -45,15 +45,15 @@ bibliography: bibliography.bib
 # Introduction
 
 Simulator-based inference is currently at the core of many scientific
-fields, such as population genetics, epidemiology or experimental
+fields, such as population genetics, epidemiology, and experimental
 particle physics.
-In many cases, the implicit generative procedure defined in the simulation is
+In many cases the implicit generative procedure defined in the simulation is
 stochastic and/or lacks a tractable probability density
 $p(\boldsymbol{x}| \boldsymbol{\theta})$, where
 $\boldsymbol{\theta} \in \mathcal{\Theta}$
 is the vector of model parameters. Given some experimental
 observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
-a problem of special relevance for many of these
+a problem of special relevance for these
 disciplines is statistical inference on a subset of model parameter
 $\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$.
 This can be approached via likelihood-free inference
@@ -65,7 +65,7 @@ or density estimation-by-comparison approaches
 Because the relation between the parameters of the model and the data is
 only available via forward simulation, most likelihood-free inference algorithms
 tend to be computationally expensive due to the need of repeated simulations
-required to cover the parameter space. Furthermore, when data are
+to cover the parameter space. Furthermore, when data are
 high-dimensional, likelihood-free
 inference can rapidly become inefficient, so low-dimensional summary statistics
 $\boldsymbol{s}(D)$ are used instead of the raw data
@@ -75,7 +75,7 @@ given that naive choices might cause loss of
 relevant information and a corresponding degradation of the power
 of resulting statistical inference.
 
-As a motivating example, we can consider data analyses at the Large
+As a motivating example we consider data analyses at the Large
 Hadron Collider (LHC), such as those carried out to establish the
 discovery of the Higgs boson [@higgs2012cms; @higgs2012atlas].
 In this framework, the ultimate aim is to extract information
@@ -92,7 +92,8 @@ cannot be analytically computed.
 
 The inference problem in particle physics is commonly posed as hypothesis
 testing based on the acquired data. An alternate hypothesis $H_1$ (e.g. a
-new theory that predicts that a new fundamental particle) is tested against
+new theory that predicts the existence of
+a new fundamental particle) is tested against
 a null hypothesis $H_0$ (e.g. an existing theory, which explain previous
 observed phenomena). The aim is checking whether the null hypothesis can be rejected
 in favour of the alternate hypothesis at a certain confidence level $\alpha$
@@ -115,20 +116,21 @@ practice to obtain an approximation of the likelihood ratio by casting
 the problem as supervised learning classification.
 
 In many cases,
-the mixture structure of
-the generative model allows the treatment of the problem as
+the nature of the generative model (a mixture of different processes)
+allows the treatment of the problem as
 signal (S) vs background (B) classification [@adam2015higgs],
-effectively estimating
+when the task becomes one of effectively estimating
 an approximation of $p_{S}(\boldsymbol{x})/p_{B}(\boldsymbol{x})$ which will
 vary monotonically with the likelihood ratio.
 While the use of classifiers to learn a summary statistic can be effective and
 increase the discovery sensitivity, the simulations used to generate
 the samples for the classifier often depend on additional
-uncertain parameters. These parameters are not of immediate interest but
+uncertain parameters (commonly referred as nuisance parameters).
+These nuisance parameters are not of immediate interest but
 have to be accounted for in order to make quantitative statements about the
 model parameters based on the data. Classification-based summary statistics
 cannot easily account for these effects, so the inference power is degraded
-when these additional parameters are taken into account.
+when these additional nuisances are taken into account.
 
 In this work, we present a new machine learning method to
 construct non-linear sample summary statistics that directly
@@ -136,8 +138,8 @@ optimise the expected amount of information about the subset of
 parameters of interest using simulated samples, taking into account
 the effect of nuisance parameters.
 In addition, the learned
-summary statistics can be used to build a synthetic
-sample-based likelihood and perform robust and efficient classical or
+summary statistics can be used to build synthetic
+sample-based likelihoods and perform robust and efficient classical or
 Bayesian inference from the observed data, so they can be readily applied
 in place of current classification-based or domain-motivated summary statistics
 in current scientific data analysis workflows.
@@ -147,12 +149,12 @@ in current scientific data analysis workflows.
 
 Let us consider a set of $n$ i.i.d. observations $D =
 \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$ where $\boldsymbol{x} \in \mathcal{X}
-\subseteq \mathbb{R}^d$ and a generative model
+\subseteq \mathbb{R}^d$, and a generative model
 which implicitly defines a
 probability density $p(\boldsymbol{x} | \boldsymbol{\theta})$
 used to model the data. The generative model is a function of
 the vector of parameters $\boldsymbol{\theta} \in \mathcal{\Theta} \subseteq
-\mathbb{R}^p$, which includes both interest and nuisance parameters.
+\mathbb{R}^p$, which includes both relevant and nuisance parameters.
 We want to learn a function
 $\boldsymbol{s} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
 \mathcal{S} \subseteq \mathbb{R}^{b}$ that computes a summary statistic
@@ -182,8 +184,8 @@ to be specified.
 
 For simplicity, let us consider a problem where we are only interested on
 statistical inference on a
-single one-dimensional parameter $\boldsymbol{\omega} = \{ \omega_0\}$ of
-the model given some observed data.
+single one-dimensional model parameter $\boldsymbol{\omega} = \{ \omega_0\}$ of
+given some observed data.
 Be given a summary statistic $\boldsymbol{s}$ and a statistical procedure
 to obtain an unbiased interval estimate of the parameter of interest
 which accounts for the effect of nuisance parameters. The resulting interval
@@ -193,7 +195,7 @@ expected magnitude of the interval depends
 on the summary statistic $\boldsymbol{s}$ chosen: in general,
 summary statistics that are
 more informative about the parameters of interest will provide narrower
-confidence or credible intervals.
+confidence or credible intervals on their value.
 Under this figure of merit, the problem
 of choosing an optimal summary statistic
 can be formally expressed as finding a summary statistic $\boldsymbol{s}^{\ast}$
@@ -219,7 +221,8 @@ optimised by stochastic gradient descent within an automatic differentiation
 framework, where the considered loss function accounts for the details of
 the statistical model as well as the expected effect of nuisance parameters.
 
-![**Learning inference-aware summary statistics.**](diagram.pdf){#fig:diagram}
+![**Learning inference-aware summary statistics (see section text for
+  details).**](diagram.pdf){#fig:diagram}
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
 work is composed by a neural network model applied to each dataset
@@ -302,8 +305,8 @@ obtained by substituting $\boldsymbol{s}(D ; \boldsymbol{\phi})$ with
 $\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})$. Instead
 of using the observed data $D$, the value of $\hat{\mathcal{L}}$
 may be computed
-when the observation for each bin is equal its corresponding
-the expectation based on
+when the observation for each bin is equal to its corresponding
+expectation based on
 the simulated sample $G_s$, which is commonly denoted as the
 Asimov likelihood $\hat{\mathcal{L}}_A$:
 $$
@@ -349,7 +352,7 @@ or conditional density ratio re-weighting.
 
 From the Fisher information, if $\hat{\boldsymbol{\theta}}$
 is an unbiased estimator of the values of $\boldsymbol{\theta}$,
-the covariance matrix using the Cramér-Rao lower bound
+the covariance matrix fulfils the Cramér-Rao lower bound
 [@cramer2016mathematical; @rao1992information]:
 $$
 \textrm{cov}_{\boldsymbol{\theta}}(\hat{\boldsymbol{\theta}}) \geq
@@ -407,7 +410,7 @@ when the goal is inference over several parameters of interest
 $\boldsymbol{\omega} \subseteq \boldsymbol{\theta}$ (e.g. when
 considering a weighted sum of the relevant variances). A simple version
 of the approach just described to learn a neural-network based summary statistic
-based on an inference-aware loss is summarised in Algorithm
+employing an inference-aware loss is summarised in Algorithm
 \autoref{alg:simple_algorithm}.
 
 <!-- algorithm -->
@@ -470,7 +473,7 @@ the neural network is directly optimised based on an inference-loss.
 Additionally, once the summary statistic has been learnt the likelihood can
 be trivially constructed and used for classical or Bayesian inference
 without a dedicated calibration step. Furthermore, the approach presented
-in this work can also be extended as done by Baldi et al.
+in this work can also be extended, as done by Baldi et al.
 [@baldi2016parameterized] by a subset of the inference parameters
 to obtain a parametrised family of summary statistics with a single model.
 
@@ -484,7 +487,8 @@ and/or likelihood score in the training losses.
 While extremely promising, the most performing solutions are designed for
 a subset inference problems at the LHC and require considerable changes
 in the way the inference is carried out. The aim of this work is different,
-we try to learn sample summary statistics that may act as a plug-in replacement of
+as we try to learn sample summary statistics that may act as a
+plug-in replacement of
 classifier-based dimensionality reduction and can be applied to general
 likelihood-free problems where the effect of the parameters can be
 modelled or approximated.
@@ -518,7 +522,7 @@ summary statistics.
 In order to exemplify the usage of the proposed approach, evaluate its
 viability and test its performance by comparing to the use of
 a classification model proxy, a two-dimensional
-Gaussian mixture example with two-components is considered. One component
+Gaussian mixture example with two components is considered. One component
 will be
 referred as background $b(\boldsymbol{x} | \lambda)$ and the other as signal
 $s(\boldsymbol{x})$; their probability densities are taken to
@@ -610,7 +614,7 @@ a training dataset of 125,000 simulated observations has been considered,
 in order
 to study how the proposed method performs when training data is limited.
 Half
-of simulated the
+of the simulated
 observations correspond to the signal component and half to the background
 component. The latter is generated with $\lambda=0$.
 A validation holdout from the training dataset of 50,000
@@ -621,7 +625,7 @@ compare different approaches are computed
 using a larger dataset of 500,000 observations.
 For simplicity, mini-batches for each training step are balanced so the same
 number of events from each component is taken both when using
-classification or inference-aware losses.
+standard classification or inference-aware losses.
 
 The statistical model described above has two unknown parameters: the
 signal strength $\nu$ and the background mean shift $\lambda$. The former
@@ -654,7 +658,7 @@ the optimal learning rate is decided by means of a simple scan; the best
 choice found is specified together with the results.
 
 The considered toy problem can be posed as classification based on a simulated
-dataset. A supervised machine learning model such an neural network can
+dataset. A supervised machine learning model such as a neural network can
 be trained
 to discriminate signal and background
 observations, considering a fixed $\lambda$.
@@ -666,9 +670,9 @@ $f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$
 ratio as shown in [@Fig:subfigure_c],
 which can be compared with the true density ratio in [@Fig:subfigure_b].
 The likelihood ratio (or directly the class probabilities) are powerful
-learned features, however their construction
+learned features; however their construction
 ignores the effect of the nuisance parameter $\lambda$ on the
-background distribution. . Furthermore, some kind non-parametric density estimation
+background distribution. Furthermore, some kind non-parametric density estimation
 (e.g. a histogram) has to be considered in order to build a calibrated statistical
 model using the classification-based learned features, which  will in term
 smooth and reduce the information available for inference.
