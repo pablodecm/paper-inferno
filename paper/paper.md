@@ -474,10 +474,11 @@ in this work can also be extended as done by Baldi et al.
 [@baldi2016parameterized] by a subset of the inference parameters
 to obtain a parametrised family of summary statistics with a single model.
 
-Recently, Brehmer et al. [@brehmer2018constraining; @brehmer2018guide] further
+Recently, Brehmer et
+al. [@Brehmer:2018hga; @brehmer2018constraining; @brehmer2018guide] further
 extended the approach of parametrised classifiers to better exploit the
-latent-space space structure of generative models from particle physics
-experiments. Additionally they propose a family of approaches that include
+latent-space space structure of generative models from complex scientific
+simulators. Additionally they propose a family of approaches that include
 a direct regression of the likelihood ratio
 and/or likelihood score in the training losses.
 While extremely promising, the most performing solutions are designed for
@@ -674,9 +675,9 @@ smooth and reduce the information available for inference.
 
 ::: {#fig:subfigs_results .subfigures}
 ![inference-aware training loss
- ](gfx/training_dynamics.pdf){#fig:training_dynamics width=40%}
+ ](gfx/training_dynamics.pdf){#fig:training_dynamics width=48%}
 ![profile-likelihood comparison
- ](gfx/profile_likelihood.pdf){#fig:profile_likelihood width=40%}
+ ](gfx/profile_likelihood.pdf){#fig:profile_likelihood width=48%}
 
 **Dynamics and results of inference-aware optimisation**: (a) inference-loss
 (i.e. approximated variance of the parameter of interest) as a function of
@@ -694,18 +695,31 @@ are shown by the validation loss, which corresponds
 to the approximate expected variance
 of parameter $\nu$, as a function of the training step.
 A total 10 random initialisations are used to study the convergence
-and variability of the resulting model. All inference-aware were trained
-with SGD using mini-batches of 1024 observations, each half subsampled from
-each mixture component, and a learning rate
-$\gamma=0.0001$. The models based
-on cross-entropy were trained during 100 epochs using a mini-batch size
-of 256 and a fixed learning rate of $\gamma=0.01$.
-In [@Fig:profile_likelihood], the Asimov profile likelihood
-is obtained for each model to estimate the expected uncertainty if trained model
-are used for subsequent inference on the value of $\nu$. The width of the profile
-likelihood of the inference-aware can be compared with that obtained by
-uniformly binning
-the output of classification-based models in 10 bins.
+and variability of the resulting model. All inference-aware models
+were trained during 300 epochs with SGD using mini-batches of 1024 observations
+and a learning rate $\gamma=0.0001$. All the model initialisations considered
+seem to converge successfully to a expected variance around 0.20.
+
+To compare with alternative approaches and verify the validity of the results,
+the Asimov profile likelihoods obtained for each model are shown
+in [@Fig:profile_likelihood]. The expected uncertainty
+if the trained models are used for subsequent inference on the value of $\nu$
+can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
+the widths for the profile likelihood using inference-aware training
+$0.437\pm0.008$ can be
+compared with those obtained by uniformly binning the output of
+classification-based models in 10 bins $0.444\pm0.003$. The models based on
+cross-entropy loss were
+trained during 100 epochs using a mini-batch size of 256 and a fixed learning
+rate of $\gamma=0.01$.
+
+This simple example demonstrates that the direct optimisation of inference-aware
+losses as those described in the [@Sec:method] is viable. The summary statistics
+learnt accounting for the effect of nuisance parameters seem to compare favourably
+to those obtained by using a classification proxy to approximate the
+likelihood ratio. However, more experiments are needed to benchmark the
+usefulness of this technique for real-world inference problems as those
+found in High Energy Physics analyses at the LHC.
 
 # Conclusions
 
@@ -713,7 +727,7 @@ Classification-based summary statistics often suffer from the need of specifying
 a fixed model of the data, thus neglecting the effect of nuisance parameters
 in the learning process. The effect of nuisance parameters is only considered
 downstream of the learning phase, resulting in sub-optimal inference on
- the parameters of interest.
+the parameters of interest.
 
 In this work we have described a new approach for building
 non-linear summary statistics for
