@@ -14,6 +14,7 @@ arxiv:
   script:
     - apt-get install -y texlive-science wget
     - wget https://sourceforge.net/projects/biblatex-biber/files/biblatex-biber/2.7/binaries/Linux/biber-linux_x86_64.tar.gz
+    - tar -xvf biber-linux_x86_64.tar.gz
     - export PATH=$PWD:$PATH
     - which biber
     - cabal install pandoc-citeproc pandoc-crossref
