@@ -21,24 +21,6 @@ abstract: >-
   In this work, we show how non-linear
   summary statistics can be constructed by minimising
   inference-motivated losses via stochastic gradient descent.
-header-includes: |
-  \usepackage[nonatbib,preprint]{nips_2018}
-  \usepackage{lineno}
-  \linenumbers
-  \DeclareMathSymbol{\Gamma}{\mathord}{operators}{"00}
-  \DeclareMathSymbol{\Delta}{\mathord}{operators}{"01}
-  \DeclareMathSymbol{\Theta}{\mathord}{operators}{"02}
-  \DeclareMathSymbol{\Lambda}{\mathord}{operators}{"03}
-  \DeclareMathSymbol{\Xi}{\mathord}{operators}{"04}
-  \DeclareMathSymbol{\Pi}{\mathord}{operators}{"05}
-  \DeclareMathSymbol{\Sigma}{\mathord}{operators}{"06}
-  \DeclareMathSymbol{\Upsilon}{\mathord}{operators}{"07}
-  \DeclareMathSymbol{\Phi}{\mathord}{operators}{"08}
-  \DeclareMathSymbol{\Psi}{\mathord}{operators}{"09}
-  \DeclareMathSymbol{\Omega}{\mathord}{operators}{"0A}
-  \usepackage{algorithm}
-  \usepackage{algpseudocode}
-  \PassOptionsToPackage{sorting=none}{biblatex}
 bibliography: bibliography.bib
 ---
 
@@ -222,7 +204,7 @@ framework, where the considered loss function accounts for the details of
 the statistical model as well as the expected effect of nuisance parameters.
 
 ![**Learning inference-aware summary statistics (see section text for
-  details).**](diagram.pdf){#fig:diagram}
+  details).**](gfx/figure1.pdf){#fig:diagram}
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
 work is composed by a neural network model applied to each dataset
@@ -596,13 +578,13 @@ is shown in [@Fig:subfigure_b].
 ::: {#fig:subfigs_likelihoods .subfigures}
 ![$\ln \frac{p(\boldsymbol{x} | v = 0.04, \lambda = 0)}
             {p(\boldsymbol{x} | v = 0, \lambda = 0)}$
- ](gfx/lr_hypothesis.pdf){#fig:subfigure_a width=32%}
+ ](gfx/figure2a.pdf){#fig:subfigure_a width=32%}
 ![$\ln \frac{f_s(\boldsymbol{x})}
             {f_b(\boldsymbol{x} | \lambda = 0)}$
- ](gfx/lr_density.pdf){#fig:subfigure_b width=32%}
+ ](gfx/figure2b.pdf){#fig:subfigure_b width=32%}
  ![$\ln \frac{c_s(\boldsymbol{x})}
              {c_b(\boldsymbol{x} | \lambda = 0)}$
-  ](gfx/lr_approx_ratio.pdf){#fig:subfigure_c width=32%}
+  ](gfx/figure2c.pdf){#fig:subfigure_c width=32%}
 
 **Likelihood ratio contours**
 :::
@@ -679,9 +661,9 @@ smooth and reduce the information available for inference.
 
 ::: {#fig:subfigs_results .subfigures}
 ![inference-aware training loss
- ](gfx/training_dynamics.pdf){#fig:training_dynamics width=48%}
+ ](gfx/figure3a.pdf){#fig:training_dynamics width=48%}
 ![profile-likelihood comparison
- ](gfx/profile_likelihood.pdf){#fig:profile_likelihood width=48%}
+ ](gfx/figure3b.pdf){#fig:profile_likelihood width=48%}
 
 **Dynamics and results of inference-aware optimisation**: (a) inference-loss
 (i.e. approximated variance of the parameter of interest) as a function of

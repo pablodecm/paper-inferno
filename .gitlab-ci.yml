@@ -8,3 +8,16 @@ build_pdf:
   artifacts:
     paths:
      - paper/paper.pdf
+
+arxiv:
+  image: pablodecm/pandoc-nodejs:0.0.3
+  script:
+    - apt-get install -y texlive-science
+    - cabal install pandoc-citeproc pandoc-crossref
+    - cd paper
+    - make arxiv_tar 
+    - make arxiv_pdf  
+  artifacts:
+    paths:
+     - paper/arxiv.tar.gz
+     - paper/arxiv/paper.pdf
