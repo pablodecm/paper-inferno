@@ -10,7 +10,7 @@ build_pdf:
      - paper/paper.pdf
 
 arxiv:
-  image: pablodecm/pandoc-nodejs:0.0.3
+  image: ivotron/pandoc
   script:
     - apt-get install -y texlive-science
     - cabal install pandoc-citeproc pandoc-crossref
