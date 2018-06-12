@@ -54,7 +54,7 @@ $\boldsymbol{\theta} \in \mathcal{\Theta}$
 is the vector of model parameters. Given some experimental
 observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
 a problem of special relevance for these
-disciplines is statistical inference on a subset of model parameter
+disciplines is statistical inference on a subset of model parameters
 $\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$.
 This can be approached via likelihood-free inference
 algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate],
@@ -650,12 +650,12 @@ in the problem considered. Instead, for inference-aware classification
 the number of output nodes can be arbitrary and will be denoted with $b$,
 corresponding to the dimensionality of the sample summary statistic.
 The final layer is followed by a softmax activation function and
-a temperature $\tau \leq 1$ for inference-aware learning to ensure
+a temperature $\tau = 0.01$ for inference-aware learning to ensure
 that the differentiable approximations are closer to the true
 expectations. Standard
 mini-batch stochastic gradient descent (SGD) is used for training and
-the optimal learning rate is decided by means of a simple scan; the best
-choice found is specified together with the results.
+the optimal learning rate is fixed and decided by means of a simple scan;
+the best choice found is specified together with the results.
 
 The considered toy problem can be posed as classification based on a simulated
 dataset. A supervised machine learning model such as a neural network can
@@ -746,13 +746,14 @@ technique is targeting.
 ## Acknowledgments {.unnumbered}
 
 Pablo de Castro would like to thank Daniel Whiteson, Peter Sadowski and
-the attendants of their ML for HEP meeting at UCI for the initial feedback
-and support of the idea presented in this paper, and Edward Goul for
+the other attendants of the ML for HEP meeting at UCI for the initial feedback
+and support of the idea presented in this paper, as well as Edward Goul for
 his interest when the project was in early stages. The authors would also
 like to acknowledge Gilles Louppe and Joeri Hermans for some useful discussions
 directly related to this work.
 
-This work is part of a more general effort to develop new statistical techniques
+This work is part of a more general effort to develop new statistical
+and machine learning techniques
 to use in High Energy Physics analyses within within the  AMVA4NewPhysics
 project, which is supported by the European Union's Horizon 2020 research
 and innovation programme under Grant Agreement number 675440. CloudVeneto
