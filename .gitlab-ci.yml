@@ -12,7 +12,6 @@ build_pdf:
 arxiv:
   image: ivotron/pandoc
   script:
-    - apt-get install -y texlive-science
     - cabal install pandoc-citeproc pandoc-crossref
     - cd paper
     - make arxiv_tar 
