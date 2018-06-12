@@ -12,7 +12,7 @@ build_pdf:
 arxiv:
   image: pablodecm/pandoc-nodejs:0.0.3
   script:
-    - apt-get install -y texlive-science
+    - apt-get install -y texlive-science wget
     - wget https://sourceforge.net/projects/biblatex-biber/files/biblatex-biber/2.7/binaries/Linux/biber-linux_x86_64.tar.gz
     - export PATH=$PWD:$PATH
     - which biber
