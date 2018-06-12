@@ -6,7 +6,6 @@ import tensorflow as tf
 from tensorflow.python.estimator import estimator
 from collections import OrderedDict
 from neyman.inferences import batch_hessian
-import tfplot
 
 ds = tf.contrib.distributions
 ge = tf.contrib.graph_editor
@@ -29,24 +28,6 @@ def small_nn(n_logits=2, softmax_output=False):
   return model 
 
 
-def scatter_argmax(x,y, argmax):
-  fig, ax = tfplot.subplots(figsize=(8, 6))
-  ax.scatter(x, y, c=argmax, alpha=0.7)
-  return fig
-
-def bar_mean(indexes, soft_means, hard_means):
-  fig, ax = tfplot.subplots(figsize=(8, 6))
-  for i, (s_mean, h_mean) in enumerate(zip(soft_means, hard_means)):
-    ax.bar(indexes, h_mean, fill=False, linewidth=2,
-           edgecolor="C{}".format(i))
-    ax.bar(indexes, s_mean, fill=False, linewidth=2,
-           linestyle="--", edgecolor="C{}".format(i))
-  
-  ax.set_ylim([-0.05, 1.05])
-  return fig
-
-
-
 class InferenceEstimator(estimator.Estimator):
 
     def __init__(self,
@@ -62,6 +43,7 @@ class InferenceEstimator(estimator.Estimator):
                  model_dir=None,
                  clip_gradients=None,
                  temperature=1.0,
+                 control_plots=False,
                  config=None):
 
       def _model_fn(features, labels, mode):
@@ -108,11 +90,6 @@ class InferenceEstimator(estimator.Estimator):
         split_counts = [ mean*norm*mu if (c_name==c_interest) else mean*norm
              for c_name, mean, norm in zip(c_names, split_means, c_norms)]
 
-        for mean, count, c_name in zip(split_means, split_counts, c_names):
-          for n in range(n_logits):
-            tf.summary.scalar("mean/{}/{}".format(c_name,n), mean[n])
-            tf.summary.scalar("count/{}/{}".format(c_name,n), count[n])
-          
         exp_counts = tf.cast(sum(split_counts), dtype=tf.float64)
         # asimov loss
         nuis_pars = norm_nuis + trans_nuis
@@ -151,36 +128,16 @@ class InferenceEstimator(estimator.Estimator):
         loss = cross_entropy if use_cross_entropy else asimov_loss 
 
         if mode == tf.estimator.ModeKeys.EVAL:
-          argmax = tf.argmax(probs, axis=-1)
-          # add image summary
-          x_variable = X[:,0]
-          y_variable = X[:,1]
-          tfplot.summary.plot("scatter_argmax", scatter_argmax,
-                              [x_variable, y_variable, argmax])
-
-          hard_means = [tf.bincount(tf.argmax(s_prob, axis=-1,output_type=tf.int32),
-                          minlength=n_logits, maxlength=n_logits,
-                          dtype=tf.float32)
-                          for s_prob in split_probs]
-
-          hard_means = tf.stack([bc/tf.reduce_sum(bc) for bc in hard_means]) 
-          soft_means = tf.stack(split_means) 
-          indexes = tf.range(n_logits, dtype=tf.int32)
-          tfplot.summary.plot("bar_mean", bar_mean, [indexes, soft_means, hard_means])
 
           asimov_mean = tf.metrics.mean(asimov_loss,name="asimov_mean") 
-          metrics = {"asimov_loss" : asimov_mean}
-
-
-          # Create a SummarySaverHook to save eval summaries
-          eval_summary_hook = tf.train.SummarySaverHook(
-                                save_steps=1,
-                                output_dir= self._model_dir + "/eval_core",
-                                summary_op=tf.summary.merge_all())
-          evaluation_hooks = [eval_summary_hook]
+          hess_mean = tf.metrics.mean_tensor(hess[0], name="hessian_mean")
+          cov_mean = tf.metrics.mean_tensor(cov, name="cov_mean")
+          metrics = {"asimov_loss" : asimov_mean,
+                     "hessian" : hess_mean,
+                     "cov" :  cov_mean}
 
           return tf.estimator.EstimatorSpec( mode, loss=loss,
-              eval_metric_ops=metrics,evaluation_hooks=evaluation_hooks)
+              eval_metric_ops=metrics)
 
         assert mode == tf.estimator.ModeKeys.TRAIN
 
