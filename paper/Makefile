@@ -20,7 +20,11 @@ arxiv_tar: diagram
 	cp -r gfx arxiv/.
 	cp -r bibliography.bib arxiv/.
 	cp nips_2018.sty arxiv/.
+	$(LATEX2PDF) paper.tex
+	$(BIBER) paper.bcf
+	mv paper.aux arxiv/.
+	mv paper.bbl arxiv/.
 	tar -czvf arxiv.tar.gz arxiv
 
 arxiv_pdf: arxiv_tar
-	cd arxiv; $(LATEX2PDF) paper.tex; $(BIBER) paper.bcf; $(LATEX2PDF) paper.tex
+	cd arxiv; $(LATEX2PDF) paper.tex
