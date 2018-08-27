@@ -499,40 +499,50 @@ optimisation in a synthetic mixture problem where the likelihood is known. We th
 compare the results with those obtained by standard classification-based
 summary statistics.
 
-## 2D Mixture of Gaussians
+## 3D Synthetic Problem
 
 In order to exemplify the usage of the proposed approach, evaluate its
 viability and test its performance by comparing to the use of
-a classification model proxy, a two-dimensional
-Gaussian mixture example with two components is considered. One component
-will be
-referred as background $b(\boldsymbol{x} | \lambda)$ and the other as signal
-$s(\boldsymbol{x})$; their probability densities are taken to
-correspond respectively to:
+a classification model proxy, a three-dimensional
+mixture example with two components is considered.
+One component will be referred as background $f_b(\boldsymbol{x} | \lambda)$ and
+the other as signal $f_s(\boldsymbol{x})$; their probability density functions
+are taken to correspond respectively to:
 $$
-f_b(\boldsymbol{x} | \lambda) =
-\mathcal{N} \left ( (2+\lambda, 0),
+f_b(\boldsymbol{x} | r, \lambda) =
+\mathcal{N} \left (
+  (x_0, x_1) \, \middle | \,
+  (2+r, 0),
   \begin{bmatrix}
     5 & 0 \\
     0 & 9 \\
    \end{bmatrix}
 \right)
+Exp (x_2 | \lambda)
 $${#eq:bkg_toy_pdf}
 $$
 f_s(\boldsymbol{x}) =
-\mathcal{N} \left ( (1,1),
+\mathcal{N} \left (
+  (x_0, x_1) \, \middle | \,
+  (1,1),
   \begin{bmatrix}
     1 & 0 \\
     0 & 1 \\
    \end{bmatrix}
 \right)
+Exp (x_2 | 2)
 $${#eq:sig_toy_pdf}
-where $\lambda$, a nuisance parameter that
-shifts the mean of the background density, is unknown.
+so that $(x_0,x_1)$ are distributed according to a multivariate normal
+distribution while $x_2$ follows an independent exponential distribution
+both for background and signal. The signal distribution is fully specified while
+the background distribution depends on $r$, parameter that
+shifts the mean of the background density, and $\lambda$ which is specifies
+the exponential rate in the third dimension. This parameters will be the
+treated as nuisance parameters when benchmarking different methods.
 Hence, the probability density
 function of observations has the following mixture structure:
 $$
-p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) f_b(\boldsymbol{x} | \lambda) + \mu f_s(\boldsymbol{x})
+p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) + \mu f_s(\boldsymbol{x})
 $${#eq:mixture_eq}
 where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
@@ -553,7 +563,8 @@ a mean $\nu s+b$, where $s$ and $b$ are the expected number of signal
 and background observations. Thus the following parametrisation will be
 more convenient for building sample-based likelihoods:
 $$
-p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b} f_b(\boldsymbol{x} | \lambda) +
+p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b}
+ f_b(\boldsymbol{x} | r, \lambda) +
  \frac{\nu s}{\nu s+b} f_s(\boldsymbol{x})
 $${#eq:mixture_alt}
 where $\nu$ is the amount of signal corresponding
@@ -569,6 +580,8 @@ p(\boldsymbol{x}| \nu, \lambda)
 $${#eq:ext_ll}
 which will be used to provide an optimal inference baseline when benchmarking
 the different approaches.
+
+
 The analytical likelihood ratio
 per observation as a function of the value of $\boldsymbol{x}$ is shown in
 [@Fig:subfigure_a] when $\nu=0.04$ and $\lambda=0$, while the density ratio between
