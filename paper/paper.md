@@ -542,7 +542,7 @@ treated as nuisance parameters when benchmarking different methods.
 Hence, the probability density
 function of observations has the following mixture structure:
 $$
-p(\boldsymbol{x}| \mu, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) + \mu f_s(\boldsymbol{x})
+p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) + \mu f_s(\boldsymbol{x})
 $${#eq:mixture_eq}
 where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
@@ -559,27 +559,30 @@ could also give information on the expected number of observations as a function
 of the model parameters.
 In this toy problem, we consider a case where the underlying model
 predicts that the total number of observations are Poisson distributed with
-a mean $\nu s+b$, where $s$ and $b$ are the expected number of signal
+a mean $s+b$, where $s$ and $b$ are the expected number of signal
 and background observations. Thus the following parametrisation will be
 more convenient for building sample-based likelihoods:
 $$
-p(\boldsymbol{x}| \nu, \lambda) = \frac{b}{\nu s+b}
+p(\boldsymbol{x}| s, r, \lambda, b) = \frac{b}{ s+b}
  f_b(\boldsymbol{x} | r, \lambda) +
- \frac{\nu s}{\nu s+b} f_s(\boldsymbol{x})
+ \frac{\nu s}{s+b} f_s(\boldsymbol{x})
 $${#eq:mixture_alt}
-where $\nu$ is the amount of signal corresponding
-to the model expectation. This
-parametrisation is common for physics analyses at the LHC,
+this parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
 of observations. If the probability density is known, but the expectation for
 the number of observed events depends on the model parameters, the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
 $$
-\mathcal{L}(\nu, \lambda) = \textrm{Pois}(n | \nu s+b) \prod^{n}
-p(\boldsymbol{x}| \nu, \lambda)
+\mathcal{L}(s, r, \lambda, b) = \textrm{Pois}(n | s+b) \prod^{n}
+p(\boldsymbol{x}| s,r, \lambda, b)
 $${#eq:ext_ll}
 which will be used to provide an optimal inference baseline when benchmarking
-the different approaches.
+the different approaches. Another quantity of relevance is the conditional
+density ratio, which would correspond to the optimal classifier separating
+signal and background events:
+$$
+s(r, \lambda) = \frac{f_s(\boldsymbol{x}}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
+$${#eq:opt_clf}
 
 
 The analytical likelihood ratio
