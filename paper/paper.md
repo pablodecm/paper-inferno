@@ -499,7 +499,7 @@ optimisation in a synthetic mixture problem where the likelihood is known. We th
 compare the results with those obtained by standard classification-based
 summary statistics.
 
-## 3D Synthetic Problem
+## 3D Synthetic Mixture
 
 In order to exemplify the usage of the proposed approach, evaluate its
 viability and test its performance by comparing to the use of
@@ -565,7 +565,7 @@ more convenient for building sample-based likelihoods:
 $$
 p(\boldsymbol{x}| s, r, \lambda, b) = \frac{b}{ s+b}
  f_b(\boldsymbol{x} | r, \lambda) +
- \frac{\nu s}{s+b} f_s(\boldsymbol{x})
+ \frac{s}{s+b} f_s(\boldsymbol{x})
 $${#eq:mixture_alt}
 this parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
@@ -579,10 +579,43 @@ $${#eq:ext_ll}
 which will be used to provide an optimal inference baseline when benchmarking
 the different approaches. Another quantity of relevance is the conditional
 density ratio, which would correspond to the optimal classifier separating
-signal and background events:
+signal and background events in a balanced test dataset:
 $$
-s(r, \lambda) = \frac{f_s(\boldsymbol{x}}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
+s(r, \lambda) = \frac{f_s(\boldsymbol{x})}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $${#eq:opt_clf}
+noting that this quantity depends on the parameters that define the background
+distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
+the mixture coefficients. 
+<!-- TODO: link to proof of sufficiency in appendix -->
+In practise, the probability density function of signal and
+background are not known analytically for complex scientific simulators,
+so alternative approaches are required.
+
+An option is to pose the frame the problem as classification
+based on a simulated dataset. A supervised machine learning model such a
+neural network can be trained to discriminate signal and background
+observations, considering a fixed parameters $r$ and $\lambda$.
+The output of such a model typically consist on class probabilities
+$c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which will tend
+asymptotically ti the optimal classifier from [@Eq:opt_clf] given
+enough data, a flexible enough model and a powerful learning rule.
+The conditional class probabilities (or likelihood ratio 
+$f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$) are powerful
+learned features that can be used as summary statistic; however their construction
+ignores the effect of the nuisance parameters $r$ and $\lambda$ on the
+background distribution. Furthermore, some kind non-parametric density estimation
+(e.g. a histogram) has to be considered in order to build a calibrated statistical
+model using the classification-based learned features, which  will in term
+smooth and reduce the information available for inference.
+
+::: {#fig:subfigs_distributions .subfigures}
+![signal and background
+ ](gfx/figure2a.pdf){#fig:subfigure_a width=49%}
+![mixture
+ ](gfx/figure2b.pdf){#fig:subfigure_b width=49%}
+
+**Distributions**
+:::
 
 
 The analytical likelihood ratio
@@ -591,19 +624,8 @@ per observation as a function of the value of $\boldsymbol{x}$ is shown in
 the signal and background densities when $\lambda=0$
 is shown in [@Fig:subfigure_b].
 
-::: {#fig:subfigs_likelihoods .subfigures}
-![$\ln \frac{p(\boldsymbol{x} | v = 0.04, \lambda = 0)}
-            {p(\boldsymbol{x} | v = 0, \lambda = 0)}$
- ](gfx/figure2a.pdf){#fig:subfigure_a width=32%}
-![$\ln \frac{f_s(\boldsymbol{x})}
-            {f_b(\boldsymbol{x} | \lambda = 0)}$
- ](gfx/figure2b.pdf){#fig:subfigure_b width=32%}
- ![$\ln \frac{c_s(\boldsymbol{x})}
-             {c_b(\boldsymbol{x} | \lambda = 0)}$
-  ](gfx/figure2c.pdf){#fig:subfigure_c width=32%}
 
-**Likelihood ratio contours**
-:::
+
 
 While the synthetic nature of this example allows to rapidly generate
 training data
@@ -646,7 +668,7 @@ ReLU activations. The number of layers on the output layer is two when
 classification proxies are used, matching the number of mixture classes
 in the problem considered. Instead, for inference-aware classification
 the number of output nodes can be arbitrary and will be denoted with $b$,
-corresponding to the dimensionality of the sample summary statistic.
+corresponding to the dimensionality of the sample summary statistics.
 The final layer is followed by a softmax activation function and
 a temperature $\tau = 0.01$ for inference-aware learning to ensure
 that the differentiable approximations are closer to the true
@@ -655,25 +677,7 @@ mini-batch stochastic gradient descent (SGD) is used for training and
 the optimal learning rate is fixed and decided by means of a simple scan;
 the best choice found is specified together with the results.
 
-The considered toy problem can be posed as classification based on a simulated
-dataset. A supervised machine learning model such as a neural network can
-be trained
-to discriminate signal and background
-observations, considering a fixed $\lambda$.
-The output of such a model consist on class probabilities
-$c_s$ and $c_b$ given an observation $\boldsymbol{x}$. The class probabilities
-can
-be used to approximate the
-$f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$
-ratio as shown in [@Fig:subfigure_c],
-which can be compared with the true density ratio in [@Fig:subfigure_b].
-The likelihood ratio (or directly the class probabilities) are powerful
-learned features; however their construction
-ignores the effect of the nuisance parameter $\lambda$ on the
-background distribution. Furthermore, some kind non-parametric density estimation
-(e.g. a histogram) has to be considered in order to build a calibrated statistical
-model using the classification-based learned features, which  will in term
-smooth and reduce the information available for inference.
+
 
 ::: {#fig:subfigs_results .subfigures}
 ![inference-aware training loss
