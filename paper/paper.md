@@ -597,7 +597,7 @@ neural network can be trained to discriminate signal and background
 observations, considering a fixed parameters $r$ and $\lambda$.
 The output of such a model typically consist on class probabilities
 $c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which will tend
-asymptotically ti the optimal classifier from [@Eq:opt_clf] given
+asymptotically to the optimal classifier from [@Eq:opt_clf] given
 enough data, a flexible enough model and a powerful learning rule.
 The conditional class probabilities (or likelihood ratio 
 $f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$) are powerful
@@ -679,21 +679,15 @@ the best choice found is specified together with the results.
 
 
 
-::: {#fig:subfigs_results .subfigures}
-![inference-aware training loss
- ](gfx/figure3a.pdf){#fig:training_dynamics width=48%}
-![profile-likelihood comparison
- ](gfx/figure3b.pdf){#fig:profile_likelihood width=48%}
+::: {#fig:subfigs_clf_hists .subfigures}
+![trained classifier
+   ](gfx/figure3a.pdf){#fig:train_clf width=48%}
+![optimal classifier
+ ](gfx/figure3b.pdf){#fig:opt_clf width=48%}
 
-**Dynamics and results of inference-aware optimisation**: (a) inference-loss
-(i.e. approximated variance of the parameter of interest) as a function of
-the training step for 10 different random initialisations of the neural
-network parameters (b) profiled likelihood around the expectation value
-for the parameter of interest of 10
-trained inference-aware models and 10 trained cross-entropy loss based models.
-The latter are constructed by building a binned likelihood by uniformly
-signal probability in 10 uniform intervals.
-
+**Output of neural network based and optimal classifer**: (a) 
+histogram of distribution for signal and background (b) relative effect
+of variation of nuisance parameters.
 :::
 
 In [@Fig:training_dynamics], the dynamics of systematic-aware optimisation
