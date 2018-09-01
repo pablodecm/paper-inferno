@@ -2,29 +2,30 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split as d_split
 import numpy as np
 import tensorflow as tf
+
 
 class MixtureBatcher(object):
 
   def __init__(self, c_names, name="batcher",
                buffer_size=100000):
 
-    self.batch_size = tf.placeholder(dtype=tf.int64, shape = (),
+    self.batch_size = tf.placeholder(dtype=tf.int64, shape=(),
                                      name=f"batch_size_{name}")
     self.buffer_size = buffer_size
-    self.seed = tf.placeholder(dtype=tf.int64,shape=(),
+    self.seed = tf.placeholder(dtype=tf.int64, shape=(),
                                name=f"seed_{name}")
     self.name = name
     self.c_names = c_names
 
-    self.tensors ={}
+    self.tensors = {}
     components = {}
     for c_name in c_names:
       self.tensors[c_name] = tf.placeholder(dtype=tf.float32,
-                               name=f"{c_name}_{self.name}_ph",
-                               shape=(None, None))
+                                            name=f"{c_name}_{self.name}_ph",
+                                            shape=(None, None))
       dat = tf.data.Dataset.from_tensor_slices(self.tensors[c_name])
       dat = dat.shuffle(buffer_size=self.buffer_size, seed=self.seed)
       components[c_name] = dat.batch(self.batch_size)
@@ -53,6 +54,7 @@ def softmax(x, axis=None):
   e_x = np.exp(x - np.max(x, axis=axis, keepdims=True))
   return e_x / np.sum(e_x, axis=axis, keepdims=True)
 
+
 class InputFactory(object):
 
   def __init__(self, file_name,
@@ -67,21 +69,19 @@ class InputFactory(object):
     self.val_batch_size = val_batch_size
     self.keys = keys
 
-
   def train_input_fn(self):
 
-
-    data =  np.load(self.file_name)
+    data = np.load(self.file_name)
 
     train_data = {}
     val_data = {}
     for key, value in data.items():
-      train_data[key], val_data[key] = train_test_split(value,
-          random_state=self.random_state)
+      train_data[key], val_data[key] = d_split(value,
+                                               random_state=self.random_state)
 
-    self.train_data = {k : tf.convert_to_tensor(v) for k,v in train_data.items()}
-    self.val_data = {k : tf.convert_to_tensor(v) for k,v in val_data.items()}
-
+    self.train_data = {k: tf.convert_to_tensor(
+        v) for k, v in train_data.items()}
+    self.val_data = {k: tf.convert_to_tensor(v) for k, v in val_data.items()}
 
     components = {}
     for key, value in self.train_data.items():
@@ -90,27 +90,26 @@ class InputFactory(object):
                                          .shuffle(buffer_size=10000)\
                                          .batch(self.batch_size)
 
-    dataset = tf.data.Dataset.zip({"components" : components})
+    dataset = tf.data.Dataset.zip({"components": components})
 
     dataset_it = dataset.make_one_shot_iterator()
     next_batch = dataset_it.get_next()
-
 
     return next_batch, None
 
   def val_input_fn(self):
 
-    data =  np.load(self.file_name)
+    data = np.load(self.file_name)
 
     train_data = {}
     val_data = {}
     for key, value in data.items():
-      train_data[key], val_data[key] = train_test_split(value,
-          random_state=self.random_state)
+      train_data[key], val_data[key] = d_split(value,
+                                               random_state=self.random_state)
 
-    self.train_data = {k : tf.convert_to_tensor(v) for k,v in train_data.items()}
-    self.val_data = {k : tf.convert_to_tensor(v) for k,v in val_data.items()}
-
+    self.train_data = {k: tf.convert_to_tensor(
+        v) for k, v in train_data.items()}
+    self.val_data = {k: tf.convert_to_tensor(v) for k, v in val_data.items()}
 
     components = {}
     for key, value in self.val_data.items():
@@ -119,10 +118,9 @@ class InputFactory(object):
                                          .shuffle(buffer_size=10000)\
                                          .batch(self.val_batch_size)
 
-    dataset = tf.data.Dataset.zip({"components" : components})
+    dataset = tf.data.Dataset.zip({"components": components})
 
     dataset_it = dataset.make_one_shot_iterator()
     next_batch = dataset_it.get_next()
 
     return next_batch, None
-
