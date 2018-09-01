@@ -74,7 +74,7 @@ class SyntheticThreeDimCrossEntropy(object):
     self.saver = tf.train.Saver()
     self.history = {}
 
-  def fit(self, n_epochs, lr, seed):
+  def fit(self, n_epochs, lr, batch_size, seed):
 
     with tf.Session() as sess:
       train_arrays = sess.run(self.problem.train_data())
@@ -92,7 +92,7 @@ class SyntheticThreeDimCrossEntropy(object):
         for i in t:
           shuffle_seed = rs.randint(np.iinfo(np.int32).max)
           self.batcher.init_iterator(train_arrays,
-                                     batch_size=32, seed=shuffle_seed)
+                                     batch_size=batch_size, seed=shuffle_seed)
           while True:
             try:
               batch_n += 1
