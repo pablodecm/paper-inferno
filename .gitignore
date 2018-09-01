@@ -1,0 +1,35 @@
+## Core latex/pdflatex auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+## Bibliography auxiliary files (bibtex/biblatex/biber):
+*.bbl
+*.bcf
+*.blg
+*-blx.aux
+*-blx.bib
+*.run.xml
+
+# auto-generated files and folders (from markdown)
+paper/paper.tex
+paper/paper.pdf
+paper/arxiv*
+paper/gfx/figure1.pdf
+
+# models folder
+data/models/*
+
+# caches
+*__pycache__*
+*.ropeproject*
+*.ipynb_checkpoints*

@@ -5,6 +5,7 @@ from __future__ import print_function
 from sklearn.model_selection import train_test_split as d_split
 import numpy as np
 import tensorflow as tf
+import json
 
 
 class MixtureBatcher(object):
@@ -53,6 +54,18 @@ def softmax(x, axis=None):
   """ Simple Numpy softmax implementation"""
   e_x = np.exp(x - np.max(x, axis=axis, keepdims=True))
   return e_x / np.sum(e_x, axis=axis, keepdims=True)
+
+
+class NumpyEncoder(json.JSONEncoder):
+  def default(self, obj):
+    if isinstance(obj, np.integer):
+      return int(obj)
+    elif isinstance(obj, np.floating):
+      return float(obj)
+    elif isinstance(obj, np.ndarray):
+      return obj.tolist()
+    else:
+      return super(NumpyEncoder, self).default(obj)
 
 
 class InputFactory(object):
