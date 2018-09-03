@@ -95,7 +95,7 @@ class SummaryStatisticComputer(object):
         b_clf_hist = np.histogram(b_clf, bins)[0]
         shapes[key] = b_clf_hist
 
-        k.backend.set_session(None)
+      k.backend.set_session(None)
 
     return shapes
 
@@ -130,6 +130,6 @@ class SummaryStatisticComputer(object):
                                  minlength=n_outputs)
         shapes[key] = b_clf_hist
 
-        k.backend.set_session(None)
+      k.backend.set_session(None)
 
       return shapes

@@ -89,23 +89,20 @@ class TemplateModel(object):
 
     self.h_hess, self.h_grad = batch_hessian(self.h_nll, pars)
 
-  def templates_from_json(self, json_path,
+  def templates_from_dict(self, templates,
                           r_dist=[2.0, 2.2, 1.8],
                           b_rate=[3.0, 3.5, 2.5]):
-
-    with open(json_path) as f:
-      templates = json.load(f)
 
     def normalise(arr):
         arr = np.array(arr, dtype=np.float32)
         return arr / arr.sum()
 
+    templates = {k: normalise(v) for k, v in templates.items()}
+
     shift_phs = {self.r_dist_init: r_dist[0],
                  self.r_dist_shift: (r_dist[1] - r_dist[2]) / 2.,
                  self.b_rate_init: b_rate[0],
                  self.b_rate_shift: (b_rate[1] - b_rate[2]) / 2.}
-
-    templates = {literal_eval(k): normalise(v) for k, v in templates.items()}
 
     c_nom = templates[('bkg', r_dist[0], b_rate[0])]
     c_up = np.array([templates[('bkg', r_dist[1], b_rate[0])],
@@ -124,6 +121,19 @@ class TemplateModel(object):
                       self.c_dw: c_dw[:, zero_filter],
                       self.sig_shape: sig_shape[zero_filter],
                       **shift_phs}
+
+    return templates
+
+  def templates_from_json(self, json_path,
+                          r_dist=[2.0, 2.2, 1.8],
+                          b_rate=[3.0, 3.5, 2.5]):
+
+    with open(json_path) as f:
+      templates = json.load(f)
+
+    templates = {literal_eval(k): v for k, v in templates.items()}
+    templates = self.templates_from_dict(templates, r_dist=r_dist,
+                                         b_rate=b_rate)
 
     return templates
 
