@@ -1,0 +1,14 @@
+name: inferno-env
+channels:
+- conda-forge
+dependencies:
+- python=3.6
+- numpy
+- matplotlib
+- pandas
+- jupyter
+- tqdm
+- pip:
+  - tensorflow==1.10.1
+  - tensorflow-probability
+  - corner

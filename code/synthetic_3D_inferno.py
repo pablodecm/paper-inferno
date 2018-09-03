@@ -14,8 +14,8 @@ import os
 import json
 import itertools as it
 from fisher_matrix import FisherMatrix
-import tensorflow_probability as tfp
 import tensorflow as tf
+import tensorflow_probability as tfp
 
 k = tf.keras
 ds = tfp.distributions
@@ -207,9 +207,9 @@ def main(_):
 
   inferno = SyntheticThreeDimInferno(model_path="default_b_exp_small",
                                      poi="s_exp", pars=pars, seed=7, aux=aux)
-  inferno.fit(n_epochs=100, lr=1e-6, temperature=0.1, seed=7)
+  inferno.fit(n_epochs=1, lr=1e-6, temperature=0.1, seed=7)
 
-  hess, hess_aux = inferno.eval_hessian(temperature=0.01)
+  hess, hess_aux = inferno.eval_hessian(temperature=0.1)
 
 
 if __name__ == "__main__":
