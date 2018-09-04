@@ -44,11 +44,13 @@ class SummaryStatisticComputer(object):
                                  name="x_vals")
     self.x_opt_clf = problem.optimal_classifier(self.x_vals)
 
-  def optimal_shapes(self, bins=default_bins):
+  def optimal_shapes(self, bins=default_bins, sess=None):
 
     shapes = {}
 
-    with tf.Session() as sess:
+    if sess is None:
+       sess = tf.Session()
+    with sess.as_default():
       s_clf = sess.run(self.x_opt_clf,
                        {self.x_vals: self.data["sig"]})
       shapes[("sig",)] = np.histogram(s_clf, bins)[0]
@@ -64,7 +66,8 @@ class SummaryStatisticComputer(object):
 
     return shapes
 
-  def classifier_shapes(self, model_path, bins=default_bins):
+  def classifier_shapes(self, model_path, bins=default_bins,
+                        sess=None):
 
     shapes = {}
 
@@ -74,7 +77,9 @@ class SummaryStatisticComputer(object):
       model_json = json.load(f)
     model = k.models.model_from_json(model_json)
 
-    with tf.Session() as sess:
+    if sess is None:
+       sess = tf.Session()
+    with sess.as_default():
       k.backend.set_session(sess)
       model.load_weights(f'{model_path}/model.h5')
 
@@ -99,7 +104,7 @@ class SummaryStatisticComputer(object):
 
     return shapes
 
-  def inferno_shapes(self, model_path):
+  def inferno_shapes(self, model_path, sess=None):
 
     shapes = {}
 
@@ -110,7 +115,9 @@ class SummaryStatisticComputer(object):
     model = k.models.model_from_json(model_json)
     n_outputs = model.get_output_shape_at(0)[1]
 
-    with tf.Session() as sess:
+    if sess is None:
+       sess = tf.Session()
+    with sess.as_default():
       k.backend.set_session(sess)
       model.load_weights(f'{model_path}/model.h5')
 

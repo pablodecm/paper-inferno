@@ -3,9 +3,11 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+import json
 import tensorflow as tf
 
 from synthetic_3D_cross_entropy import SyntheticThreeDimCrossEntropy
+from train_helpers import NumpyEncoder
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -38,6 +40,16 @@ def main():
       )
       clf = SyntheticThreeDimCrossEntropy(model_path=model_path, seed=seed)
       clf.fit(n_epochs=n_epochs, lr=1e-3, batch_size=batch_size, seed=seed)
+
+      info_dict = {"b_name": "clf",
+                   "n_epochs": n_epochs,
+                   "lr": lr,
+                   "batch_size": batch_size,
+                   "init": i,
+                   "seed": seed}
+
+      with open(f'{model_path}/info.json', 'w') as fp:
+        json.dump(info_dict, fp, indent=2, cls=NumpyEncoder)
 
 
 if __name__ == '__main__':

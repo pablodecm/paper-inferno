@@ -13,6 +13,7 @@ from summary_statistic_computer import SummaryStatisticComputer
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import json as json
 
 parser = argparse.ArgumentParser()
 
@@ -51,12 +52,19 @@ def benchmark_model(model_re, model_type):
   common_path = path.dirname(path.commonprefix(model_paths))
   print(common_path)
   for model_path in tqdm(model_paths):
-    shapes = model_types[model_type](model_path)
+    info_json_path = f"{model_path}/info.json"
+    if path.exists(info_json_path):
+      with open(f"{model_path}/info.json") as fp:
+        info = json.load(fp)
+    else:
+      info = {}
     with sess.as_default():
+      shapes = model_types[model_type](model_path, sess=sess)
       tm.templates_from_dict(shapes)
-      fisher_matrix = tm.asimov_hess()
+      fisher_matrix = tm.asimov_hess(sess=sess)
       results[model_path] = {"common_path": common_path,
-                             "fisher_matrix": fisher_matrix}
+                             "fisher_matrix": fisher_matrix,
+                             **info}
 
   df = pd.DataFrame.from_dict(results, orient="index")
   for b_name, config in benchmarks.items():

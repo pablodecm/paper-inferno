@@ -137,15 +137,17 @@ class TemplateModel(object):
 
     return templates
 
-  def asimov_data(self, par_phs={}):
+  def asimov_data(self, par_phs={}, sess=None):
 
-    sess = tf.get_default_session()
+    if sess is None:
+      sess = tf.get_default_session()
     asimov_data = sess.run(self.t_exp, {**par_phs, **self.shape_phs})
     return asimov_data
 
-  def asimov_hess(self, par_phs={}):
+  def asimov_hess(self, par_phs={}, sess=None):
 
-    obs_phs = {self.obs: self.asimov_data(par_phs)}
-    sess = tf.get_default_session()
+    if sess is None:
+      sess = tf.get_default_session()
+    obs_phs = {self.obs: self.asimov_data(par_phs, sess=sess)}
     h_hess = sess.run(self.h_hess, {**par_phs, **obs_phs, **self.shape_phs})
     return FisherMatrix(h_hess, par_names=list(self.all_pars.keys()))
