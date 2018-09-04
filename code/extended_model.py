@@ -57,9 +57,10 @@ class ExtendedModel(object):
 
     self.t_hess = sum([self.e_hess] + list(self.hess_nll_aux.values()))
 
-  def hess(self, par_phs={}, obs_phs={}):
+  def hess(self, par_phs={}, obs_phs={}, sess=None):
 
-    sess = tf.get_default_session()
+    if sess is None:
+      sess = tf.get_default_session()
     all_pars_names = list(self.problem.all_pars.keys())
     e_hess, e_hess_aux = sess.run(
         [self.e_hess, self.hess_nll_aux], {**par_phs, **obs_phs})

@@ -9,6 +9,8 @@ import argparse
 
 from template_model import TemplateModel
 from summary_statistic_computer import SummaryStatisticComputer
+from synthetic_3D_example import SyntheticThreeDimExample
+from extended_model import ExtendedModel
 
 import numpy as np
 import pandas as pd
@@ -72,6 +74,59 @@ def benchmark_model(model_re, model_type):
     df.loc[:, b_name] = df.apply(marginal(pars, aux), axis=1)
 
   df.to_csv(f"{common_path}/results.csv")
+  return df
+
+
+def benchmark_optimal(path=None):
+  results = {}
+  tm = TemplateModel()
+  ssc = SummaryStatisticComputer()
+  sess = tf.Session()
+  with sess.as_default():
+    shapes = ssc.optimal_shapes(sess=sess)
+    tm.templates_from_dict(shapes)
+    fisher_matrix = tm.asimov_hess(sess=sess)
+    results["optimal"] = {"common_path": "optimal",
+                          "fisher_matrix": fisher_matrix}
+
+  df = pd.DataFrame.from_dict(results, orient="index")
+  for b_name, config in benchmarks.items():
+    pars, aux = config
+    df.loc[:, b_name] = df.apply(marginal(pars, aux), axis=1)
+
+  if path is not None:
+    df.to_csv(path)
+  return df
+
+
+def benchmark_likelihood(path=None):
+
+  results = {}
+  aux = {}
+
+  problem = SyntheticThreeDimExample()
+  x_values = tf.placeholder(dtype=tf.float32, shape=(None, 3), name="x_values")
+
+  em = ExtendedModel(problem, aux=aux)
+  sess = tf.Session()
+  with sess.as_default():
+    bkg_t = problem.transform_bkg(x_values)
+    valid_arrays = sess.run(problem.valid_data())
+    bkg_t_arr = sess.run(bkg_t, {x_values: valid_arrays["bkg"]})
+    obs_phs = {em.s_n_exp: 50.,
+               em.b_n_exp: 1000.,
+               em.s_data: valid_arrays["sig"],
+               em.b_data: bkg_t_arr}
+    fisher_matrix = em.hess(par_phs={}, obs_phs=obs_phs, sess=sess)[0]
+    results["likelihood"] = {"common_path": "likelihood",
+                             "fisher_matrix": fisher_matrix}
+
+  df = pd.DataFrame.from_dict(results, orient="index")
+  for b_name, config in benchmarks.items():
+    pars, aux = config
+    df.loc[:, b_name] = df.apply(marginal(pars, aux), axis=1)
+  if path is not None:
+    df.to_csv(path)
   return df
 
 
