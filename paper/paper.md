@@ -203,8 +203,8 @@ optimised by stochastic gradient descent within an automatic differentiation
 framework, where the considered loss function accounts for the details of
 the statistical model as well as the expected effect of nuisance parameters.
 
-![**Learning inference-aware summary statistics (see section text for
-  details).**](gfx/figure1.pdf){#fig:diagram}
+![Learning inference-aware summary statistics (see section text for
+  details).](gfx/figure1.pdf){#fig:diagram}
 
 The family of summary statistics $\boldsymbol{s}(D)$ considered in this
 work is composed by a neural network model applied to each dataset
@@ -556,8 +556,8 @@ the mixture distribution for a small $\mu=50/1050$ is shown in
 ![mixture distribution (black)
  ](gfx/figure2b.pdf){#fig:subfigure_b width=49%}
 
-**Projection in 1D and 2D dimensions of 50000 samples from
-the synthetic problem considered.** The background distribution
+Projection in 1D and 2D dimensions of 50000 samples from
+the synthetic problem considered. The background distribution
 nuisance parameters used for generating data correspond to
 $r=0$ and $\lambda=3$. For samples the mixture distribution,
 $s=50$ and $b=1000$ was used, hence the mixture coefficient is $\mu=50/1050$.
@@ -596,15 +596,35 @@ the different approaches. Another quantity of relevance is the conditional
 density ratio, which would correspond to the optimal classifier separating
 signal and background events in a balanced test dataset:
 $$
-s(r, \lambda) = \frac{f_s(\boldsymbol{x})}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
+s(\boldsymbol{x} | r, \lambda) = \frac{f_s(\boldsymbol{x})}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $${#eq:opt_clf}
 noting that this quantity depends on the parameters that define the background
 distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
 the mixture coefficients. 
 <!-- TODO: link to proof of sufficiency in appendix -->
 In practise, the probability density function of signal and
-background are not known analytically for complex scientific simulators,
-so alternative approaches are required.
+background are not known analytically but only samples are available
+for complex scientific simulators, so alternative approaches are required.
+
+While the synthetic nature of this example allows to rapidly generate
+training data
+on demand,
+a training dataset of 200,000 simulated observations has been considered,
+in order
+to study how the proposed method performs when training data is limited.
+Half of the simulated
+observations correspond to the signal component and half to the background
+component. The latter has been generated generated using $r=0.0$ and
+$\lambda=3.0$.
+A validation holdout from the training dataset of 200,000
+observations is only used for computing relevant metrics during
+training and
+to control over-fitting. The final figures of merit that allow to
+compare different approaches are computed
+using a larger dataset of 1,000,000 observations.
+For simplicity, mini-batches for each training step are balanced so the same
+number of events from each component is taken both when using
+standard classification or inference-aware losses.
 
 An option is to pose the frame the problem as classification
 based on a simulated dataset. A supervised machine learning model such a
@@ -623,79 +643,135 @@ background distribution. Furthermore, some kind non-parametric density estimatio
 model using the classification-based learned features, which  will in term
 smooth and reduce the information available for inference.
 
+To exemplify the use of this family of classification-based summary statistics,
+a histogram of a deep neural network classifier output trained on simulated data
+and its variation it is computed for different values of $r$ and $\lambda$
+are shown in [@Fig:train_clf]. The details of the training procedure
+will be provided later in this document. The classifier output can be directly
+compared with $s(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$ evaluated using the
+analytical distribution function of signal and background according to [@Eq:opt_clf],
+which is shown in [@Fig:opt_clf] and corresponds to the optimal classifier. The
+trained classifier approximated very well the optimal classifier. The
+summary statistic distribution for background depends considerably on the value
+of the nuisance parameters both for the trained and the optimal classifier, which will
+in turn cause an important degradation on the subsequent statistical inference.
 
+::: {#fig:subfigs_clf_hists .subfigures}
+![classifier trained on simulated samples
+   ](gfx/figure3a.pdf){#fig:train_clf width=48%}
+![optimal classifier $s(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
+ ](gfx/figure3b.pdf){#fig:opt_clf width=48%}
 
-The analytical likelihood ratio
-per observation as a function of the value of $\boldsymbol{x}$ is shown in
-[@Fig:subfigure_a] when $\nu=0.04$ and $\lambda=0$, while the density ratio between
-the signal and background densities when $\lambda=0$
-is shown in [@Fig:subfigure_b].
+Histograms of summary statistics for signal and background (top) and
+and relative variation for different nuisance parameters (bottom). The
+classifier was trained using signal and background samples generated
+for $r = 0.0$ and $\lambda = 3.0$.
+:::
 
-
-
-
-While the synthetic nature of this example allows to rapidly generate
-training data
-on demand,
-a training dataset of 125,000 simulated observations has been considered,
-in order
-to study how the proposed method performs when training data is limited.
-Half
-of the simulated
-observations correspond to the signal component and half to the background
-component. The latter is generated with $\lambda=0$.
-A validation holdout from the training dataset of 50,000
-observations is only used for computing relevant metrics during training and
-to control
-over-fitting. The final figures of merit that allow to
-compare different approaches are computed
-using a larger dataset of 500,000 observations.
-For simplicity, mini-batches for each training step are balanced so the same
-number of events from each component is taken both when using
-standard classification or inference-aware losses.
-
-The statistical model described above has two unknown parameters: the
-signal strength $\nu$ and the background mean shift $\lambda$. The former
-is the parameter of interest and its effect can be easily included in
-the computation graph by
-weighting the signal observations. This is equivalent to scaling
-the resulting vector of Poisson counts (or its differentiable approximation)
+The statistical model described above has up to four unknown parameters: the
+expected number of signal observations $s$,
+the background mean shift $r$,
+the background exponential rate in the third dimension $\lambda$ and
+the expected number of background observations. The effect of the
+expected number of signal and background observations $s$ and $b$
+can be easily included in the computation graph by
+weighting the signal and background observations.
+This is equivalent to scaling the resulting vector of Poisson counts (or its differentiable approximation)
 if a non-parametric counting model as the one described in [@Sec:method] is used.
-The latter, referred as $\lambda$, is a nuisance parameter that causes a shift on
-the background along variable 1 with respect to the densities shown
-in [@Fig:subfigure_b]; its effect can accounted for in the computation graph
-by simply adding $(\lambda,0)$ to each observation in the mini-batch. The effect
-of alternative transformations depending on parameters could also be accounted
-for as long as they are differentiable or substituted by a differentiable
-approximation.
+Instead the effect of $r$ and $\lambda$, both nuisance parameters
+that will define the background distribution are more easily modelled
+as transformation of the input data $\boldsymbol{x}$. In particular,
+$r$ is a nuisance parameter that causes a shift on the background
+along the first dimension  and its effect can accounted for in the
+computation graph by simply adding $(r,0.0,0.0)$ to each observation
+in the mini-batch generated from the background distribution.
+Similarly, the effect of $\lambda$ can be modelled by multiplying
+$x_2$ by ratio between the $\lambda_0$ used for generation and that
+one being modelled.
+These transformations are specific for this example,
+but alternative transformations depending on
+parameters could also be accounted for as long as they are
+differentiable or substituted by a differentiable approximation.
+
+For this problem, we are interested in carrying out statistical
+inference about the parameter of interest $s$. In fact,
+the performance of inference-aware optimisation as described in
+[@Sec:method] will be compared with classification-based summary statistics for
+a series of inference benchmarks based on the synthetic problem described above
+that vary in the number of nuisance parameters considered and and their constraints:
+\begin{itemize}
+  \item \textbf{Benchmark 0:} no nuisance parameters are considered, both signal and
+  background distributions are taken as fully specified ($r=0.0$, $\lambda=3.0$
+  and $b=1000$).
+  \item \textbf{Benchmark 1:} $r$ is considered as an unconstrained
+  nuisance parameter, while $\lambda=3.0$ and $b=1000$ are fixed. 
+  \item \textbf{Benchmark 2:} $r$ and $\lambda$ are considered as unconstrained
+  nuisance parameters, while $b=1000$ is fixed. 
+  \item \textbf{Benchmark 3:} $r$ and $\lambda$ are considered as
+  nuisance parameters but with the following constraints $\mathcal{N} (r |0.0, 0.4)$
+  and $\mathcal{N} (\lambda| 3.0, 1.0)$, while $b=1000$ is fixed. 
+  \item \textbf{Benchmark 4:} all $r$, $\lambda$ and $b$ are all considered as
+  nuisance parameters with the following constraints $\mathcal{N} (r |0.0, 0.4)$,
+  $\mathcal{N} (\lambda| 3.0, 1.0)$ and $\mathcal{N} (b | 1000., 100.)$ . 
+\end{itemize}
+When using classification-based summary statistics, the construction of
+a summary statistic does depend on the presence of nuisance parameters, so the same
+model is trained independently of the benchmark considered. In real-world
+inference scenarios, nuisance parameters have often to be accounted for and
+typically are constrained by prior information or auxiliary measurements.
+For the approach
+presented in this work, inference-aware neural optimisation, the effect of the
+nuisance parameters and their constraints can be taken into account during training.
+Hence, 5 different training procedures for INFERNO will be considered,
+one for each of the benchmarks, denoted by the same number. 
 
 The same basic network architecture is used both for cross-entropy and
-inference-aware training: two hidden layers of 10 nodes followed by
+inference-aware training: two hidden layers of 100 nodes followed by
 ReLU activations. The number of layers on the output layer is two when
 classification proxies are used, matching the number of mixture classes
 in the problem considered. Instead, for inference-aware classification
 the number of output nodes can be arbitrary and will be denoted with $b$,
 corresponding to the dimensionality of the sample summary statistics.
 The final layer is followed by a softmax activation function and
-a temperature $\tau = 0.01$ for inference-aware learning to ensure
+a temperature $\tau = 0.1$ for inference-aware learning to ensure
 that the differentiable approximations are closer to the true
 expectations. Standard
 mini-batch stochastic gradient descent (SGD) is used for training and
-the optimal learning rate is fixed and decided by means of a simple scan;
-the best choice found is specified together with the results.
+the optimal learning rate is fixed and decided by means of a
+simple scan; the best choice found is specified together with the results.
 
 
 
-::: {#fig:subfigs_clf_hists .subfigures}
-![trained classifier
-   ](gfx/figure3a.pdf){#fig:train_clf width=48%}
-![optimal classifier
- ](gfx/figure3b.pdf){#fig:opt_clf width=48%}
+In [@Fig:training_dynamics], the dynamics of inference-aware optimisation
+are shown by the validation loss, which corresponds
+to the approximate expected variance
+of parameter $s$, as a function of the training step for 10 random-initialised
+instances of the \textsc{INFERNO} model corresponding to Benchmark 2.
+All inference-aware models were trained during 200 epochs with SGD using
+mini-batches of 2000 observations
+and a learning rate $\gamma=10^{-6}$. All the model initialisations
+converge to summary statistics that provide low variance for the estimator of
+$s$ when the nuisance parameters are accounted for.
 
-**Output of neural network based and optimal classifer**: (a) 
-histogram of distribution for signal and background (b) relative effect
-of variation of nuisance parameters.
-:::
+To compare with alternative approaches and verify the validity of the results,
+the profiled likelihoods obtained for each model are shown
+in [@Fig:profile_likelihood]. The expected uncertainty if the trained models are
+used for subsequent inference on the value of $s$
+can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
+the widths for the profile likelihood using inference-aware training
+$0.437\pm0.008$ can be
+compared with those obtained by uniformly binning the output of
+classification-based models in 10 bins $0.444\pm0.003$. The models based on
+cross-entropy loss were
+trained during 200 epochs using a mini-batch size of 64 and a fixed learning
+rate of $\gamma=0.001$.
+
+A more complete quantitative study of the improvement of the different INFERNO
+models is provided in \autoref{tab:results_table}, where the median and 1-sigma
+percentiles on the expected uncertainty on $s$ are provided for 100 random-initialised
+models. The results for 100 random-initialised cross-entropy trained models and
+the results for the optimal classifier and likelihood-based inference are also
+included for comparison.
 
 \begin{table}
   \caption{Results table}
@@ -704,29 +780,6 @@ of variation of nuisance parameters.
   \small
   \input{table.tex}
 \end{table}
-
-In [@Fig:training_dynamics], the dynamics of systematic-aware optimisation
-are shown by the validation loss, which corresponds
-to the approximate expected variance
-of parameter $\nu$, as a function of the training step.
-A total 10 random initialisations are used to study the convergence
-and variability of the resulting model. All inference-aware models
-were trained during 300 epochs with SGD using mini-batches of 1024 observations
-and a learning rate $\gamma=0.0001$. All the model initialisations considered
-seem to converge successfully to a expected variance around 0.20.
-
-To compare with alternative approaches and verify the validity of the results,
-the Asimov profile likelihoods obtained for each model are shown
-in [@Fig:profile_likelihood]. The expected uncertainty
-if the trained models are used for subsequent inference on the value of $\nu$
-can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
-the widths for the profile likelihood using inference-aware training
-$0.437\pm0.008$ can be
-compared with those obtained by uniformly binning the output of
-classification-based models in 10 bins $0.444\pm0.003$. The models based on
-cross-entropy loss were
-trained during 100 epochs using a mini-batch size of 256 and a fixed learning
-rate of $\gamma=0.01$.
 
 This simple example demonstrates that the direct optimisation of inference-aware
 losses as those described in the [@Sec:method] is viable. The summary statistics
