@@ -534,7 +534,7 @@ Exp (x_2 | 2)
 $${#eq:sig_toy_pdf}
 so that $(x_0,x_1)$ are distributed according to a multivariate normal
 distribution while $x_2$ follows an independent exponential distribution
-both for background and signal. The signal distribution is fully specified while
+both for background and signal, as shown in [@Fig:subfigure_a]. The signal distribution is fully specified while
 the background distribution depends on $r$, parameter that
 shifts the mean of the background density, and $\lambda$ which is specifies
 the exponential rate in the third dimension. This parameters will be the
@@ -546,7 +546,22 @@ p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) + 
 $${#eq:mixture_eq}
 where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
-background.
+background. The low-dimensional projections from samples from
+the mixture distribution for a small $\mu=50/1050$ is shown in
+[@Fig:subfigure_b].
+
+::: {#fig:subfigs_distributions .subfigures}
+![signal (red) and background (blue)
+ ](gfx/figure2a.pdf){#fig:subfigure_a width=49%}
+![mixture distribution (black)
+ ](gfx/figure2b.pdf){#fig:subfigure_b width=49%}
+
+**Projection in 1D and 2D dimensions of 50000 samples from
+the synthetic problem considered.** The background distribution
+nuisance parameters used for generating data correspond to
+$r=0$ and $\lambda=3$. For samples the mixture distribution,
+$s=50$ and $b=1000$ was used, hence the mixture coefficient is $\mu=50/1050$.
+:::
 
 Let us assume that we want to carry out inference based
 on $n$ i.i.d. observations, such that $\mathbb{E}[n_s]=\mu n$ observations
@@ -608,14 +623,6 @@ background distribution. Furthermore, some kind non-parametric density estimatio
 model using the classification-based learned features, which  will in term
 smooth and reduce the information available for inference.
 
-::: {#fig:subfigs_distributions .subfigures}
-![signal and background
- ](gfx/figure2a.pdf){#fig:subfigure_a width=49%}
-![mixture
- ](gfx/figure2b.pdf){#fig:subfigure_b width=49%}
-
-**Distributions**
-:::
 
 
 The analytical likelihood ratio
