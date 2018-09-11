@@ -17,6 +17,7 @@ arxiv_tar: diagram
 	$(PANDOC) arxiv.yaml paper.md -s -o paper.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
 	mkdir -p arxiv
 	cp -r paper.tex arxiv/.
+	cp -r table.tex arxiv/.
 	cp -r gfx arxiv/.
 	cp -r bibliography.bib arxiv/.
 	cp nips_2018.sty arxiv/.
