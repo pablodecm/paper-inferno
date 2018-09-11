@@ -599,7 +599,7 @@ The output of such a model typically consist on class probabilities
 $c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which will tend
 asymptotically to the optimal classifier from [@Eq:opt_clf] given
 enough data, a flexible enough model and a powerful learning rule.
-The conditional class probabilities (or likelihood ratio 
+The conditional class probabilities (or alternatively likelihood ratio 
 $f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$) are powerful
 learned features that can be used as summary statistic; however their construction
 ignores the effect of the nuisance parameters $r$ and $\lambda$ on the
@@ -689,6 +689,14 @@ the best choice found is specified together with the results.
 histogram of distribution for signal and background (b) relative effect
 of variation of nuisance parameters.
 :::
+
+\begin{table}
+  \caption{Results table}
+  \label{tab:results_table}
+  \centering
+  \small
+  \input{table.tex}
+\end{table}
 
 In [@Fig:training_dynamics], the dynamics of systematic-aware optimisation
 are shown by the validation loss, which corresponds

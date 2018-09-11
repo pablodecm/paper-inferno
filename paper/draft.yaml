@@ -3,6 +3,7 @@ header-includes: |
   \usepackage{lineno}
   \linenumbers
   \usepackage[nonatbib,preprint]{nips_2018}
+  \usepackage{booktabs}
   \DeclareMathSymbol{\Gamma}{\mathord}{operators}{"00}
   \DeclareMathSymbol{\Delta}{\mathord}{operators}{"01}
   \DeclareMathSymbol{\Theta}{\mathord}{operators}{"02}
