@@ -534,7 +534,8 @@ Exp (x_2 | 2)
 $${#eq:sig_toy_pdf}
 so that $(x_0,x_1)$ are distributed according to a multivariate normal
 distribution while $x_2$ follows an independent exponential distribution
-both for background and signal, as shown in [@Fig:subfigure_a]. The signal distribution is fully specified while
+both for background and signal, as shown in [@Fig:subfigure_a].
+The signal distribution is fully specified while
 the background distribution depends on $r$, parameter that
 shifts the mean of the background density, and $\lambda$ which is specifies
 the exponential rate in the third dimension. This parameters will be the
@@ -542,7 +543,8 @@ treated as nuisance parameters when benchmarking different methods.
 Hence, the probability density
 function of observations has the following mixture structure:
 $$
-p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) + \mu f_s(\boldsymbol{x})
+p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) 
+                                      + \mu f_s(\boldsymbol{x})
 $${#eq:mixture_eq}
 where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
@@ -702,14 +704,14 @@ that vary in the number of nuisance parameters considered and and their constrai
 \begin{itemize}
   \item \textbf{Benchmark 0:} no nuisance parameters are considered, both signal and
   background distributions are taken as fully specified ($r=0.0$, $\lambda=3.0$
-  and $b=1000$).
+  and $b=1000.$).
   \item \textbf{Benchmark 1:} $r$ is considered as an unconstrained
-  nuisance parameter, while $\lambda=3.0$ and $b=1000$ are fixed. 
+  nuisance parameter, while $\lambda=3.0$ and $b=100.0$ are fixed. 
   \item \textbf{Benchmark 2:} $r$ and $\lambda$ are considered as unconstrained
-  nuisance parameters, while $b=1000$ is fixed. 
+  nuisance parameters, while $b=1000.$ is fixed. 
   \item \textbf{Benchmark 3:} $r$ and $\lambda$ are considered as
   nuisance parameters but with the following constraints $\mathcal{N} (r |0.0, 0.4)$
-  and $\mathcal{N} (\lambda| 3.0, 1.0)$, while $b=1000$ is fixed. 
+  and $\mathcal{N} (\lambda| 3.0, 1.0)$, while $b=1000.$ is fixed. 
   \item \textbf{Benchmark 4:} all $r$, $\lambda$ and $b$ are all considered as
   nuisance parameters with the following constraints $\mathcal{N} (r |0.0, 0.4)$,
   $\mathcal{N} (\lambda| 3.0, 1.0)$ and $\mathcal{N} (b | 1000., 100.)$ . 
@@ -722,7 +724,7 @@ typically are constrained by prior information or auxiliary measurements.
 For the approach
 presented in this work, inference-aware neural optimisation, the effect of the
 nuisance parameters and their constraints can be taken into account during training.
-Hence, 5 different training procedures for INFERNO will be considered,
+Hence, 5 different training procedures for \textsc{INFERNO} will be considered,
 one for each of the benchmarks, denoted by the same number. 
 
 The same basic network architecture is used both for cross-entropy and
@@ -766,11 +768,13 @@ cross-entropy loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
 rate of $\gamma=0.001$.
 
-A more complete quantitative study of the improvement of the different INFERNO
-models is provided in \autoref{tab:results_table}, where the median and 1-sigma
-percentiles on the expected uncertainty on $s$ are provided for 100 random-initialised
-models. The results for 100 random-initialised cross-entropy trained models and
-the results for the optimal classifier and likelihood-based inference are also
+A more complete study of the improvement provided by the different INFERNO
+training procedures is provided in \autoref{tab:results_table},
+where the median and 1-sigma
+percentiles on the expected uncertainty on $s$ are provided for 100
+random-initialised instances of each model. In addition, the results for 100
+random-initialised cross-entropy trained models and
+the optimal classifier and likelihood-based inference are also
 included for comparison.
 
 \begin{table}
@@ -807,7 +811,7 @@ include a discussion of examples more similar to the use cases of parameter
 estimation in High Energy Physics analyses, which the proposed
 technique is targeting.
 
-## Acknowledgments {.unnumbered}
+# Acknowledgments {.unnumbered}
 
 Pablo de Castro would like to thank Daniel Whiteson, Peter Sadowski and
 the other attendants of the ML for HEP meeting at UCI for the initial feedback
