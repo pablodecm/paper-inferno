@@ -742,6 +742,22 @@ mini-batch stochastic gradient descent (SGD) is used for training and
 the optimal learning rate is fixed and decided by means of a
 simple scan; the best choice found is specified together with the results.
 
+::: {#fig:subfigs_training .subfigures}
+![inference-aware training loss
+](gfx/figure4a.pdf){#fig:training_dynamics width=48%}
+![profile-likelihood comparison
+](gfx/figure4a.pdf){#fig:profile_likelihood width=48%}
+ 
+Dynamics and results of inference-aware optimisation: (a) square root of
+inference-loss (i.e. approximated standard deviation of the parameter
+of interest) as a function
+of the training step for 10 different random initialisations of the neural
+network parameters (b) profiled likelihood around the expectation value
+for the parameter of interest of 10 trained inference-aware models and 10
+trained cross-entropy loss based models. The latter are constructed by
+building a binned likelihood by uniformly signal probability in
+10 uniform intervals.
+:::
 
 
 In [@Fig:training_dynamics], the dynamics of inference-aware optimisation
@@ -772,7 +788,7 @@ A more complete study of the improvement provided by the different INFERNO
 training procedures is provided in \autoref{tab:results_table},
 where the median and 1-sigma
 percentiles on the expected uncertainty on $s$ are provided for 100
-random-initialised instances of each model. In addition, the results for 100
+random-initialised instances of each model. In addition, results for 100
 random-initialised cross-entropy trained models and
 the optimal classifier and likelihood-based inference are also
 included for comparison.

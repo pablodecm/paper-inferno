@@ -14,26 +14,54 @@ from fisher_matrix import FisherMatrix
 ds = tfp.distributions
 
 
-def int_quad_lin(alpha, c_nom, c_up, c_dw):
+def int_quad_lin(alpha, c_nom, c_up, c_dw, multiple_pars=False):
   "Three-point interpolation, quadratic inside and linear outside"
 
-  alpha_t = tf.tile(tf.expand_dims(alpha, axis=-1), [1, 1, tf.shape(c_nom)[0]])
-  a = 0.5 * (c_up + c_dw) - c_nom
-  b = 0.5 * (c_up - c_dw)
+  if multiple_pars:
+    tiling_shape = [1, 1, 1, tf.shape(c_nom)[0]]
+    expand_axis = 1
+  else:
+    tiling_shape = [1, 1, tf.shape(c_nom)[0]]
+    expand_axis = 0
+  # alpha dimensions are (1, n_par_types, n_par_inst)
+  # c_dw and c_up are (n_bins, n_par_types)
+  alpha_t = tf.tile(tf.expand_dims(alpha, axis=-1), tiling_shape)
+  # alpha_t dimensions are (1, n_par_types, n_par_inst, n_bins)
+  # if multiple_pars is True or (1, n_par_types, n_bins)
+  a = tf.expand_dims(0.5 * (c_up + c_dw) - c_nom,
+                     axis=expand_axis, name="a")
+  b = tf.expand_dims(0.5 * (c_up - c_dw),
+                     axis=expand_axis, name="b")
   ones = tf.ones_like(alpha_t)
+  #  (1, n_par_types, n_par_inst, n_bins) broadcast when multiple_pars
+  #      (n_par_types,         1, n_bins) (if expand axis 1)
+  #  (1, n_par_types, n_bins) broadcast when not multiple_pars
+  #      (n_par_types,n_bins) (if expand axis 0)
   switch = tf.where(alpha_t < 0.,
-                    ones * tf.expand_dims(c_dw - c_nom, axis=0),
-                    ones * tf.expand_dims(c_up - c_nom, axis=0))
+                    ones * tf.expand_dims(c_dw - c_nom, axis=expand_axis),
+                    ones * tf.expand_dims(c_up - c_nom, axis=expand_axis))
   abs_var = tf.where(tf.abs(alpha_t) > 1.,
                      (2 * b + tf.sign(alpha_t) * a) *
                      (alpha_t - tf.sign(alpha_t)) + switch,
                      a * tf.pow(alpha_t, 2) + b * alpha_t)
+  # abs_var is (1, n_par_types, n_par_inst, n_bins) or (1, n_par_types, n_bins)
   return c_nom + tf.reduce_sum(abs_var, axis=1)
 
 
 class TemplateModel(object):
 
-  def __init__(self):
+  def __init__(self, multiple_pars=False):
+
+    if multiple_pars:
+      shape_pars = (None,)
+    else:
+      shape_pars = ()
+
+    def default_ph_value(val):
+      if multiple_pars:
+        return [val, ]
+      else:
+        return val
 
     self.r_dist_init = tf.placeholder_with_default(
         2., shape=(), name="r_dist_init")
@@ -44,11 +72,15 @@ class TemplateModel(object):
     self.b_rate_shift = tf.placeholder_with_default(
         0.5, shape=(), name="b_rate_shift")
 
-    self.r_dist = tf.placeholder_with_default(2., shape=(), name="r_dist")
-    self.b_rate = tf.placeholder_with_default(3., shape=(), name="b_rate")
+    self.r_dist = tf.placeholder_with_default(default_ph_value(2.),
+                                              shape=shape_pars,
+                                              name="r_dist")
+    self.b_rate = tf.placeholder_with_default(default_ph_value(3.),
+                                              shape=shape_pars,
+                                              name="b_rate")
 
     # background templates
-    self.c_nom = tf.placeholder(dtype=tf.float32, shape=(None), name="c_nom")
+    self.c_nom = tf.placeholder(dtype=tf.float32, shape=(None,), name="c_nom")
     self.c_up = tf.placeholder(
         dtype=tf.float32, shape=(None, None), name="c_up")
     self.c_dw = tf.placeholder(
@@ -56,28 +88,42 @@ class TemplateModel(object):
 
     # signal template
     self.sig_shape = tf.placeholder(
-        dtype=tf.float32, shape=(None), name="sig_shape")
+        dtype=tf.float32, shape=(None,), name="sig_shape")
 
     self.alpha_pars = [[(self.r_dist - self.r_dist_init) / self.r_dist_shift,
                         (self.b_rate - self.b_rate_init) / self.b_rate_shift]]
 
+    # bkg_shape shape is (n_par_inst, n_bins, 1) if multiple_pars
     self.bkg_shape = int_quad_lin(self.alpha_pars,
-                                  self.c_nom, self.c_up, self.c_dw)[0]
-
+                                  self.c_nom, self.c_up, self.c_dw,
+                                  multiple_pars=multiple_pars)[0]
     # expected amount of signal
-    self.s_exp = tf.placeholder_with_default(50., shape=(), name="s_exp")
+    self.s_exp = tf.placeholder_with_default(default_ph_value(50.),
+                                             shape=shape_pars, name="s_exp")
     # expected amount of background
-    self.b_exp = tf.placeholder_with_default(1000., shape=(), name="b_exp")
+    self.b_exp = tf.placeholder_with_default(default_ph_value(1000.),
+                                             shape=shape_pars, name="b_exp")
 
-    self.t_exp = tf.cast(self.s_exp * self.sig_shape +
-                         self.b_exp * self.bkg_shape, dtype=tf.float64)
+    if multiple_pars:
+      sig_shape = tf.expand_dims(self.sig_shape, axis=0,
+                                 name="expanded_sig_shape")
+      s_exp = tf.expand_dims(self.s_exp, axis=-1, name="expanded_s_exp")
+      b_exp = tf.expand_dims(self.b_exp, axis=-1, name="expanded_b_exp")
+    else:
+      sig_shape = self.sig_shape
+      s_exp = self.s_exp
+      b_exp = self.b_exp
+
+    self.t_exp = tf.cast(s_exp * sig_shape +
+                         b_exp * self.bkg_shape,
+                         dtype=tf.float64, name="t_exp")
 
     # placeholder for observed data
-    self.obs = tf.placeholder(dtype=tf.float64, shape=(None), name="obs")
+    self.obs = tf.placeholder(dtype=tf.float64, shape=(None,), name="obs")
 
     self.h_pois = ds.Poisson(self.t_exp)
     self.h_nll = - \
-        tf.cast(tf.reduce_sum(self.h_pois.log_prob(self.obs)),
+        tf.cast(tf.reduce_sum(self.h_pois.log_prob(self.obs), axis=-1),
                 dtype=tf.float32)
 
     self.all_pars = OrderedDict([('s_exp', self.s_exp),
