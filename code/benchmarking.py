@@ -11,6 +11,7 @@ from template_model import TemplateModel
 from summary_statistic_computer import SummaryStatisticComputer
 from synthetic_3D_example import SyntheticThreeDimExample
 from extended_model import ExtendedModel
+from train_helpers import NumpyEncoder
 
 import numpy as np
 import pandas as pd
@@ -62,6 +63,9 @@ def benchmark_model(model_re, model_type):
       info = {}
     with sess.as_default():
       shapes = model_types[model_type](model_path, sess=sess)
+      with open(f"{model_path}/templates.json", 'w') as t_file:
+        json.dump({str(k): v for k, v in shapes.items()},
+                  t_file, cls=NumpyEncoder)
       tm.templates_from_dict(shapes)
       fisher_matrix = tm.asimov_hess(sess=sess)
       results[model_path] = {"common_path": common_path,

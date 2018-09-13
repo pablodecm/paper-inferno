@@ -7,6 +7,7 @@ import tensorflow as tf
 from neyman.inferences import batch_hessian
 from ast import literal_eval
 import json
+import itertools as it
 import tensorflow_probability as tfp
 from collections import OrderedDict
 from fisher_matrix import FisherMatrix
@@ -52,6 +53,7 @@ class TemplateModel(object):
 
   def __init__(self, multiple_pars=False):
 
+    self.multiple_pars = multiple_pars
     if multiple_pars:
       shape_pars = (None,)
     else:
@@ -188,6 +190,8 @@ class TemplateModel(object):
     if sess is None:
       sess = tf.get_default_session()
     asimov_data = sess.run(self.t_exp, {**par_phs, **self.shape_phs})
+    if self.multiple_pars:
+      asimov_data = asimov_data[0]
     return asimov_data
 
   def asimov_hess(self, par_phs={}, sess=None):
@@ -197,3 +201,21 @@ class TemplateModel(object):
     obs_phs = {self.obs: self.asimov_data(par_phs, sess=sess)}
     h_hess = sess.run(self.h_hess, {**par_phs, **obs_phs, **self.shape_phs})
     return FisherMatrix(h_hess, par_names=list(self.all_pars.keys()))
+
+  def hessian_and_gradient(self, pars, par_phs={}, obs_phs={}, sess=None):
+
+    if sess is None:
+      sess = tf.get_default_session()
+
+    pars = tuple(pars)
+    nll, hess, grad = sess.run([self.h_nll, self.h_hess, self.h_grad],
+                               feed_dict={**par_phs, **obs_phs,
+                                          **self.shape_phs})
+
+    indices = [list(self.all_pars.keys()).index(par) for par in pars]
+    idx_subset = np.reshape(list(it.product(indices, indices)),
+                            (len(pars), len(pars), -1)).T
+
+    sub_hess = hess[:, idx_subset[0], idx_subset[1]]
+    sub_grad = grad[:, indices]
+    return nll, sub_hess, sub_grad

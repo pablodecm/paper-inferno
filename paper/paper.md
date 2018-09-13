@@ -746,7 +746,7 @@ simple scan; the best choice found is specified together with the results.
 ![inference-aware training loss
 ](gfx/figure4a.pdf){#fig:training_dynamics width=48%}
 ![profile-likelihood comparison
-](gfx/figure4a.pdf){#fig:profile_likelihood width=48%}
+](gfx/figure4b.pdf){#fig:profile_likelihood width=48%}
  
 Dynamics and results of inference-aware optimisation: (a) square root of
 inference-loss (i.e. approximated standard deviation of the parameter
@@ -777,9 +777,9 @@ in [@Fig:profile_likelihood]. The expected uncertainty if the trained models are
 used for subsequent inference on the value of $s$
 can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
 the widths for the profile likelihood using inference-aware training
-$0.437\pm0.008$ can be
+$16.97\pm0.11$ can be
 compared with those obtained by uniformly binning the output of
-classification-based models in 10 bins $0.444\pm0.003$. The models based on
+classification-based models in 10 bins $24.01\pm0.36$. The models based on
 cross-entropy loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
 rate of $\gamma=0.001$.
