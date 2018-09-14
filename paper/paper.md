@@ -801,6 +801,18 @@ included for comparison.
   \input{table.tex}
 \end{table}
 
+
+::: {#fig:validity_range .subfigures}
+![different $r$ value
+](gfx/figure5a.pdf){#fig:range_r_dist width=48%}
+![different $\lambda$ value
+](gfx/figure5b.pdf){#fig:range_b_rate width=48%}
+
+Expected uncertainty when the value of the nuisance
+parameters is different.
+:::
+
+
 This simple example demonstrates that the direct optimisation of inference-aware
 losses as those described in the [@Sec:method] is viable. The summary statistics
 learnt accounting for the effect of nuisance parameters seem to compare favourably

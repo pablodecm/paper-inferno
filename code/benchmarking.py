@@ -22,6 +22,8 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--model_re", help="regular expression for models")
 parser.add_argument("--model_type", help="inf or clf")
+parser.add_argument("--fine_scan", help="compute shapes finely",
+                    action="store_true")
 
 
 aux_none = [None, None, None, None]
@@ -43,11 +45,18 @@ def marginal(pars, aux_std, poi="s_exp", row_name="fisher_matrix"):
   return marginal_computer
 
 
-def benchmark_model(model_re, model_type):
+def benchmark_model(model_re, model_type, fine_scan=False):
 
   results = {}
   tm = TemplateModel()
-  ssc = SummaryStatisticComputer()
+  if fine_scan:
+    pars_scan = {"r_dist": np.round(np.linspace(1.5, 2.5, 21, endpoint=True),
+                                    decimals=2),
+                 "b_rate": np.round(np.linspace(2.0, 4.0, 21, endpoint=True),
+                                    decimals=1)}
+    ssc = SummaryStatisticComputer(pars_scan=pars_scan)
+  else:
+    ssc = SummaryStatisticComputer()
   sess = tf.Session()
   model_types = {"clf": ssc.classifier_shapes,
                  "inf": ssc.inferno_shapes}
@@ -77,7 +86,9 @@ def benchmark_model(model_re, model_type):
     pars, aux = config
     df.loc[:, b_name] = df.apply(marginal(pars, aux), axis=1)
 
-  df.to_csv(f"{common_path}/results.csv")
+  if not fine_scan:
+    df.to_csv(f"{common_path}/results.csv")
+
   return df
 
 
@@ -136,7 +147,7 @@ def benchmark_likelihood(path=None):
 
 def main():
   args = parser.parse_args()
-  benchmark_model(args.model_re, args.model_type)
+  benchmark_model(args.model_re, args.model_type, args.fine_scan)
 
 
 if __name__ == '__main__':
