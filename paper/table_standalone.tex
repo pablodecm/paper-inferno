@@ -1,0 +1,19 @@
+
+\documentclass[a4paper]{standalone}
+
+\usepackage{booktabs}
+\usepackage{caption}
+
+\begin{document}
+
+\minipage{1.3\textwidth}
+  \captionof{table}{Expected uncertainty on the parameter of interest $s$
+    for each of the inference benchmarks considered using a cross-entropy
+    trained neural network model, INFERNO customised for each problem
+    and the optimal classifier and likelihood based resuls.}
+  \label{tab:results_table}
+  \centering
+  \small
+  \input{table.tex}
+  \endminipage
+\end{document}

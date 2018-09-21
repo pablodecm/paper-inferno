@@ -706,12 +706,12 @@ that vary in the number of nuisance parameters considered and and their constrai
   background distributions are taken as fully specified ($r=0.0$, $\lambda=3.0$
   and $b=1000.$).
   \item \textbf{Benchmark 1:} $r$ is considered as an unconstrained
-  nuisance parameter, while $\lambda=3.0$ and $b=100.0$ are fixed. 
+  nuisance parameter, while $\lambda=3.0$ and $b=1000$ are fixed. 
   \item \textbf{Benchmark 2:} $r$ and $\lambda$ are considered as unconstrained
-  nuisance parameters, while $b=1000.$ is fixed. 
+  nuisance parameters, while $b=1000$ is fixed. 
   \item \textbf{Benchmark 3:} $r$ and $\lambda$ are considered as
   nuisance parameters but with the following constraints $\mathcal{N} (r |0.0, 0.4)$
-  and $\mathcal{N} (\lambda| 3.0, 1.0)$, while $b=1000.$ is fixed. 
+  and $\mathcal{N} (\lambda| 3.0, 1.0)$, while $b=1000$ is fixed. 
   \item \textbf{Benchmark 4:} all $r$, $\lambda$ and $b$ are all considered as
   nuisance parameters with the following constraints $\mathcal{N} (r |0.0, 0.4)$,
   $\mathcal{N} (\lambda| 3.0, 1.0)$ and $\mathcal{N} (b | 1000., 100.)$ . 
@@ -794,7 +794,10 @@ the optimal classifier and likelihood-based inference are also
 included for comparison.
 
 \begin{table}
-  \caption{Results table}
+  \caption{Expected uncertainty on the parameter of interest $s$
+    for each of the inference benchmarks considered using a cross-entropy
+    trained neural network model, INFERNO customised for each problem
+    and the optimal classifier and likelihood based resuls.}
   \label{tab:results_table}
   \centering
   \small
