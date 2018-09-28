@@ -6,9 +6,9 @@
 # Sufficient Statistics for Mixture Models
 
 Let us consider the general problem of inference for two-component
-mixture problem , which is very common in scientific disciplines such
+mixture problem, which is very common in scientific disciplines such
 as High Energy Physics.
-While their functional form will no be explicitly specified to keep
+While their functional form will not be explicitly specified to keep
 the formulation general, one of the components will be denoted as signal
 $f_s(\boldsymbol{x}| \boldsymbol{\theta})$ and the other as background
 $f_b(\boldsymbol{x} | \boldsymbol{\theta})$, where  $\boldsymbol{\theta}$ is
@@ -40,7 +40,7 @@ summary statistic $s_{s/(s+b)}= f_s(\boldsymbol{x} | \boldsymbol{\theta}) /(
 instead of $s_{s/ b}$. The advantage of $s_{s/(s+b)}$ is that it represents
 the conditional probability of one observation $\boldsymbol{x}$ coming
 from the signal assuming a balanced mixture, and hence is bounded between
-zero and one greatly simplifying its visualisation and non-parametetric
+zero and one. This greatly simplifies its visualisation and non-parametetric
 likelihood estimation. Taking [@Eq:mixture_div] and manipulating the
 subexpression depending on $\mu$ by adding and subtracting $2\mu$  we have:
 $$
