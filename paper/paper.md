@@ -113,11 +113,11 @@ These nuisance parameters are not of immediate interest but
 have to be accounted for in order to make quantitative statements about the
 model parameters based on the data. Classification-based summary statistics
 cannot easily account for these effects, so their inference power is degraded
-when these additional nuisances are finally taken into account. Clearly, the 
+when these additional nuisances are finally taken into account.
 
 In this work, we present a new machine learning method to
 construct non-linear sample summary statistics that directly
-optimise the expected amount of information about the subset of
+optimises the expected amount of information about the subset of
 parameters of interest using simulated samples, by explicitly
 taking into account
 the effect of nuisance parameters.
