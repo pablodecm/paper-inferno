@@ -153,16 +153,22 @@ about the subset of interest
 $\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$
 of the model parameters. The concept of statistical
 sufficiency is especially useful to evaluate whether
-summary statistics are informative. Classical sufficiency
-can be characterised by means of the factorisation criterion:
+summary statistics are informative. In the absence of nuisance
+parameters, classical sufficiency
+can be characterised by means of the factorisation
+criterion:
 $$
 p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
 $${#eq:sufficiency}
 where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
 can be factorised as indicated, the
-summary statistic $\boldsymbol{s}(D)$ will yield the same inference about the parameters of
-interest $\boldsymbol{\omega}$ as the full set of observations $D$. For the problems
-of interest of this work, the probability density is not explicit so
+summary statistic $\boldsymbol{s}(D)$ will yield the same inference about
+the parameters $\boldsymbol{\omega}$ as the full set of observations $D$.
+When nuisance parameters have to be accounted in the inference procedure,
+alternate notions of sufficiency are commonly use such as partial
+or marginal sufficiency [@basu2011partial;@sprott1975marginal].
+Nonetheless, for the problems
+of relevance in this work, the probability density is not explicit so
 the general task of finding a sufficient summary statistic cannot be tackled
 directly. Hence, alternative methods to build summary statistics have
 to be followed.
@@ -348,8 +354,11 @@ $$
 \textrm{cov}_{\boldsymbol{\theta}}(\hat{\boldsymbol{\theta}}) \geq
 I(\boldsymbol{\theta})^{-1}
 $${#eq:CRB}
-and the inverse of the Fisher information can be used as an estimator
-of the expected variance. If some of the parameters
+and the inverse of the Fisher information can be used as an
+approximate estimator of the expected variance, given that
+the bound would become
+an equality in the asymptotic limit for MLE.
+If some of the parameters
 $\boldsymbol{\theta}$ are constrained by independent measurements
 characterised by their likelihoods
 $\{\mathcal{L}_C^{0}(\boldsymbol{\theta}), ...,
@@ -604,15 +613,19 @@ p(\boldsymbol{x}| s,r, \lambda, b)
 $${#eq:ext_ll}
 which will be used to provide an optimal inference baseline when benchmarking
 the different approaches. Another quantity of relevance is the conditional
-density ratio, which would correspond to the optimal classifier separating
-signal and background events in a balanced test dataset:
+density ratio, which would correspond to the optimal classifier (in the
+Bayes risk sense) separating
+signal and background events in a balanced dataset (equal priors):
 $$
-s(\boldsymbol{x} | r, \lambda) = \frac{f_s(\boldsymbol{x})}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
+s^{*}(\boldsymbol{x} | r, \lambda) = \frac{f_s(\boldsymbol{x})}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $${#eq:opt_clf}
 noting that this quantity depends on the parameters that define the background
 distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
-the mixture coefficients. 
-<!-- TODO: link to proof of sufficiency in appendix -->
+the mixture coefficients. It can be proven (see [appendix @sec:sufficiency] )
+that $s^{*}(\boldsymbol{x})$ is a sufficient summary statistic with respect to an
+arbitrary two-component mixture model if the only unknown parameter
+is the signal mixture fraction $\mu$ (or alternatively $s$ in the chosen
+parametrisation).
 In practise, the probability density functions of signal and
 background are not known analytically, and only forward samples are available
 through simulation, so alternative approaches are required.
@@ -766,7 +779,8 @@ network parameters; (b) profiled likelihood around the expectation value
 for the parameter of interest of 10 trained inference-aware models and 10
 trained cross-entropy loss based models. The latter are constructed by
 building a uniformly binned Poisson count likelihood of the conditional
-signal probability output.
+signal probability output.  All results
+correspond to Benchmark 2.
 :::
 
 
@@ -801,13 +815,23 @@ percentiles on the expected uncertainty on $s$ are provided for 100
 random-initialised instances of each model. In addition, results for 100
 random-initialised cross-entropy trained models and
 the optimal classifier and likelihood-based inference are also
-included for comparison.
+included for comparison. The confidence intervals obtained using INFERNO-based
+summary statistics are considerably narrower than those using
+classification and tend to be much closer to those expected when using
+the true model likelihood for inference. Much smaller
+fluctuations between initialisations are also observed for the INFERNO-based
+cases. The improvement over classification
+increases when more nuisance parameters are considered. The results also
+seem to suggest the inclusion of additional information about the inference
+problem in the INFERNO technique leads to comparable or better results than
+its omission.
 
 \begin{table}
   \caption{Expected uncertainty on the parameter of interest $s$
     for each of the inference benchmarks considered using a cross-entropy
     trained neural network model, INFERNO customised for each problem
-    and the optimal classifier and likelihood based resuls.}
+    and the optimal classifier and likelihood based results. The results
+    for INFERNO matching each problem are shown with bold characters.}
   \label{tab:results_table}
   \centering
   \small
@@ -822,22 +846,38 @@ included for comparison.
 ](gfx/figure5b.pdf){#fig:range_b_rate width=48%}
 
 Expected uncertainty when the value of the nuisance
-parameters is different.
+parameters is different for 10 learnt summary statistics
+(different random initialisation) based on cross-entropy
+classification and inference-aware technique. Results
+correspond to Benchmark 2.
 :::
 
+Given that a certain value of the parameters $\boldsymbol{\theta}_s$
+has been used to learn the summary statistics as described in
+Algorithm \autoref{alg:simple_algorithm} while their true
+value is unknown, the expected uncertainty on $s$ has also been computed
+for cases when the true value of the parameters
+$\boldsymbol{\theta}_{\textrm{true}}$ differs. The
+variation of the expected uncertainty on $s$ when either $r$ or $\lambda$
+is varied for classification and inference-aware summary statistics is
+shown in [@Fig:validity_range] for Benchmark 2. The inference-aware summary
+statistics learnt for $\boldsymbol{\theta}_s$ work
+well when  $\boldsymbol{\theta}_{\textrm{true}} \neq \boldsymbol{\theta}_s$
+in the range of variation explored. 
 
-This simple example demonstrates that the direct optimisation of inference-aware
-losses as those described in the [@Sec:method] is quite effective.
+This synthetic example demonstrates that the direct optimisation of inference-aware
+losses as those described in the [@Sec:method] is effective.
 The summary statistics
 learnt accounting for the effect of nuisance parameters compare very favourably
 to those obtained by using a classification proxy to approximate the
-likelihood ratio. Of course, more experiments are needed to benchmark the
+likelihood ratio.  Of course, more experiments are needed to benchmark the
 usefulness of this technique for real-world inference problems as those
 found in High Energy Physics analyses at the LHC.
 
 # Conclusions
 
-Classification-based summary statistics often suffer from the need of specifying
+Classification-based summary statistics for mixture models
+often suffer from the need of specifying
 a fixed model of the data, thus neglecting the effect of nuisance parameters
 in the learning process. The effect of nuisance parameters is only considered
 downstream of the learning phase, resulting in sub-optimal inference on
@@ -845,10 +885,28 @@ the parameters of interest.
 
 In this work we have described a new approach for building
 non-linear summary statistics for
-likelihood-free inference that directly minimise the expected
+likelihood-free inference that directly minimises the expected
 variance of the parameters of interest, which is considerably more
 effective than the use of classification surrogates when nuisance
 parameters are present.
+
+The results obtained for the synthetic experiment considered clearly
+demonstrate that machine learning techniques, in particular neural networks,
+can be adapted for learning summary statistics that match the particularities
+of the inference problem  at hand, greatly increasing the information available
+for subsequent inference. The application of INFERNO to non-synthetic examples
+where nuisance parameters are relevant, such as the systematic-extended
+Higgs dataset [@estrade2017adversarial], are left for future studies.
+
+
+
+Furthermore, the technique presented can be applied to arbitrary
+likelihood-free problems as long as the effect of parameters
+over the simulated data can be implemented as a differentiable
+transformations. As a possible extension,
+alternative non-parametric density estimation
+techniques such as kernel density could very well be used in
+place Poisson count models.
 
 # Acknowledgments {.unnumbered}
 

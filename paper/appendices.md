@@ -3,7 +3,7 @@
 \appendix
 \renewcommand{\thesection}{\Alph{section}}
 
-# Sufficient Statistics for Mixture Models
+# Sufficient Statistics for Mixture Models  {#sec:sufficiency}
 
 Let us consider the general problem of inference for two-component
 mixture problem, which is very common in scientific disciplines such
