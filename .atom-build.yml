@@ -1,0 +1,3 @@
+cmd: 'make'
+name: 'Makefile'
+cwd: '{PROJECT_PATH}/paper/.'
