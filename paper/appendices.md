@@ -5,7 +5,7 @@
 
 # Sufficient Statistics for Mixture Models  {#sec:sufficiency}
 
-Let us consider the general problem of inference for two-component
+Let us consider the general problem of inference for a two-component
 mixture problem, which is very common in scientific disciplines such
 as High Energy Physics.
 While their functional form will not be explicitly specified to keep

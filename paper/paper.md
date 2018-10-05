@@ -20,7 +20,13 @@ abstract: >-
   uncertainty or misspecification on the remaining nuisance parameters.
   In this work, we show how non-linear
   summary statistics can be constructed by minimising
-  inference-motivated losses via stochastic gradient descent.
+  inference-motivated losses via stochastic gradient descent such they
+  provided the smallest uncertainty in the parameter of interest. As a possible
+  use case, the problem of confidence interval estimation for
+  the mixture coefficient in a multi-dimensional two-component mixture
+  model (i.e. signal vs background) is considered, where the proposed technique clearly outperforms probabilistic classifier based summary statistics which
+  are commonly used alternative but do not account for the presence of nuisance
+  parameters.
 bibliography: bibliography.bib
 ---
 
@@ -47,7 +53,7 @@ or density estimation-by-comparison approaches
 Because the relation between the parameters of the model and the data is
 only available via forward simulation, most likelihood-free inference algorithms
 tend to be computationally expensive due to the need of repeated simulations
-to cover the parameter space. When when data are
+to cover the parameter space. When data are
 high-dimensional, likelihood-free
 inference can rapidly become inefficient, so low-dimensional summary statistics
 $\boldsymbol{s}(D)$ are used instead of the raw data
@@ -67,7 +73,7 @@ and acquired by highly complex detectors built around the collision
 point.
 Accurate data modelling is only available via stochastic simulation
 of a complicated chain of physical processes, from the underlying
-fundament interaction to the subsequent particle interactions with
+fundamental interaction to the subsequent particle interactions with
 the detector elements and their readout.
 As a result, the density $p(\boldsymbol{x}| \boldsymbol{\theta})$
 cannot be analytically computed.
@@ -76,12 +82,12 @@ The inference problem in particle physics is commonly posed as hypothesis
 testing based on the acquired data. An alternate hypothesis $H_1$ (e.g. a
 new theory that predicts the existence of
 a new fundamental particle) is tested against
-a null hypothesis $H_0$ (e.g. an existing theory, which explain previous
+a null hypothesis $H_0$ (e.g. an existing theory, which explains previous
 observed phenomena). The aim is to check whether the null hypothesis
 can be rejected
 in favour of the alternate hypothesis at a certain confidence level surpassing
-$1-\alpha$, where $\alpha$, known as the Type I error rate is commonly set
-to $\alpha=3\times10^{-7}$ for claiming discovery. Because $\alpha$ is
+$1-\alpha$, where $\alpha$, known as the Type I error rate, is commonly set
+to $\alpha=3\times10^{-7}$ for discovery claims. Because $\alpha$ is
 fixed, the sensitivity of an analysis is determined by the power $1-\beta$ of
 the test, where $\beta$ is the probability of rejecting
 a false null hypothesis, also known as Type II error rate.
@@ -107,19 +113,20 @@ an approximation of $p_{S}(\boldsymbol{x})/p_{B}(\boldsymbol{x})$ which will
 vary monotonically with the likelihood ratio.
 While the use of classifiers to learn a summary statistic can be effective and
 increase the discovery sensitivity, the simulations used to generate
-the samples for the classifier often depend on additional
+the samples which are needed to train the classifier often depend on additional
 uncertain parameters (commonly referred as nuisance parameters).
 These nuisance parameters are not of immediate interest but
 have to be accounted for in order to make quantitative statements about the
-model parameters based on the data. Classification-based summary statistics
-cannot easily account for these effects, so their inference power is degraded
-when these additional nuisances are finally taken into account.
+model parameters based on the available data.
+Classification-based summary statistics
+cannot easily account for those effects, so their inference power is degraded
+when nuisance parameters are finally taken into account.
 
 In this work, we present a new machine learning method to
 construct non-linear sample summary statistics that directly
 optimises the expected amount of information about the subset of
 parameters of interest using simulated samples, by explicitly
-taking into account
+and directly taking into account
 the effect of nuisance parameters.
 In addition, the learned
 summary statistics can be used to build synthetic
@@ -165,10 +172,11 @@ can be factorised as indicated, the
 summary statistic $\boldsymbol{s}(D)$ will yield the same inference about
 the parameters $\boldsymbol{\omega}$ as the full set of observations $D$.
 When nuisance parameters have to be accounted in the inference procedure,
-alternate notions of sufficiency are commonly use such as partial
+alternate notions of sufficiency are commonly used such as partial
 or marginal sufficiency [@basu2011partial;@sprott1975marginal].
 Nonetheless, for the problems
-of relevance in this work, the probability density is not explicit so
+of relevance in this work, the probability density is not available in
+closed form so
 the general task of finding a sufficient summary statistic cannot be tackled
 directly. Hence, alternative methods to build summary statistics have
 to be followed.
@@ -182,9 +190,10 @@ to obtain an unbiased interval estimate of the parameter of interest
 which accounts for the effect of nuisance parameters. The resulting interval
 can be characterised by its width
 $\Delta \omega_0 = \hat{\omega}^{+}_0- \hat{\omega}^{-}_0$, defined by some
-criterion so as to contain on average a given fraction of the probability
+criterion so as to contain on average, upon repeated samping,
+a given fraction of the probability
 density, e.g. a central $68.3\%$ interval. The
-expected magnitude of the interval depends
+expected size of the interval depends
 on the summary statistic $\boldsymbol{s}$ chosen: in general,
 summary statistics that are
 more informative about the parameters of interest will provide narrower
@@ -205,7 +214,7 @@ confidence or credible regions.
 
 In this section, a machine learning technique to learn non-linear
 sample summary statistics is described in detail.
-The method is based on minimising the expected variance
+The method seeks to minimise the expected variance
 of the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood. A graphical description of the
 technique  is depicted on [@Fig:diagram].
@@ -371,7 +380,7 @@ $$\hat{\mathcal{L}}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
 \prod_{i=0}^{c}\mathcal{L}_C^i(\boldsymbol{\theta}).$$ {#eq:add_constraint}
 In Bayesian
 terminology, this approach is referred to as the Laplace approximation
-[@laplace1986memoir] where the log joint density (including the priors)
+[@laplace1986memoir] where the logarithm of the joint density (including the priors)
 is expanded around the MAP to a multi-dimensional normal
 approximation of the posterior
 density:
@@ -650,7 +659,7 @@ For simplicity, mini-batches for each training step are balanced so the same
 number of events from each component is taken both when using
 standard classification or inference-aware losses.
 
-An option is to pose the frame the problem as one of classification
+An option is to pose the problem as one of classification
 based on a simulated dataset. A supervised machine learning model such a
 neural network can be trained to discriminate signal and background
 observations, considering a fixed parameters $r$ and $\lambda$.
@@ -687,7 +696,9 @@ in turn cause an important degradation on the subsequent statistical inference.
  ](gfx/figure3b.pdf){#fig:opt_clf width=48%}
 
 Histograms of summary statistics for signal and background (top) and
-relative variation for different values of nuisance parameters (bottom). The
+variation for different values of nuisance parameters compared
+with the expected signal relative to the nominal background magniture (bottom).
+The
 classifier was trained using signal and background samples generated
 for $r = 0.0$ and $\lambda = 3.0$.
 :::
@@ -733,10 +744,10 @@ that vary in the number of nuisance parameters considered and their constraints:
   \item \textbf{Benchmark 2:} $r$ and $\lambda$ are considered as unconstrained
   nuisance parameters, while $b=1000$ is fixed. 
   \item \textbf{Benchmark 3:} $r$ and $\lambda$ are considered as
-  nuisance parameters but with the following constraints $\mathcal{N} (r |0.0, 0.4)$
+  nuisance parameters but with the following constraints: $\mathcal{N} (r |0.0, 0.4)$
   and $\mathcal{N} (\lambda| 3.0, 1.0)$, while $b=1000$ is fixed. 
   \item \textbf{Benchmark 4:} all $r$, $\lambda$ and $b$ are all considered as
-  nuisance parameters with the following constraints $\mathcal{N} (r |0.0, 0.4)$,
+  nuisance parameters with the following constraints: $\mathcal{N} (r |0.0, 0.4)$,
   $\mathcal{N} (\lambda| 3.0, 1.0)$ and $\mathcal{N} (b | 1000., 100.)$ . 
 \end{itemize}
 When using classification-based summary statistics, the construction of
@@ -802,7 +813,7 @@ used for subsequent inference on the value of $s$
 can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
 the average width for the profile likelihood using inference-aware training,
 $16.97\pm0.11$, can be
-compared with the corresponding obtained by uniformly binning the output of
+compared with the corresponding one obtained by uniformly binning the output of
 classification-based models in 10 bins, $24.01\pm0.36$. The models based on
 cross-entropy loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
