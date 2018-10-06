@@ -523,7 +523,11 @@ over the parameters of interest.
 In this section, we first study the effectiveness of the inference-aware
 optimisation in a synthetic mixture problem where the likelihood is known. We then
 compare our results with those obtained by standard classification-based
-summary statistics.
+summary statistics. All the code needed to reproduce the results
+presented the results presented here is available in
+an online repository [@code_repository], extensively using \textsc{TensorFlow}
+[@tensorflow2015-whitepaper]
+and \textsc{TensorFlow Probability} [@dillon2017tensorflow] software libraries.
 
 ## 3D Synthetic Mixture
 
