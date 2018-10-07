@@ -21,11 +21,13 @@ abstract: >-
   In this work, we show how non-linear
   summary statistics can be constructed by minimising
   inference-motivated losses via stochastic gradient descent such they
-  provided the smallest uncertainty in the parameter of interest. As a possible
+  provided the smallest uncertainty for the parameters of interest. As a
   use case, the problem of confidence interval estimation for
   the mixture coefficient in a multi-dimensional two-component mixture
-  model (i.e. signal vs background) is considered, where the proposed technique clearly outperforms probabilistic classifier based summary statistics which
-  are commonly used alternative but do not account for the presence of nuisance
+  model (i.e. signal vs background) is considered, where the proposed technique
+  clearly outperforms summary statistics based on probabilistic
+  classification, which
+  are a commonly used alternative but do not account for the presence of nuisance
   parameters.
 bibliography: bibliography.bib
 ---
@@ -527,7 +529,7 @@ summary statistics. All the code needed to reproduce the results
 presented the results presented here is available in
 an online repository [@code_repository], extensively using \textsc{TensorFlow}
 [@tensorflow2015-whitepaper]
-and \textsc{TensorFlow Probability} [@dillon2017tensorflow] software libraries.
+and \textsc{TensorFlow Probability} [@tran2016edward;@dillon2017tensorflow] software libraries.
 
 ## 3D Synthetic Mixture
 
