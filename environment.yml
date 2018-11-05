@@ -12,6 +12,6 @@ dependencies:
 - h5py  
 - pip:
   - tensorflow==1.10.1
-  - tensorflow-probability
+  - tensorflow-probability==0.3.0
   - corner
   - git+https://github.com/pablodecm/neyman.git
