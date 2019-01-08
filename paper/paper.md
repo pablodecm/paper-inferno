@@ -20,14 +20,15 @@ abstract: >-
   uncertainty or misspecification on the remaining nuisance parameters.
   In this work, we show how non-linear
   summary statistics can be constructed by minimising
-  inference-motivated losses via stochastic gradient descent such they
-  provided the smallest uncertainty for the parameters of interest. As a
+  inference-motivated losses via stochastic gradient descent such that they
+  provide the smallest uncertainty for the parameters of interest. As a
   use case, the problem of confidence interval estimation for
   the mixture coefficient in a multi-dimensional two-component mixture
   model (i.e. signal vs background) is considered, where the proposed technique
   clearly outperforms summary statistics based on probabilistic
-  classification, which
-  are a commonly used alternative but do not account for the presence of nuisance
+  classification,
+  a commonly used alternative which does not account for the presence
+  of nuisance
   parameters.
 bibliography: bibliography.bib
 ---
@@ -86,13 +87,13 @@ new theory that predicts the existence of
 a new fundamental particle) is tested against
 a null hypothesis $H_0$ (e.g. an existing theory, which explains previous
 observed phenomena). The aim is to check whether the null hypothesis
-can be rejected
-in favour of the alternate hypothesis at a certain confidence level surpassing
+can be rejectedat a certain confidence level
 $1-\alpha$, where $\alpha$, known as the Type I error rate, is commonly set
-to $\alpha=3\times10^{-7}$ for discovery claims. Because $\alpha$ is
+to $\alpha=3\times10^{-7}$ for discovery claims (the so-called 5-sigma
+criterion). Because $\alpha$ is
 fixed, the sensitivity of an analysis is determined by the power $1-\beta$ of
-the test, where $\beta$ is the probability of rejecting
-a false null hypothesis, also known as Type II error rate.
+the test, where $\beta$ is the probability of failing to reject
+the null hypothesis when it is false, also known as Type II error rate.
 
 Due to the high dimensionality of the observed data, a low-dimensional summary
 statistic has to be constructed in order to perform inference. A
@@ -176,7 +177,7 @@ can be factorised as indicated, the
 summary statistic $\boldsymbol{s}(D)$ will yield the same inference about
 the parameters $\boldsymbol{\omega}$ as the full set of observations $D$.
 When nuisance parameters have to be accounted in the inference procedure,
-alternate notions of sufficiency are commonly used such as partial
+alternative notions of sufficiency are commonly used, such as partial
 or marginal sufficiency [@basu2011partial;@sprott1975marginal].
 Nonetheless, for the problems
 of relevance in this work, the probability density is not available in
@@ -353,9 +354,10 @@ Asimov likelihood:
 
 $$
 {\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
-= \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}}
+= \mathop{\mathbb{E}} \left [
+\frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}}
  \left ( - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
- \boldsymbol{\phi}) \right )
+ \boldsymbol{\phi}) \right ) \right ]
 $$ {#eq:fisher_info}
 
 which can be computed via automatic differentiation
@@ -461,7 +463,7 @@ employing an inference-aware loss is summarised in Algorithm
       $\boldsymbol{s}(D; \boldsymbol{\phi})$.\\
  \end{flushleft}
  \begin{algorithmic}[1]
- \For{$i=1$ to $N$}
+ \For{$i=1$ to $N$ (number of SGD iterations)}
   \State{Sample a representative mini-batch $G_s$ from
   $g(\boldsymbol{\theta}_s)$.}
   \State{Compute differentiable summary statistic
@@ -508,15 +510,16 @@ the neural network is directly optimised based on an inference-aware loss.
 Additionally, once the summary statistic has been learnt the likelihood can
 be trivially constructed and used for classical or Bayesian inference
 without a dedicated calibration step. Furthermore, the approach presented
-in this work can also be extended, as done by Baldi et al.
-[@baldi2016parameterized] by a subset of the inference parameters
+in this work can also be extended, similarly to what was
+done by Baldi et al.
+[@baldi2016parameterized] considering a subset of the inference parameters
 to obtain a parametrised family of summary statistics with a single model.
 
 Recently, Brehmer et
 al. [@Brehmer:2018hga; @brehmer2018constraining; @brehmer2018guide] further
 extended the approach of parametrised classifiers to better exploit the
 latent-space space structure of generative models from complex scientific
-simulators. Additionally they propose a family of approaches that include
+simulators. Additionally they proposed a family of approaches that include
 a direct regression of the likelihood ratio
 and/or likelihood score in the training losses.
 While extremely promising, the most performing solutions are designed for
@@ -621,7 +624,7 @@ the mixture distribution for a small $\mu=50/1050$ is shown in
 ![mixture distribution (black)
  ](gfx/figure2b.pdf){#fig:subfigure_b width=49%}
 
-Projection in 1D and 2D dimensions of 50000 samples from
+Projection in 1D and 2D dimensions of 50,000 samples from
 the synthetic problem considered. The background distribution
 nuisance parameters used for generating data correspond to
 $r=0$ and $\lambda=3$. For samples the mixture distribution,
@@ -667,7 +670,9 @@ Bayes risk sense) separating
 signal and background events in a balanced dataset (equal priors):
 
 $$
-s^{*}(\boldsymbol{x} | r, \lambda) = \frac{f_s(\boldsymbol{x})}{f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
+s^{*}(\boldsymbol{x} | r, \lambda) =
+\frac{f_s(\boldsymbol{x})}{
+f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $$ {#eq:opt_clf}
 
 noting that this quantity depends on the parameters that define the background
@@ -677,7 +682,7 @@ that $s^{*}(\boldsymbol{x})$ is a sufficient summary statistic with respect to a
 arbitrary two-component mixture model if the only unknown parameter
 is the signal mixture fraction $\mu$ (or alternatively $s$ in the chosen
 parametrisation).
-In practise, the probability density functions of signal and
+In practice, the probability density functions of signal and
 background are not known analytically, and only forward samples are available
 through simulation, so alternative approaches are required.
 
@@ -704,14 +709,15 @@ standard classification or inference-aware losses.
 An option is to pose the problem as one of classification
 based on a simulated dataset. A supervised machine learning model such a
 neural network can be trained to discriminate signal and background
-observations, considering a fixed parameters $r$ and $\lambda$.
-The output of such a model typically consist in class probabilities
+observations, considering parameters $r$ and $\lambda$ fixed.
+The output of such a model typically consists in class probabilities
 $c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which will tend
 asymptotically to the optimal classifier from [@Eq:opt_clf] given
 enough data, a flexible enough model and a powerful learning rule.
 The conditional class probabilities (or alternatively the likelihood ratio 
 $f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$) are powerful
-learned features that can be used as summary statistic; however their construction
+learned features that can be used as summary statistics; however
+their construction
 ignores the effect of the nuisance parameters $r$ and $\lambda$ on the
 background distribution. Furthermore, some kind  of non-parametric density estimation
 (e.g. a histogram) has to be considered in order to build a calibrated statistical
@@ -727,8 +733,10 @@ compared with $s(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$ evaluated using the
 analytical distribution function of signal and background according to [@Eq:opt_clf],
 which is shown in [@Fig:opt_clf] and corresponds to the optimal classifier. The
 trained classifier approximates very well the optimal classifier. The
-summary statistic distribution for background depends considerably on the value
-of the nuisance parameters both for the trained and the optimal classifier, which will
+summary statistic distribution for the background component
+shows a marked dependence on the value
+of the nuisance parameters both for the trained and the optimal classifier,
+which will
 in turn cause an important degradation on the subsequent statistical inference.
 
 ::: {#fig:subfigs_clf_hists .subfigures}
@@ -739,7 +747,7 @@ in turn cause an important degradation on the subsequent statistical inference.
 
 Histograms of summary statistics for signal and background (top) and
 variation for different values of nuisance parameters compared
-with the expected signal relative to the nominal background magniture (bottom).
+with the expected signal relative to the nominal background magnitude (bottom).
 The
 classifier was trained using signal and background samples generated
 for $r = 0.0$ and $\lambda = 3.0$.
@@ -812,8 +820,8 @@ the number of output nodes can be arbitrary and will be denoted with $b$,
 corresponding to the dimensionality of the sample summary statistics.
 The final layer is followed by a softmax activation function and
 a temperature $\tau = 0.1$ for inference-aware learning to ensure
-that the differentiable approximations are closer to the true
-expectations. Standard
+that the differentiable approximations are close to the true values
+(see approximation from [@Eq:soft_summary]). Standard
 mini-batch stochastic gradient descent (SGD) is used for training and
 the optimal learning rate is fixed and decided by means of a
 simple scan; the best choice found is specified together with the results.
@@ -829,7 +837,8 @@ inference-loss (i.e. approximated standard deviation of the parameter
 of interest) as a function
 of the training step for 10 different random initialisations of the neural
 network parameters; (b) profiled likelihood around the expectation value
-for the parameter of interest of 10 trained inference-aware models and 10
+for the parameter of interest $s$ (i.e. number of signal events
+in the sample) of 10 trained inference-aware models and 10
 trained cross-entropy loss based models. The latter are constructed by
 building a uniformly binned Poisson count likelihood of the conditional
 signal probability output.  All results
@@ -905,11 +914,12 @@ classification and inference-aware technique. Results
 correspond to Benchmark 2.
 :::
 
-Given that a certain value of the parameters $\boldsymbol{\theta}_s$
-has been used to learn the summary statistics as described in
+Given that a fixed value of the parameters $\boldsymbol{\theta}_s$
+was used to learn the summary statistics as described in
 Algorithm \autoref{alg:simple_algorithm} while their true
-value is unknown, the expected uncertainty on $s$ has also been computed
-for cases when the true value of the parameters
+value is unknown in practical applications, the expected uncertainty
+on $s$ has also been
+computed for cases when the true value of the parameters
 $\boldsymbol{\theta}_{\textrm{true}}$ differs. The
 variation of the expected uncertainty on $s$ when either $r$ or $\lambda$
 is varied for classification and inference-aware summary statistics is
@@ -964,7 +974,7 @@ place Poisson count models.
 # Acknowledgments {.unnumbered}
 
 Pablo de Castro would like to thank Daniel Whiteson, Peter Sadowski and
-the other attendants of the ML for HEP meeting at UCI for the initial feedback
+the other members of the ML for HEP group at UCI for the initial feedback
 and support of the idea presented in this paper, as well as Edward Goul for
 his interest when the project was in early stages. The authors would also
 like to acknowledge Gilles Louppe and Joeri Hermans for some useful discussions
