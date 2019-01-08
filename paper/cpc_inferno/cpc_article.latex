@@ -1,0 +1,85 @@
+\documentclass[preprint,12pt,3p]{elsarticle}
+
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs} 
+\usepackage{subfig}
+\usepackage{graphicx}
+
+% this is to keep keep aspect ratio by default
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+$if(natbib)$
+\usepackage{natbib}
+\bibliographystyle{unsrtnat}
+\biboptions{sort&compress}
+$endif$
+
+% some missing math symbols
+\DeclareMathSymbol{\Gamma}{\mathord}{operators}{"00}
+\DeclareMathSymbol{\Delta}{\mathord}{operators}{"01}
+\DeclareMathSymbol{\Theta}{\mathord}{operators}{"02}
+\DeclareMathSymbol{\Lambda}{\mathord}{operators}{"03}
+\DeclareMathSymbol{\Xi}{\mathord}{operators}{"04}
+\DeclareMathSymbol{\Pi}{\mathord}{operators}{"05}
+\DeclareMathSymbol{\Sigma}{\mathord}{operators}{"06}
+\DeclareMathSymbol{\Upsilon}{\mathord}{operators}{"07}
+\DeclareMathSymbol{\Phi}{\mathord}{operators}{"08}
+\DeclareMathSymbol{\Psi}{\mathord}{operators}{"09}
+\DeclareMathSymbol{\Omega}{\mathord}{operators}{"0A}
+
+\journal{Computer Physics Communications}
+
+\begin{document}
+
+\begin{frontmatter}
+  
+\title{$title$}
+
+\author[infn]{Pablo de Castro\corref{cor1}}
+\ead{pablo.de.castro@cern.ch}
+\author[infn]{Tommaso Dorigo}
+\ead{tommaso.dorigo@cern.ch}
+\cortext[cor1]{Corresponding author}
+\address[infn]{INFN - Sezione di Padova, Via Marzolo 8, 35131 Padova - Italy}
+
+\begin{abstract}
+$abstract$
+\end{abstract}
+
+\end{frontmatter}
+
+$for(include-before)$
+$include-before$
+$endfor$
+
+$body$
+
+$for(include-after)$
+$include-after$
+$endfor$
+
+$if(biblatex)$
+\printbibliography
+$endif$
+
+$if(natbib)$
+$if(bibliography)$
+\section*{References}
+\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+$endif$
+$endif$
+
+\end{document}
