@@ -448,7 +448,7 @@ $\boldsymbol{\omega} \subseteq \boldsymbol{\theta}$ (e.g. when
 considering a weighted sum of the relevant variances). A simple version
 of the approach just described to learn a neural-network based summary statistic
 employing an inference-aware loss is summarised in Algorithm
-\autoref{alg:simple_algorithm}.
+\ref{alg:simple_algorithm}.
 
 <!-- algorithm -->
 \begin{algorithm}[H]
@@ -916,7 +916,7 @@ correspond to Benchmark 2.
 
 Given that a fixed value of the parameters $\boldsymbol{\theta}_s$
 was used to learn the summary statistics as described in
-Algorithm \autoref{alg:simple_algorithm} while their true
+Algorithm \ref{alg:simple_algorithm} while their true
 value is unknown in practical applications, the expected uncertainty
 on $s$ has also been
 computed for cases when the true value of the parameters
