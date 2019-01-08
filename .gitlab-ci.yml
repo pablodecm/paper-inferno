@@ -25,7 +25,7 @@ arxiv:
 cpc:
   image: pablodecm/pandoc-nodejs:0.0.4
   script:
-    - apt-get install -y texlive-science wget
+    - apt-get install -y texlive-science texlive-publishers wget
     - cabal install pandoc-citeproc pandoc-crossref
     - cd paper
     - make cpc_tar
