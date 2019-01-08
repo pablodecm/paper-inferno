@@ -64,9 +64,8 @@ $abstract$
 likelihood-free inference \sep
 high energy physics \sep
 neural networks \sep
-systematic uncertainties \sep
-nuisance parameters \sep
-deep learning
+nuisance parameters
+\PACS 02.50.-r \sep 29.85.-c
 \end{keyword}
 
 \end{frontmatter}
