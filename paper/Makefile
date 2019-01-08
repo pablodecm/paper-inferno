@@ -34,7 +34,7 @@ arxiv_tar: diagram appendices
 arxiv_pdf: arxiv_tar
 	cd arxiv; $(LATEX2PDF) paper.tex
 
-cpc_tar:
+cpc_tar: diagram appendices
 	$(PANDOC) paper.md -s -o cpc_inferno/paper.tex \
 	--template cpc_inferno/cpc_article.latex \
 	--include-after-body=appendices.tex \
