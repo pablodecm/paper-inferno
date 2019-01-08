@@ -21,3 +21,16 @@ arxiv:
     paths:
      - paper/arxiv.tar.gz
      - paper/arxiv/paper.pdf
+
+cpc:
+  image: pablodecm/pandoc-nodejs:0.0.4
+  script:
+    - apt-get install -y texlive-science wget
+    - cabal install pandoc-citeproc pandoc-crossref
+    - cd paper
+    - make cpc_tar
+    - make cpc_pdf
+  artifacts:
+    paths:
+     - paper/cpc_inferno.tar.gz
+     - paper/arxiv/cpc_inferno/paper.pdf
