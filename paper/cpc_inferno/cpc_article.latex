@@ -59,6 +59,16 @@ $endif$
 $abstract$
 \end{abstract}
 
+
+\begin{keyword}
+likelihood-free inference \sep
+high energy physics \sep
+neural networks \sep
+systematic uncertainties \sep
+nuisance parameters \sep
+deep learning
+\end{keyword}
+
 \end{frontmatter}
 
 $for(include-before)$
