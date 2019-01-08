@@ -33,4 +33,4 @@ cpc:
   artifacts:
     paths:
      - paper/cpc_inferno.tar.gz
-     - paper/arxiv/cpc_inferno/paper.pdf
+     - paper/cpc_inferno/paper.pdf
