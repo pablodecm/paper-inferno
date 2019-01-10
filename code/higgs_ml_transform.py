@@ -113,7 +113,7 @@ class V4:
     
     def __add__(self, other):
         """Add 2 V4 vectors : v3 = v1 + v2 = v1.__add__(v2)"""
-        copy = V4()
+        copy = self.copy()
         try:
             copy.px += other.px
             copy.py += other.py
@@ -164,6 +164,7 @@ def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
 
     # now recompute the DER quantities which are affected
 
+    # first built 4-vectors
     vtau = V4() # tau 4-vector
     vtau.setPtEtaPhiM(batch["PRI_tau_pt"], batch["PRI_tau_eta"], batch["PRI_tau_phi"], 0.8) # tau mass 0.8 like in original
 
@@ -176,11 +177,9 @@ def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
     # fix MET according to tau pt change
     vtauDeltaMinus = vtau.copy()
     vtauDeltaMinus.scaleFixedM( (1.-systTauEnergyScale)/systTauEnergyScale )
-
-    vmet += vtauDeltaMinus
+    vmet = vmet + vtauDeltaMinus
     vmet.pz = 0.
     vmet.e = vmet.eWithM(0.)
-
     batch["PRI_met"] = vmet.pt()
     batch["PRI_met_phi"] = vmet.phi()
 
@@ -219,7 +218,7 @@ def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
     # compute many vector sum
     vtransverse = V4()
     vtransverse.setPtEtaPhiM(vlep.pt(), 0., vlep.phi(), 0.) # just the transverse component of the lepton
-    vtransverse += vmet
+    vtransverse = vtransverse + vmet
     batch["DER_mass_transverse_met_lep"] = vtransverse.m()
 
     vltau = vlep + vtau # lep + tau
