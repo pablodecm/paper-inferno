@@ -108,7 +108,7 @@ class HiggsInferno(object):
       os.makedirs(self.model_path)
 
     json_str = self.nn_model.to_json()
-    with open(f'{self.model_path}/model.json', 'w') as f:
+    with open('{model_path}/model.json'.format(model_path=self.model_path), 'w') as f:
       json.dump(json_str, f)
 
     self.saver = tf.train.Saver()
@@ -170,15 +170,15 @@ class HiggsInferno(object):
           self.history.setdefault("loss_std_valid", []).append(
               [batch_n, float(val_loss_std)])
 
-      self.nn_model.save_weights(f'{self.model_path}/model.h5')
-      self.saver.save(sess, f'{self.model_path}/model.ckpt',
+      self.nn_model.save_weights('{model_path}/model.h5'.format(model_path=self.model_path))
+      self.saver.save(sess, '{model_path}/model.ckpt'.format(model_path=self.model_path),
                       global_step=self.global_step)
-      with open(f'{self.model_path}/history.json', 'w') as fp:
+      with open('{model_path}/history.json'.format(model_path=self.model_path), 'w') as fp:
         json.dump(self.history, fp)
 
   def load_weights(self):
     sess = tf.get_default_session()
-    last_ckpt = tf.train.latest_checkpoint(f'{self.model_path}')
+    last_ckpt = tf.train.latest_checkpoint(self.model_path)
     print("loading_vars_from", last_ckpt)
     self.saver.restore(sess, last_ckpt)
 

@@ -14,10 +14,10 @@ class MixtureBatcher(object):
                buffer_size=100000):
 
     self.batch_size = tf.placeholder(dtype=tf.int64, shape=(),
-                                     name=f"batch_size_{name}")
+                                     name="batch_size_{name}".format(name=name))
     self.buffer_size = buffer_size
     self.seed = tf.placeholder(dtype=tf.int64, shape=(),
-                               name=f"seed_{name}")
+                               name="seed_{name}".format(name=name))
     self.name = name
     self.c_names = c_names
 
@@ -25,7 +25,7 @@ class MixtureBatcher(object):
     components = {}
     for c_name in c_names:
       self.tensors[c_name] = tf.placeholder(dtype=tf.float32,
-                                            name=f"{c_name}_{self.name}_ph",
+                                            name="{c_name}_{name}_ph".format(name=name, c_name=c_name),
                                             shape=(None, None))
       dat = tf.data.Dataset.from_tensor_slices(self.tensors[c_name])
       dat = dat.shuffle(buffer_size=self.buffer_size, seed=self.seed)
@@ -77,15 +77,15 @@ class HiggsBatcher(object):
                higgs_data_path="../data/atlas-higgs-challenge-2014-v2.csv"):
 
     self.batch_size = tf.placeholder(dtype=tf.int64, shape=(),
-                                     name=f"batch_size_{name}")
+                                     name="batch_size_{name}".format(name=name))
     self.buffer_size = buffer_size
     self.seed = tf.placeholder(dtype=tf.int64, shape=(),
-                               name=f"seed_{name}")
+                               name="seed_{name}".format(name=name))
     self.name = name
     self.c_names = c_names
 
     self.set_name = tf.placeholder(dtype=tf.string, shape=(),
-                                   name=f"set_name_{name}")
+                                   name="set_name_{name}".format(name=name))
 
     csv_dataset = tf.contrib.data.make_csv_dataset(higgs_data_path, batch_size=1,
                                                    shuffle=False, num_epochs=1)
