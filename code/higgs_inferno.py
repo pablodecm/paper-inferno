@@ -29,7 +29,7 @@ class HiggsInferno(object):
     tf.set_random_seed(seed)
 
     self.problem = HiggsExample()
-    self.batcher = HiggsBatcher(buffer_size = 1000)
+    self.batcher = HiggsBatcher(buffer_size = 10000)
 
     b_sizes = []
     dense_batches = []
@@ -63,7 +63,7 @@ class HiggsInferno(object):
     b_counts = tf.reduce_sum(b_probs*weights[1], axis=0)
 
     # add constant small term to avoid NaNs
-    small_const = tf.constant(1e-5)
+    small_const = tf.constant(1e-3)
     self.exp_counts = tf.cast(self.problem.mu * s_counts + b_counts+small_const,
                               dtype=tf.float64)
 
@@ -147,8 +147,8 @@ class HiggsInferno(object):
           while True:
             try:
               batch_n += 1
-              print(sess.run([self.hess_nll, self.grad_nll], phs_train))
-              loss_t, _ = sess.run([self.loss, self.train_op], phs_train)
+              hess_t, loss_t, _ = sess.run([self.hess_nll,self.loss, self.train_op], phs_train)
+              print(hess_t, loss_t)
               self.history.setdefault("loss_train", []).append(
                   [batch_n, float(np.sqrt(loss_t))])
             except tf.errors.OutOfRangeError:
@@ -201,13 +201,13 @@ class HiggsInferno(object):
 
 def main(_):
 
-  pars = ["mu"]
+  pars = ["mu","tau_energy"]
   aux = {}
 
   inferno = HiggsInferno(model_path="higgs_default",
-                                     poi="mu", pars=pars, seed=7, aux=aux)
-  inferno.fit(n_epochs=1, lr=1e-10,
-              temperature=0.1, batch_size=512, seed=7)
+                                     poi="mu", pars=pars, seed=17, aux=aux)
+  inferno.fit(n_epochs=1, lr=1e-6,
+              temperature=0.1, batch_size=256, seed=17)
 
   hess, hess_aux = inferno.eval_hessian(temperature=0.1)
 

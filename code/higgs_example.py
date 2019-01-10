@@ -33,7 +33,7 @@ class HiggsExample(object):
       self.features = features
 
     # tau energy scale nuisance parameter
-    self.tau_energy = tf.placeholder_with_default(0., shape=(), name="tau_energy")
+    self.tau_energy = tf.placeholder_with_default(1., shape=(), name="tau_energy")
 
     # signal relative to the expected amount
     self.mu = tf.placeholder_with_default(1., shape=(), name="mu")
