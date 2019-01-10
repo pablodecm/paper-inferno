@@ -147,6 +147,7 @@ class HiggsInferno(object):
           while True:
             try:
               batch_n += 1
+              print(sess.run([self.hess_nll, self.grad_nll], phs_train))
               loss_t, _ = sess.run([self.loss, self.train_op], phs_train)
               self.history.setdefault("loss_train", []).append(
                   [batch_n, float(np.sqrt(loss_t))])

@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 from collections import OrderedDict
+from higgs_four_vector import V4, eta_centrality, METphi_centrality
 
 
 class HiggsExample(object):
@@ -41,11 +42,102 @@ class HiggsExample(object):
     self.all_pars = OrderedDict([('mu', self.mu),
                                  ('tau_energy', self.tau_energy)])
 
-  def transform(self, batch):
+  def transform(self, batch, missing_value = -999.0):
 
-    # TODO: add transformation code
+    zeros_batch = tf.zeros_like(batch["PRI_tau_pt"])
+    missing_value_batch = zeros_batch + missing_value
+    batch = OrderedDict(batch)
+    # scale tau energy scale, arbitrary but reasonable value
+    batch["PRI_tau_pt"] = batch["PRI_tau_pt"] * self.tau_energy
+
+    # now recompute the DER quantities which are affected
+
+    # first built 4-vectors
+    vtau = V4() # tau 4-vector
+    vtau.setPtEtaPhiM(batch["PRI_tau_pt"], batch["PRI_tau_eta"], batch["PRI_tau_phi"], 0.8) # tau mass 0.8 like in original
+
+    vlep = V4() # lepton 4-vector
+    vlep.setPtEtaPhiM(batch["PRI_lep_pt"], batch["PRI_lep_eta"], batch["PRI_lep_phi"], 0.) # lep mass 0 (either 0.106 or 0.0005 but info is lost)
+
+    vmet = V4() # met 4-vector
+    vmet.setPtEtaPhiM(batch["PRI_met"], 0., batch["PRI_met_phi"], 0.) # met mass zero,
+
+    # fix MET according to tau pt change
+    vtauDeltaMinus = vtau.copy()
+    vtauDeltaMinus.scaleFixedM( (1.-self.tau_energy)/self.tau_energy)
+    vmet = vmet + vtauDeltaMinus
+    vmet.pz = 0.
+    vmet.e = vmet.eWithM(0.)
+    batch["PRI_met"] = vmet.pt()
+    batch["PRI_met_phi"] = vmet.phi()
+
+    # first jet if it exists
+    vj1 = V4()
+    vj1.setPtEtaPhiM(tf.where(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_pt"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_eta"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_phi"], zeros_batch),
+                         0.) # zero mass
+
+    vj2 = V4()
+    vj2.setPtEtaPhiM(tf.where(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_pt"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_eta"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_phi"], zeros_batch),
+                     0.) # zero mass
+
+    vjsum = vj1 + vj2
+
+    batch["DER_deltaeta_jet_jet"] = tf.where(batch["PRI_jet_num"] > 1, vj1.deltaEta(vj2), missing_value_batch )
+    batch["DER_mass_jet_jet"] = tf.where(batch["PRI_jet_num"] > 1, vjsum.m(), missing_value_batch )
+    batch["DER_prodeta_jet_jet"] = tf.where(batch["PRI_jet_num"] > 1, vj1.eta() * vj2.eta(), missing_value_batch )
+
+    tmp = (batch["PRI_jet_subleading_eta"] - batch["PRI_jet_leading_eta"]) / 2
+    eta_centrality_tmp = tf.where(# if
+                                        tf.equal(tmp, 0),
+                                      # then
+                                        zeros_batch,
+                                      # else
+                                        eta_centrality(batch["PRI_lep_eta"],
+                                                         batch["PRI_jet_leading_eta"],
+                                                         batch["PRI_jet_subleading_eta"])
+                                     )
+
+    batch["DER_lep_eta_centrality"] = tf.where(batch["PRI_jet_num"] > 1, eta_centrality_tmp, missing_value_batch )
+
+    # compute many vector sum
+    vtransverse = V4()
+    vtransverse.setPtEtaPhiM(vlep.pt(), 0., vlep.phi(), 0.) # just the transverse component of the lepton
+    vtransverse = vtransverse + vmet
+    batch["DER_mass_transverse_met_lep"] = vtransverse.m()
+
+    vltau = vlep + vtau # lep + tau
+    batch["DER_mass_vis"] = vltau.m()
+
+    vlmet = vlep + vmet # lep + met  # FIXME Seems to be unused ?
+    vltaumet = vltau + vmet # lep + tau + met
+
+    batch["DER_pt_h"] = vltaumet.pt()
+
+    batch["DER_deltar_tau_lep"] = vtau.deltaR(vlep)
+
+    vtot = vltaumet + vjsum
+    batch["DER_pt_tot"] = vtot.pt()
+
+    batch["DER_sum_pt"] = vlep.pt() + vtau.pt() + batch["PRI_jet_all_pt"] # sum_pt is the scalar sum
+    batch["DER_pt_ratio_lep_tau"] = vlep.pt()/vtau.pt()
+
+    batch["DER_met_phi_centrality"] = tf.where(# if
+                                            tf.equal(tf.sin(batch["PRI_tau_phi"] - batch["PRI_lep_phi"]), 0),
+                                          # then
+                                             zeros_batch,
+                                          # else
+                                            METphi_centrality(batch["PRI_lep_phi"], batch["PRI_tau_phi"], batch["PRI_met_phi"])
+                                         )
+    # FIXME do not really recompute MMC, apply a simple scaling, better than nothing (but not MET dependence)
+    # rescaled_mass_MMC = data["ORIG_mass_MMC"] * data["DER_sum_pt"] / data["ORIG_sum_pt"]
+    # data["DER_mass_MMC"] = data["ORIG_mass_MMC"].where(data["ORIG_mass_MMC"] < 0, other=rescaled_mass_MMC)
 
     return batch
+
 
   def make_dense(self, batch):
 
