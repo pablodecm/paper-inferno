@@ -34,14 +34,11 @@ class HiggsExample(object):
     # tau energy scale nuisance parameter
     self.tau_energy = tf.placeholder_with_default(0., shape=(), name="tau_energy")
 
-    # expected amount of signal
-    self.s_exp = tf.placeholder_with_default(50., shape=(), name="s_exp")
-    # expected amount of background
-    self.b_exp = tf.placeholder_with_default(1000., shape=(), name="b_exp")
+    # signal relative to the expected amount
+    self.mu = tf.placeholder_with_default(1., shape=(), name="mu")
 
     # ordered dict with all model parameters
-    self.all_pars = OrderedDict([('s_exp', self.s_exp),
-                                 ('b_exp', self.b_exp),
+    self.all_pars = OrderedDict([('mu', self.mu),
                                  ('tau_energy', self.tau_energy)])
 
   def transform(self, batch):
@@ -56,6 +53,17 @@ class HiggsExample(object):
                       name="dense_batch")
 
     return dense_batch
+
+  def get_weight(self, batch, c_name):
+
+    c_factors = {"s" : tf.convert_to_tensor(691.9886077135781),
+                 "b" : tf.convert_to_tensor(410999.84732187376)}
+
+    weight = batch["Weight"]
+    weight_sum = tf.reduce_sum(weight)
+    c_factor = c_factors[c_name]
+
+    return c_factor*weight/weight_sum
 
 
 

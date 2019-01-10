@@ -33,11 +33,14 @@ class HiggsInferno(object):
 
     b_sizes = []
     dense_batches = []
+    weights = []
     for c_name in self.batcher.c_names:
       transform_batch = self.problem.transform(self.batcher.batch[c_name])
       dense_batch = self.problem.make_dense(transform_batch)
+      weight =  self.problem.get_weight(transform_batch, c_name)
       b_sizes.append(tf.shape(dense_batch)[0])
       dense_batches.append(dense_batch)
+      weights.append(weight)
 
     train_batch = tf.concat(dense_batches, axis=0, name="input_batch")
 
@@ -56,11 +59,12 @@ class HiggsInferno(object):
 
     s_probs, b_probs = tf.split(self.probs, b_sizes, axis=0)
 
-    s_counts = tf.reduce_mean(s_probs, axis=0)
-    b_counts = tf.reduce_mean(b_probs, axis=0),
+    s_counts = tf.reduce_sum(s_probs*weights[0], axis=0)
+    b_counts = tf.reduce_sum(b_probs*weights[1], axis=0)
 
-    self.exp_counts = tf.cast(self.problem.s_exp * s_counts +
-                              self.problem.b_exp * b_counts,
+    # add constant small term to avoid NaNs
+    small_const = tf.constant(1e-5)
+    self.exp_counts = tf.cast(self.problem.mu * s_counts + b_counts+small_const,
                               dtype=tf.float64)
 
     self.pois = ds.Poisson(self.exp_counts, name="poisson")
@@ -72,7 +76,6 @@ class HiggsInferno(object):
     all_pars = list(self.problem.all_pars.values())
     self.hess_nll, self.grad_nll = batch_hessian(self.nll,
                                                  all_pars)
-
     self.aux = aux
 
     self.nll_aux = {}
@@ -150,8 +153,7 @@ class HiggsInferno(object):
             except tf.errors.OutOfRangeError:
               break
           # fix seed for validation set (no need to shuffle)
-          self.batcher.init_iterator("b",
-                                     batch_size=batch_size, seed=20)
+          self.batcher.init_iterator("b", batch_size=batch_size, seed=20)
           val_losses = []
           while True:
             try:
@@ -184,9 +186,8 @@ class HiggsInferno(object):
     phs_val = {self.temperature: temperature}
 
     with tf.Session() as sess:
-      valid_arrays = sess.run(self.problem.valid_data())
       self.load_weights()
-      self.batcher.init_iterator(valid_arrays,
+      self.batcher.init_iterator("b",
                                  batch_size=-1, seed=20)
       hess, hess_aux = sess.run([self.hess_nll, self.hess_nll_aux], phs_val)
 
@@ -199,12 +200,12 @@ class HiggsInferno(object):
 
 def main(_):
 
-  pars = ["s_exp"]
+  pars = ["mu"]
   aux = {}
 
   inferno = HiggsInferno(model_path="higgs_default",
-                                     poi="s_exp", pars=pars, seed=7, aux=aux)
-  inferno.fit(n_epochs=1, lr=1e-6,
+                                     poi="mu", pars=pars, seed=7, aux=aux)
+  inferno.fit(n_epochs=1, lr=1e-10,
               temperature=0.1, batch_size=512, seed=7)
 
   hess, hess_aux = inferno.eval_hessian(temperature=0.1)
