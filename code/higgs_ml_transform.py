@@ -1,3 +1,4 @@
+import collections
 import tensorflow as tf
 import numpy as np
 
@@ -155,8 +156,11 @@ def eta_centrality(eta, etaJ1, etaJ2):
 
 
 def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
+    zeros_batch = tf.zeros_like(batch["PRI_tau_pt"])
+    missing_value_batch = zeros_batch + missing_value
+    batch = collections.OrderedDict(batch)  # Copy to avoid modification of original Dict
     # scale tau energy scale, arbitrary but reasonable value
-    batch["PRI_tau_pt"] *= systTauEnergyScale 
+    batch["PRI_tau_pt"] = batch["PRI_tau_pt"] * systTauEnergyScale 
 
     # now recompute the DER quantities which are affected
 
@@ -182,35 +186,35 @@ def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
 
     # first jet if it exists
     vj1 = V4()
-    vj1.setPtEtaPhiM(if_then_else(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_pt"]),
-                     if_then_else(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_eta"]),
-                     if_then_else(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_phi"]),
+    vj1.setPtEtaPhiM(tf.where(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_pt"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_eta"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_phi"], zeros_batch),
                          0.) # zero mass
 
     vj2 = V4()
-    vj2.setPtEtaPhiM(if_then_else(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_pt"]),
-                     if_then_else(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_eta"]),
-                     if_then_else(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_phi"]),
+    vj2.setPtEtaPhiM(tf.where(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_pt"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_eta"], zeros_batch),
+                     tf.where(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_phi"], zeros_batch),
                      0.) # zero mass
 
     vjsum = vj1 + vj2
 
-    batch["DER_deltaeta_jet_jet"] = if_then_else(batch["PRI_jet_num"] > 1, vj1.deltaEta(vj2), missing_value)
-    batch["DER_mass_jet_jet"] = if_then_else(batch["PRI_jet_num"] > 1, vjsum.m(), missing_value)
-    batch["DER_prodeta_jet_jet"] = if_then_else( batch["PRI_jet_num"] > 1, vj1.eta() * vj2.eta(), missing_value )
+    batch["DER_deltaeta_jet_jet"] = tf.where(batch["PRI_jet_num"] > 1, vj1.deltaEta(vj2), missing_value_batch )
+    batch["DER_mass_jet_jet"] = tf.where(batch["PRI_jet_num"] > 1, vjsum.m(), missing_value_batch )
+    batch["DER_prodeta_jet_jet"] = tf.where(batch["PRI_jet_num"] > 1, vj1.eta() * vj2.eta(), missing_value_batch )
     
     tmp = (batch["PRI_jet_subleading_eta"] - batch["PRI_jet_leading_eta"]) / 2
-    eta_centrality_tmp = if_then_else(# if
+    eta_centrality_tmp = tf.where(# if
                                         tf.equal(tmp, 0), 
                                       # then
-                                        0.0,
+                                        zeros_batch,
                                       # else
                                         eta_centrality(batch["PRI_lep_eta"],
                                                          batch["PRI_jet_leading_eta"],
                                                          batch["PRI_jet_subleading_eta"])
                                      )
 
-    batch["DER_lep_eta_centrality"] = if_then_else(batch["PRI_jet_num"] > 1, eta_centrality_tmp, missing_value)
+    batch["DER_lep_eta_centrality"] = tf.where(batch["PRI_jet_num"] > 1, eta_centrality_tmp, missing_value_batch )
     
     # compute many vector sum
     vtransverse = V4()
@@ -234,10 +238,10 @@ def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
     batch["DER_sum_pt"] = vlep.pt() + vtau.pt() + batch["PRI_jet_all_pt"] # sum_pt is the scalar sum
     batch["DER_pt_ratio_lep_tau"] = vlep.pt()/vtau.pt()
 
-    batch["DER_met_phi_centrality"] = if_then_else(# if
+    batch["DER_met_phi_centrality"] = tf.where(# if
                                             tf.equal(tf.sin(batch["PRI_tau_phi"] - batch["PRI_lep_phi"]), 0),
                                           # then 
-                                            0.0,
+                                             zeros_batch,
                                           # else 
                                             METphi_centrality(batch["PRI_lep_phi"], batch["PRI_tau_phi"], batch["PRI_met_phi"])
                                          )
