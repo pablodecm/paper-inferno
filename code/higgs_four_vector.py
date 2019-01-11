@@ -136,11 +136,21 @@ def METphi_centrality(aPhi, bPhi, cPhi):
     Returns sqrt(2) if in dead center
     Returns smaller than 1 if an object is not between
     a and b are the bounds, c is the vector to be tested
-    """
-    A = tf.sin(cPhi - aPhi) / tf.sin(bPhi - aPhi)
-    B = tf.sin(bPhi - cPhi) / tf.sin(bPhi - aPhi)
-    res = (A+B)/tf.sqrt(A**2 + B**2)
-    return res
+    """    
+    x = tf.sin(bPhi - aPhi)
+    x_ok = tf.not_equal(x, 0.0)
+    safe_f = tf.zeros_like
+    safe_x = tf.where(x_ok, x, tf.ones_like(x))
+    
+    caPhi = tf.sin(cPhi - aPhi)
+    bcPhi = tf.sin(bPhi - cPhi)
+    
+    def f(x, caPhi, bcPhi):
+        A = caPhi / x
+        B = bcPhi / x
+        res = (A+B) / tf.sqrt(A**2 + B**2)
+        return res
+    return tf.where(x_ok, f(safe_x, caPhi, bcPhi), safe_f(x))
 
 
 # another magic variable
@@ -237,13 +247,8 @@ def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
     batch["DER_sum_pt"] = vlep.pt() + vtau.pt() + batch["PRI_jet_all_pt"] # sum_pt is the scalar sum
     batch["DER_pt_ratio_lep_tau"] = vlep.pt()/vtau.pt()
 
-    batch["DER_met_phi_centrality"] = tf.where(# if
-                                            tf.equal(tf.sin(batch["PRI_tau_phi"] - batch["PRI_lep_phi"]), 0),
-                                          # then 
-                                             zeros_batch,
-                                          # else 
-                                            METphi_centrality(batch["PRI_lep_phi"], batch["PRI_tau_phi"], batch["PRI_met_phi"])
-                                         )
+    batch["DER_met_phi_centrality"] = METphi_centrality(batch["PRI_lep_phi"], batch["PRI_tau_phi"], batch["PRI_met_phi"])
+    
     # FIXME do not really recompute MMC, apply a simple scaling, better than nothing (but not MET dependence)
     # rescaled_mass_MMC = data["ORIG_mass_MMC"] * data["DER_sum_pt"] / data["ORIG_sum_pt"]
     # data["DER_mass_MMC"] = data["ORIG_mass_MMC"].where(data["ORIG_mass_MMC"] < 0, other=rescaled_mass_MMC)
