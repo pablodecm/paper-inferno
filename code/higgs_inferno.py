@@ -202,12 +202,12 @@ class HiggsInferno(object):
 def main(_):
 
   pars = ["mu","tau_energy"]
-  aux = {}
+  aux = {"tau_energy" : ds.Normal(loc=1.0, scale=0.03)}
 
   inferno = HiggsInferno(model_path="higgs_default",
                                      poi="mu", pars=pars, seed=17, aux=aux)
-  inferno.fit(n_epochs=1, lr=1e-6,
-              temperature=0.1, batch_size=256, seed=17)
+  inferno.fit(n_epochs=1, lr=1e-10,
+              temperature=0.1, batch_size=2048, seed=17)
 
   hess, hess_aux = inferno.eval_hessian(temperature=0.1)
 
