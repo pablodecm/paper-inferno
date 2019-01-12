@@ -29,7 +29,8 @@ class HiggsInferno(object):
     tf.set_random_seed(seed)
 
     self.problem = HiggsExample()
-    self.batcher = HiggsBatcher(buffer_size = 10000)
+    self.batcher = HiggsBatcher(features=self.problem.features,
+                                buffer_size = 10000)
 
     b_sizes = []
     dense_batches = []
@@ -128,6 +129,8 @@ class HiggsInferno(object):
 
   def fit(self, n_epochs, lr, temperature, batch_size, seed, par_phs={}):
 
+    train_dict_arr, _ = self.batcher.kaggle_sets("t")
+    valid_dict_arr, _ = self.batcher.kaggle_sets("b")
     phs_train = {self.lr: lr,
                  self.temperature: temperature}
 
@@ -142,7 +145,7 @@ class HiggsInferno(object):
       with trange(n_epochs) as t:
         for i in t:
           shuffle_seed = rs.randint(np.iinfo(np.int32).max)
-          self.batcher.init_iterator("t",
+          self.batcher.init_iterator(dict_arr=train_dict_arr,
                                      batch_size=batch_size, seed=shuffle_seed)
           while True:
             try:
@@ -154,7 +157,8 @@ class HiggsInferno(object):
             except tf.errors.OutOfRangeError:
               break
           # fix seed for validation set (no need to shuffle)
-          self.batcher.init_iterator("b", batch_size=batch_size, seed=20)
+          self.batcher.init_iterator(dict_arr=valid_dict_arr,
+                                     batch_size=batch_size, seed=20)
           val_losses = []
           while True:
             try:
@@ -184,11 +188,12 @@ class HiggsInferno(object):
 
   def eval_hessian(self, temperature):
 
+    valid_dict_arr, _ = self.batcher.kaggle_sets("b")
     phs_val = {self.temperature: temperature}
 
     with tf.Session() as sess:
       self.load_weights()
-      self.batcher.init_iterator("b",
+      self.batcher.init_iterator(dict_arr=valid_dict_arr,
                                  batch_size=-1, seed=20)
       hess, hess_aux = sess.run([self.hess_nll, self.hess_nll_aux], phs_val)
 
