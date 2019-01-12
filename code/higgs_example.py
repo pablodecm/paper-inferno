@@ -41,7 +41,7 @@ class HiggsExample(object):
     self.all_pars = OrderedDict([('mu', self.mu),
                                  ('tau_energy', self.tau_energy)])
 
-  def transform(self, batch, missing_value = -999.0):
+  def transform(self, batch, missing_value = 0.0):
 
     zeros_batch = tf.zeros_like(batch["PRI_tau_pt"])
     missing_value_batch = zeros_batch + missing_value

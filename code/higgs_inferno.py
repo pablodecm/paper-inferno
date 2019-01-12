@@ -32,6 +32,10 @@ class HiggsInferno(object):
     self.batcher = HiggsBatcher(features=self.problem.features,
                                 buffer_size = 10000)
 
+    self.scale_means = tf.placeholder(dtype=tf.float32,
+                                      shape=(len(self.problem.features)))
+    self.scale_stds = tf.placeholder(dtype=tf.float32,
+                                     shape=(len(self.problem.features)))
     b_sizes = []
     dense_batches = []
     weights = []
@@ -44,6 +48,7 @@ class HiggsInferno(object):
       weights.append(weight)
 
     train_batch = tf.concat(dense_batches, axis=0, name="input_batch")
+    scaled_train_batch = (train_batch - self.scale_means)/self.scale_stds
 
     k_init = "he_normal"
     Dense = k.layers.Dense
@@ -54,7 +59,7 @@ class HiggsInferno(object):
                                         kernel_initializer=k_init),
                                   Dense(units=10, activation="linear")])
 
-    self.logits = self.nn_model(train_batch)
+    self.logits = self.nn_model(scaled_train_batch)
     self.temperature = tf.placeholder_with_default(1., shape=())
     self.probs = tf.nn.softmax(self.logits / self.temperature)
 
@@ -129,12 +134,17 @@ class HiggsInferno(object):
 
   def fit(self, n_epochs, lr, temperature, batch_size, seed, par_phs={}):
 
-    train_dict_arr, _ = self.batcher.kaggle_sets("t")
+    train_dict_arr, mean_and_std = self.batcher.kaggle_sets("t")
     valid_dict_arr, _ = self.batcher.kaggle_sets("b")
-    phs_train = {self.lr: lr,
-                 self.temperature: temperature}
 
-    phs_val = {self.temperature: temperature}
+    self.phs_scale = {self.scale_means : mean_and_std[0],
+                      self.scale_stds : mean_and_std[1]}
+
+    phs_train = {self.lr: lr,
+                 self.temperature: temperature,
+                 **self.phs_scale}
+    phs_val = {self.temperature: temperature,
+               **self.phs_scale}
 
     rs = np.random.RandomState(seed=seed)
 
@@ -150,8 +160,8 @@ class HiggsInferno(object):
           while True:
             try:
               batch_n += 1
-              hess_t, loss_t, _ = sess.run([self.hess_nll,self.loss, self.train_op], phs_train)
-              print(hess_t, loss_t)
+              exp_counts_t, hess_t, loss_t, _ = sess.run([self.exp_counts, self.hess_nll,self.loss, self.train_op], phs_train)
+#              print(exp_counts_t, hess_t, loss_t)
               self.history.setdefault("loss_train", []).append(
                   [batch_n, float(np.sqrt(loss_t))])
             except tf.errors.OutOfRangeError:
@@ -189,7 +199,7 @@ class HiggsInferno(object):
   def eval_hessian(self, temperature):
 
     valid_dict_arr, _ = self.batcher.kaggle_sets("b")
-    phs_val = {self.temperature: temperature}
+    phs_val = {self.temperature: temperature, **self.phs_scale}
 
     with tf.Session() as sess:
       self.load_weights()
@@ -211,10 +221,11 @@ def main(_):
 
   inferno = HiggsInferno(model_path="higgs_default",
                                      poi="mu", pars=pars, seed=17, aux=aux)
-  inferno.fit(n_epochs=1, lr=1e-10,
-              temperature=0.1, batch_size=2048, seed=17)
+  inferno.fit(n_epochs=1, lr=1.e-3,
+              temperature=0.1, batch_size=1024, seed=17)
 
   hess, hess_aux = inferno.eval_hessian(temperature=0.1)
+#  print(hess.matrix, hess_aux.matrix)
 
 
 if __name__ == "__main__":
