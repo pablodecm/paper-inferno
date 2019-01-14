@@ -64,7 +64,7 @@ class HiggsSummaryStatisticComputer(object):
 
     batch_size = 10000
 
-    with open('{}/model.h5'.format(model_path)) as f:
+    with open('{}/model.json'.format(model_path)) as f:
       model_json = json.load(f)
     model = k.models.model_from_json(model_json)
 
@@ -73,19 +73,24 @@ class HiggsSummaryStatisticComputer(object):
     with sess.as_default():
       k.backend.set_session(sess)
       model.load_weights('{}/model.h5'.format(model_path))
-
+      
       for c_name in self.batcher.c_names:
         for pars_val in it.product(*self.pars_scan.values()):
+
+          self.batcher.init_iterator(dict_arr=self.dict_arr,
+                                          batch_size=batch_size, seed=20)
+
           pars_phs = {par: val for par, val in zip(self.pars_scan.keys(),
                                                    pars_val)}
-          dense_x_arr = sess.run(self.scaled_dense_batches[c_name],
-                                {**pars_phs, **self.phs_scale})
+          dense_x_arr, weight_arr = sess.run([self.scaled_dense_batches[c_name],
+                                              self.weights[c_name]],
+                                             {**pars_phs, **self.phs_scale})
           c_clf = softmax(model.predict(dense_x_arr,
                                       batch_size=batch_size),
                         axis=1)[:, 1]
 
           key = (c_name,) + pars_val
-          c_clf_hist = np.histogram(c_clf, bins)[0]
+          c_clf_hist = np.histogram(c_clf,weights=weight_arr[:,0], bins=bins)[0]
           shapes[key] = c_clf_hist
 
       k.backend.set_session(None)

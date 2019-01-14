@@ -91,7 +91,7 @@ class HiggsBatcher(object):
     components = {}
     for c_name in self.c_names:
       self.tensors[c_name] = {}
-      for feature in (self.features+self.extra_columns):
+      for feature in (self.features+self.extra_columns+["BalancedWeight"]):
         ph_name = name="{c_name}_{name}_ph".format(name=name, c_name=c_name)
         ph = tf.placeholder(dtype=tf.float32, name=ph_name,
                             shape=(None, None))
@@ -138,6 +138,10 @@ class HiggsBatcher(object):
       c_df =  s_df.loc[(df.Label == c_name)]
       for feature in (self.features+self.extra_columns):
         dict_arr[c_name][feature] = c_df.loc[:,[feature]].values
+      # add BalancedWeight columns
+      weights = dict_arr[c_name]["Weight"]
+      print(weights.shape)
+      dict_arr[c_name]["BalancedWeight"] = weights/weights.sum()
 
     return dict_arr, mean_and_std
 

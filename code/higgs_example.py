@@ -143,6 +143,13 @@ class HiggsExample(object):
     c_factor = c_factors[c_name]
 
     return c_factor*weight/weight_sum
+    
+  def get_balanced_weight(self, batch):
+
+    weight = batch["BalancedWeight"]
+    
+    return weight
+
 
 
 
