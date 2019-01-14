@@ -55,7 +55,6 @@ class HiggsCrossEntropy(object):
     train_batch = tf.concat(dense_batches, axis=0, name="input_batch")
     scaled_train_batch = (train_batch - self.scale_means)/self.scale_stds
     weight_batch = tf.concat(weights, axis=0, name="input_batch_w")[:,0]
-    self.labels = label_batch
     k_init = "he_normal"
     Dense = k.layers.Dense
     self.nn_model = k.Sequential([Dense(units=100, activation="relu",
@@ -63,7 +62,9 @@ class HiggsCrossEntropy(object):
                                         input_shape=(len(self.problem.features),)),
                                   Dense(units=100, activation="relu",
                                         kernel_initializer=k_init),
-                                  Dense(units=10, activation="linear")])
+                                  Dense(units=100, activation="relu",
+                                        kernel_initializer=k_init),
+                                  Dense(units=2, activation="linear")])
 
     self.logits = self.nn_model(scaled_train_batch)
     self.temperature = tf.placeholder_with_default(1., shape=())
@@ -97,6 +98,17 @@ class HiggsCrossEntropy(object):
 
     train_dict_arr, mean_and_std = self.batcher.kaggle_sets("t")
     valid_dict_arr, _ = self.batcher.kaggle_sets("b")
+    
+    # rescale valid weights so valid and train can be compared
+    bw_name = "BalancedWeight"
+    for c_name in self.batcher.c_names:
+      valid_dict_arr[c_name][bw_name] /= (train_dict_arr[c_name][bw_name].shape[0]/ \
+                                          valid_dict_arr[c_name][bw_name].shape[0] )
+    # rescale weights because batches are balanced yet weights are unbalanced
+    train_dict_arr["s"][bw_name] *= (train_dict_arr["b"][bw_name].shape[0]/ \
+                                     train_dict_arr["s"][bw_name].shape[0])
+    valid_dict_arr["s"][bw_name] *= (valid_dict_arr["b"][bw_name].shape[0]/ \
+                                     valid_dict_arr["s"][bw_name].shape[0])  
 
     self.phs_scale = {self.scale_means : mean_and_std[0],
                       self.scale_stds : mean_and_std[1]}
@@ -158,9 +170,9 @@ class HiggsCrossEntropy(object):
 def main(_):
 
 
-  clf  = HiggsCrossEntropy(model_path="cross_entropy_32", seed=7)
-  clf.fit(n_epochs=1, lr=1.e2,
-          batch_size=32, seed=17)
+  clf  = HiggsCrossEntropy(model_path="cross_entropy_512", seed=7)
+  clf.fit(n_epochs=30, lr=1.e3,
+          batch_size=512, seed=17)
 
 if __name__ == "__main__":
   tf.app.run()

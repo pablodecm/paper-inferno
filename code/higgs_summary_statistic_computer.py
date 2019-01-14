@@ -61,7 +61,7 @@ class HiggsSummaryStatisticComputer(object):
                         bins=default_bins, sess=None):
 
     shapes = {}
-
+    outputs = {}
     batch_size = 10000
 
     with open('{}/model.json'.format(model_path)) as f:
@@ -75,7 +75,7 @@ class HiggsSummaryStatisticComputer(object):
       model.load_weights('{}/model.h5'.format(model_path))
       
       for c_name in self.batcher.c_names:
-        for pars_val in it.product(*self.pars_scan.values()):
+        for p_n, pars_val in enumerate(it.product(*self.pars_scan.values())):
 
           self.batcher.init_iterator(dict_arr=self.dict_arr,
                                           batch_size=batch_size, seed=20)
@@ -88,14 +88,18 @@ class HiggsSummaryStatisticComputer(object):
           c_clf = softmax(model.predict(dense_x_arr,
                                       batch_size=batch_size),
                         axis=1)[:, 1]
+          if p_n==0:
+            outputs[c_name] = c_clf
+            
 
           key = (c_name,) + pars_val
           c_clf_hist = np.histogram(c_clf,weights=weight_arr[:,0], bins=bins)[0]
           shapes[key] = c_clf_hist
 
       k.backend.set_session(None)
+      
 
-    return shapes
+    return shapes, outputs
 
   def inferno_shapes(self, model_path, batch_size = 10000, sess=None):
 
