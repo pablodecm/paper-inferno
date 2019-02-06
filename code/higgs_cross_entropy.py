@@ -69,7 +69,7 @@ class HiggsCrossEntropy(object):
     self.logits = self.nn_model(scaled_train_batch)
     self.temperature = tf.placeholder_with_default(1., shape=())
     self.probs = tf.nn.softmax(self.logits / self.temperature)
-    
+
     self.loss = tf.losses.sparse_softmax_cross_entropy(labels=label_batch,
                                                        weights=weight_batch,
                                                        logits=self.logits)
@@ -98,17 +98,17 @@ class HiggsCrossEntropy(object):
 
     train_dict_arr, mean_and_std = self.batcher.kaggle_sets("t")
     valid_dict_arr, _ = self.batcher.kaggle_sets("b")
-    
+
     # rescale valid weights so valid and train can be compared
     bw_name = "BalancedWeight"
     for c_name in self.batcher.c_names:
       valid_dict_arr[c_name][bw_name] /= (train_dict_arr[c_name][bw_name].shape[0]/ \
                                           valid_dict_arr[c_name][bw_name].shape[0] )
     # rescale weights because batches are balanced yet weights are unbalanced
-    train_dict_arr["s"][bw_name] *= (train_dict_arr["b"][bw_name].shape[0]/ \
+    train_dict_arr["b"][bw_name] *= (train_dict_arr["b"][bw_name].shape[0]/ \
                                      train_dict_arr["s"][bw_name].shape[0])
-    valid_dict_arr["s"][bw_name] *= (valid_dict_arr["b"][bw_name].shape[0]/ \
-                                     valid_dict_arr["s"][bw_name].shape[0])  
+    valid_dict_arr["b"][bw_name] *= (valid_dict_arr["b"][bw_name].shape[0]/ \
+                                     valid_dict_arr["s"][bw_name].shape[0])
 
     self.phs_scale = {self.scale_means : mean_and_std[0],
                       self.scale_stds : mean_and_std[1]}
@@ -171,7 +171,7 @@ def main(_):
 
 
   clf  = HiggsCrossEntropy(model_path="cross_entropy_512", seed=7)
-  clf.fit(n_epochs=30, lr=1.e3,
+  clf.fit(n_epochs=50, lr=1.e2,
           batch_size=512, seed=17)
 
 if __name__ == "__main__":
