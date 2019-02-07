@@ -413,7 +413,7 @@ def lep_energy_scale(batch, scale=1.0, missing_value=0.0):
     vmet.pz = zeros_batch
     vmet.e = vmet.eWithM(0.)
 
-    update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value)
+    update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
 
 
 
