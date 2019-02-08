@@ -471,8 +471,8 @@ def soft_term(batch, sigma_met=3.0, missing_value=0.0):
 
     # Compute the missing v4 vector
     v4_soft_term = V4()
-    v4_soft_term.px = tf.random.normal(zeros_batch.shape, mean=0, stddev=sigma_met)
-    v4_soft_term.py = tf.random.normal(zeros_batch.shape, mean=0, stddev=sigma_met)
+    v4_soft_term.px = tf.random.normal(tf.shape(zeros_batch), mean=0, stddev=sigma_met)
+    v4_soft_term.py = tf.random.normal(tf.shape(zeros_batch), mean=0, stddev=sigma_met)
     v4_soft_term.pz = zeros_batch
     v4_soft_term.e = v4_soft_term.eWithM(0.)
 
