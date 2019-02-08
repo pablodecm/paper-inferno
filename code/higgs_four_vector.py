@@ -357,6 +357,7 @@ def tau_energy_scale(batch, scale=1.0, missing_value=0.0):
     vmet.e = vmet.eWithM(0.)
 
     update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
+    return batch
 
 
 # ==================================================================================
@@ -400,6 +401,7 @@ def jet_energy_scale(batch, scale=1.0, missing_value=0.0):
     vmet.e = vmet.eWithM(0.)
 
     update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
+    return batch
 
 
 # ==================================================================================
@@ -439,6 +441,7 @@ def lep_energy_scale(batch, scale=1.0, missing_value=0.0):
     vmet.e = vmet.eWithM(0.)
 
     update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
+    return batch
 
 
 
