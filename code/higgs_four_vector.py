@@ -482,6 +482,48 @@ def soft_term(batch, sigma_met=3.0, missing_value=0.0):
     update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
     return batch
 
+def nasty_background(batch, scale=1.5):
+    """Apply a scaling to the weight.
+
+    TODO maybe explain why it scales only some backgrounds.
+    """
+    detail_label_num={
+        57207:0, # Signal
+        4613:1,
+        8145:2,
+        4610:3,
+        917703: 105, #Z
+        5127399:111,
+        4435976:112,
+        4187604:113,
+        2407146:114,
+        1307751:115,
+        944596:122,
+        936590:123,
+        1093224:124,
+        225326:132,
+        217575:133,
+        195328:134,
+        254338:135,
+        2268701:300 #T
+        }
+    batch = collections.OrderedDict(batch)  # Copy to avoid modification of original Dict
+
+    W = batch["Weight"]
+    iWeight = tf.floor(1e7 * W + 0.5)
+    iWeight = tf.to_int32(iWeight)
+    is_not_nasty = tf.zeros_like(W, dtype=tf.bool)
+    for is_recognized in [tf.equal(k, iWeight) for k in detail_label_num]:
+        is_not_nasty = tf.logical_or(is_not_nasty, is_recognized)
+    is_nasty_bkg = tf.logical_not(is_not_nasty)
+
+    # FIXME : For some reason if_then_else function does not work here
+    # batch["Weight"] = if_then_else(is_nasty_bkg, scale * W, lambda x : x + 0 )
+    # I used another trick to apply conditional assignment
+    W_nasty = (tf.to_float(is_nasty_bkg) * scale) * W
+    W_original = tf.to_float(is_not_nasty) * W
+    batch["Weight"] = W_nasty + W_original
+    return batch
 
 
 def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
