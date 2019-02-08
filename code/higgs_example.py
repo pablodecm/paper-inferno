@@ -4,7 +4,11 @@ from __future__ import print_function
 
 import tensorflow as tf
 from collections import OrderedDict
-from higgs_four_vector import V4, eta_centrality, METphi_centrality, if_then_else
+from higgs_four_vector import tau_energy_scale
+from higgs_four_vector import jet_energy_scale
+from higgs_four_vector import lep_energy_scale
+from higgs_four_vector import soft_term
+from higgs_four_vector import nasty_background
 
 
 class HiggsExample(object):
@@ -31,8 +35,14 @@ class HiggsExample(object):
     else:
       self.features = features
 
-    # tau energy scale nuisance parameter
-    self.tau_energy = tf.placeholder_with_default(1., shape=(), name="tau_energy")
+    # energy scale nuisance parameters
+    self.tau_energy_sc = tf.placeholder_with_default(1., shape=(), name="tau_energy_sc")
+    self.jet_energy_sc = tf.placeholder_with_default(1., shape=(), name="jet_energy_sc")
+    self.lep_energy_sc = tf.placeholder_with_default(1., shape=(), name="lep_energy_sc")
+    # mean of the MET energy systematic
+    self.sigma_met = tf.placeholder_with_default(3., shape=(), name="sigma_met")
+    # nasty background
+    self.nasty_background_sc = tf.placeholder_with_default(1., shape=(), name="nasty_background_sc")
 
     # signal relative to the expected amount
     self.mu = tf.placeholder_with_default(1., shape=(), name="mu")
@@ -41,87 +51,16 @@ class HiggsExample(object):
     self.all_pars = OrderedDict([('mu', self.mu),
                                  ('tau_energy', self.tau_energy)])
 
-  def transform(self, batch, missing_value = 0.0):
-
-    zeros_batch = tf.zeros_like(batch["PRI_tau_pt"])
-    missing_value_batch = zeros_batch + missing_value
-    missing_value_like = lambda x: tf.zeros_like(x) + missing_value
-    batch = OrderedDict(batch)
-    # scale tau energy scale, arbitrary but reasonable value
-    batch["PRI_tau_pt"] = batch["PRI_tau_pt"] * self.tau_energy
-
-    # now recompute the DER quantities which are affected
-
-    # first built 4-vectors
-    vtau = V4() # tau 4-vector
-    vtau.setPtEtaPhiM(batch["PRI_tau_pt"], batch["PRI_tau_eta"], batch["PRI_tau_phi"], 0.8) # tau mass 0.8 like in original
-
-    vlep = V4() # lepton 4-vector
-    vlep.setPtEtaPhiM(batch["PRI_lep_pt"], batch["PRI_lep_eta"], batch["PRI_lep_phi"], 0.) # lep mass 0 (either 0.106 or 0.0005 but info is lost)
-
-    vmet = V4() # met 4-vector
-    vmet.setPtEtaPhiM(batch["PRI_met"], 0., batch["PRI_met_phi"], 0.) # met mass zero,
-
-    # fix MET according to tau pt change
-    vtauDeltaMinus = vtau.copy()
-    vtauDeltaMinus.scaleFixedM( (1.-self.tau_energy)/self.tau_energy)
-    vmet = vmet + vtauDeltaMinus
-    vmet.pz = zeros_batch
-    vmet.e = vmet.eWithM(0.)
-    batch["PRI_met"] = vmet.pt()
-    batch["PRI_met_phi"] = vmet.phi()
-
-    # first jet if it exists
-    # NO LINK WITH PRI tau PT. NO LINK WITH ENERGY SCALE
-    vj1 = V4()
-    vj1.setPtEtaPhiM(if_then_else(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_pt"]),
-                     if_then_else(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_eta"]),
-                     if_then_else(batch["PRI_jet_num"] > 0, batch["PRI_jet_leading_phi"]),
-                         0.) # zero mass
-
-    vj2 = V4()
-    vj2.setPtEtaPhiM(if_then_else(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_pt"]),
-                     if_then_else(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_eta"]),
-                     if_then_else(batch["PRI_jet_num"] > 1, batch["PRI_jet_subleading_phi"]),
-                     0.) # zero mass
-
-    vjsum = vj1 + vj2
-
-    batch["DER_deltaeta_jet_jet"] = if_then_else(batch["PRI_jet_num"] > 1, vj1.deltaEta(vj2), missing_value_like )
-    batch["DER_mass_jet_jet"] = if_then_else(batch["PRI_jet_num"] > 1, vjsum.m(), missing_value_like )
-    batch["DER_prodeta_jet_jet"] = if_then_else(batch["PRI_jet_num"] > 1, vj1.eta() * vj2.eta(), missing_value_like )
-
-    # DOES NOT DEPEND OF ENERGY SCALE
-#     eta_centrality_tmp = eta_centrality(batch["PRI_lep_eta"],batch["PRI_jet_leading_eta"],batch["PRI_jet_subleading_eta"])                       
-#     batch["DER_lep_eta_centrality"] = if_then_else(batch["PRI_jet_num"] > 1, eta_centrality_tmp, missing_value_like )
-
-    # compute many vector sum
-    vtransverse = V4()
-    vtransverse.setPtEtaPhiM(batch["PRI_lep_pt"], 0., batch["PRI_lep_phi"], 0.) # just the transverse component of the lepton
-    vtransverse = vtransverse + vmet
-    batch["DER_mass_transverse_met_lep"] = vtransverse.m()
-
-    vltau = vlep + vtau # lep + tau
-    batch["DER_mass_vis"] = vltau.m()
-
-    vlmet = vlep + vmet # lep + met  # FIXME Seems to be unused ?
-    vltaumet = vltau + vmet # lep + tau + met
-
-    batch["DER_pt_h"] = vltaumet.pt()
-
-    batch["DER_deltar_tau_lep"] = vtau.deltaR(vlep)
-
-    vtot = vltaumet + vjsum
-    batch["DER_pt_tot"] = vtot.pt()
-
-    batch["DER_sum_pt"] = vlep.pt() + vtau.pt() + batch["PRI_jet_all_pt"] # sum_pt is the scalar sum
-    batch["DER_pt_ratio_lep_tau"] = vlep.pt()/vtau.pt()
-
-    batch["DER_met_phi_centrality"] = METphi_centrality(batch["PRI_lep_phi"], batch["PRI_tau_phi"], batch["PRI_met_phi"])
-    
-    # FIXME do not really recompute MMC, apply a simple scaling, better than nothing (but not MET dependence)
-    # rescaled_mass_MMC = data["ORIG_mass_MMC"] * data["DER_sum_pt"] / data["ORIG_sum_pt"]
-    # data["DER_mass_MMC"] = data["ORIG_mass_MMC"].where(data["ORIG_mass_MMC"] < 0, other=rescaled_mass_MMC)
+  def transform(self, batch, missing_value=0.0, 
+                allow_soft_term=True, 
+                allow_nasty_bacground=True):
+    tau_energy_scale(batch, self.tau_energy_sc, missing_value=missing_value)
+    jet_energy_scale(batch, self.jet_energy_sc, missing_value=missing_value)
+    lep_energy_scale(batch, self.lep_energy_sc, missing_value=missing_value)
+    if allow_soft_term:
+        soft_term(batch, self.sigma_met, missing_value=missing_value)
+    if allow_nasty_bacground:
+        nasty_background(batch, self.sigma_met, missing_value=missing_value)
 
     return batch
 
