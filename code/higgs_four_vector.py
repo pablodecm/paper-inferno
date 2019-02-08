@@ -114,16 +114,41 @@ class V4:
     
     def __add__(self, other):
         """Add 2 V4 vectors : v3 = v1 + v2 = v1.__add__(v2)"""
-        copy = self.copy()
+        copy = V4()
         try:
-            copy.px += other.px
-            copy.py += other.py
-            copy.pz += other.pz
-            copy.e += other.e
+            copy.px = self.px + other.px
+            copy.py = self.py + other.py
+            copy.pz = self.pz + other.pz
+            copy.e = self.e + other.e
         except AttributeError: 
             # If 'other' is not V4 like object then return special NotImplemented error
             return NotImplemented
         return copy
+
+    def __sub__(self, other):
+        """sub 2 V4 vectors : v3 = v1 - v2 = v1.__sub__(v2)"""
+        copy = V4()
+        try:
+            copy.px = self.px - other.px
+            copy.py = self.py - other.py
+            copy.pz = self.pz - other.pz
+            copy.e = self.e + other.e
+        except AttributeError:
+            # If 'other' is not V4 like object then return special NotImplemented error
+            return NotImplemented
+        return copy
+
+    def __isub__(self, other):
+        """Sub another V4 into self"""
+        try:
+            self.px -= other.px
+            self.py -= other.py
+            self.pz -= other.pz
+            self.e -= other.e
+        except AttributeError:
+            # If 'other' is not V4 like object then return special NotImplemented error
+            return NotImplemented
+        return self
 
 
 def if_then_else(x_ok, x, safe_f=tf.zeros_like):
