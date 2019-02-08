@@ -443,6 +443,45 @@ def lep_energy_scale(batch, scale=1.0, missing_value=0.0):
     update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
     return batch
 
+# ==================================================================================
+# Soft term
+# ==================================================================================
+def soft_term(batch, sigma_met=3.0, missing_value=0.0):
+    """
+    Manipulate MET primaries input and recompute the others values accordingly.
+
+    Args
+    ----
+        batch: the dataset should be a OrderedDict like object.
+            This function will modify the given data inplace.
+        sigma_met : the mean energy (default = 3 GeV) of the missing v4.
+        missing_value : (default=0.0) the value used to code missing value.
+            This is not used to find missing values but to write them in feature column that have some.
+    """
+    zeros_batch = tf.zeros_like(batch["PRI_tau_pt"])
+    missing_value_like = lambda x: tf.zeros_like(x) + missing_value
+    batch = collections.OrderedDict(batch)  # Copy to avoid modification of original Dict
+
+    # first built 4-vectors
+    vtau = V4_tau(batch) # tau 4-vector
+    vlep = V4_lep(batch) # lepton 4-vector
+    vmet = V4_met(batch) # met 4-vector
+    vj1 = V4_leading_jet(batch) # first jet if it exists
+    vj2 = V4_subleading_jet(batch) # second jet if it exists
+
+    # Compute the missing v4 vector
+    v4_soft_term = V4()
+    v4_soft_term.px = tf.random.normal(zeros_batch.shape, mean=0, stddev=sigma_met)
+    v4_soft_term.py = tf.random.normal(zeros_batch.shape, mean=0, stddev=sigma_met)
+    v4_soft_term.pz = zeros_batch
+    v4_soft_term.e = v4_soft_term.eWithM(0.)
+
+    # fix MET according to soft term
+    vmet = vmet + v4_soft_term
+
+    update_all(batch, vj1, vj2, vlep, vmet, vtau, missing_value_like)
+    return batch
+
 
 
 def transform(batch, systTauEnergyScale=1.0, missing_value=-999.0):
