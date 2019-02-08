@@ -196,7 +196,7 @@ def eta_centrality(eta, etaJ1, etaJ2):
     x_ok = tf.not_equal(x, 0.0)
     safe_f = tf.zeros_like
     safe_x = tf.where(x_ok, x, tf.ones_like(x))
-    f = lambda x : 1. / (x**2)
+    f = lambda x : 1. / (x*x)
     width  = tf.where(x_ok, f(safe_x), safe_f(x))
     
     return tf.exp(-width * (eta - center)**2)
@@ -352,7 +352,7 @@ def tau_energy_scale(batch, scale=1.0, missing_value=0.0):
 
     # fix MET according to tau pt change
     vtau_original.scaleFixedM( scale - 1.0 )
-    vmet -= vtau_original
+    vmet = vmet - vtau_original
     vmet.pz = zeros_batch
     vmet.e = vmet.eWithM(0.)
 
@@ -396,7 +396,7 @@ def jet_energy_scale(batch, scale=1.0, missing_value=0.0):
     # fix MET according to jet pt change
     vj1_original.scaleFixedM( scale - 1.0 )
     vj2_original.scaleFixedM( scale - 1.0 )
-    vmet = vmet - vj1_original + vj2_original
+    vmet = vmet - (vj1_original + vj2_original)
     vmet.pz = zeros_batch
     vmet.e = vmet.eWithM(0.)
 
@@ -434,9 +434,9 @@ def lep_energy_scale(batch, scale=1.0, missing_value=0.0):
     vj1 = V4_leading_jet(batch) # first jet if it exists
     vj2 = V4_subleading_jet(batch) # second jet if it exists
 
-    # fix MET according to jet pt change
+    # fix MET according to lep pt change
     vlep_original.scaleFixedM( scale - 1.0 )
-    vmet -= vlep_original
+    vmet = vmet - vlep_original
     vmet.pz = zeros_batch
     vmet.e = vmet.eWithM(0.)
 
