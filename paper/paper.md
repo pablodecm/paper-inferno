@@ -41,12 +41,12 @@ particle physics.
 In many cases the implicit generative procedure defined in the simulation is
 stochastic and/or lacks a tractable probability density
 $p(\boldsymbol{x}| \boldsymbol{\theta})$, where
-$\boldsymbol{\theta} \in \mathcal{\Theta}$
+$\boldsymbol{\theta}$
 is the vector of model parameters. Given some experimental
 observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
 a problem of special relevance for these
 disciplines is statistical inference on a subset of model parameters
-$\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$.
+$\boldsymbol{\omega}$.
 This can be approached via likelihood-free inference
 algorithms such as Approximate Bayesian Computation (ABC) [@beaumont2002approximate],
 simplified synthetic likelihoods [@wood2010statistical]
@@ -151,27 +151,32 @@ in current scientific data analysis workflows.
 
 # Problem Statement
 
-Let us consider a set of $n$ i.i.d. observations $D =
-\{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$ where $\boldsymbol{x} \in \mathcal{X}
-\subseteq \mathbb{R}^d$, and a generative model
+Let us consider a set of $n$ i.i.d. $d$-dimensional observations $D =
+\{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$ where
+$\boldsymbol{x} \in \mathbb{R}^d$, and a generative model
 which implicitly defines a
 probability density $p(\boldsymbol{x} | \boldsymbol{\theta})$
 used to model the data. The generative model is a function of
-the vector of parameters $\boldsymbol{\theta} \in \mathcal{\Theta} \subseteq
-\mathbb{R}^p$, which includes both relevant and nuisance parameters.
+the $p$-dimensional vector of parameters
+$\boldsymbol{\theta} \in \mathbb{R}^p$, which includes both relevant and nuisance parameters.
 We want to learn a function
-$\boldsymbol{t} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
-\mathcal{S} \subseteq \mathbb{R}^{m}$ that computes a summary statistic
-of the dataset and reduces its dimensionality so likelihood-free inference
-methods can be applied effectively. From here onwards, $m$ will be used to
-denote the dimensionality of the summary statistic $\boldsymbol{t}(D)$.
+$\boldsymbol{t} : \mathbb{R}^{d\times n} \rightarrow
+\mathbb{R}^{m}$ that computes a low-dimensional
+summary statistic
+of the dataset and greatly reduces its dimensionality (i.e. $m \ll d \times n$),
+so likelihood-free inference
+methods can be applied effectively.
+From here onwards, $m$
+will be used to denote the dimensionality of the summary
+statistic $\boldsymbol{t}(D)$.
+
 
 While there might be infinite ways to construct a summary statistic
 $\boldsymbol{t} (D)$, we are
 only interested in those that are informative
-about the subset of interest
-$\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$
-of the model parameters. The concept of statistical
+about the subset of interest of the model parameters,
+which will be referred as $\boldsymbol{\omega}$.
+The concept of statistical
 sufficiency is especially useful to evaluate whether
 summary statistics are informative. In the absence of nuisance
 parameters, classical sufficiency
@@ -245,9 +250,8 @@ the statistical model as well as the expected effect of nuisance parameters.
 
 The family of summary statistics $\boldsymbol{t}(D)$ considered in this
 work is composed by a neural network model applied to each dataset
-observation $\boldsymbol{h}(\boldsymbol{x}; \boldsymbol{\phi}) :
-\mathcal{X} \subseteq \mathbb{R}^{d} \rightarrow
-\mathcal{Y} \subseteq \mathbb{R}^{m}$,
+observation $\boldsymbol{h}(\boldsymbol{x}; \boldsymbol{\phi}) : \mathbb{R}^{d} \rightarrow
+\mathbb{R}^{m}$,
 whose parameters $\boldsymbol{\phi}$ will be learned during training by means of
 stochastic gradient descent, as will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
@@ -261,7 +265,7 @@ $$ {#eq:summary}
 
 where $\boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 will reduce the dimensionality from the input observations space
-$\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
+$\mathbb{R}^{d}$ to a lower-dimensional space $\mathbb{R}^{m}$$.
 The next step is to map observation outputs to a
 dataset summary statistic, which will in turn be calibrated
 and optimised via a non-parametric likelihood
