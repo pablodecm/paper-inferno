@@ -81,20 +81,6 @@ the detector elements and their readout.
 As a result, the density $p(\boldsymbol{x}| \boldsymbol{\theta})$
 cannot be analytically computed.
 
-The inference problem in particle physics is commonly posed as hypothesis
-testing based on the acquired data. An alternate hypothesis $H_1$ (e.g. a
-new theory that predicts the existence of
-a new fundamental particle) is tested against
-a null hypothesis $H_0$ (e.g. an existing theory, which explains previous
-observed phenomena). The aim is to check whether the null hypothesis
-can be rejectedat a certain confidence level
-$1-\alpha$, where $\alpha$, known as the Type I error rate, is commonly set
-to $\alpha=3\times10^{-7}$ for discovery claims (the so-called 5-sigma
-criterion). Because $\alpha$ is
-fixed, the sensitivity of an analysis is determined by the power $1-\beta$ of
-the test, where $\beta$ is the probability of failing to reject
-the null hypothesis when it is false, also known as Type II error rate.
-
 Due to the high dimensionality of the observed data, a low-dimensional summary
 statistic has to be constructed in order to perform inference. A
 well-known result of classical statistics,
@@ -120,9 +106,9 @@ distribution of the summary statistic for simulated observations.
 In many cases,
 the nature of the generative model (a mixture of different processes)
 allows the treatment of the problem as
-signal (S) vs background (B) classification [@adam2015higgs],
+signal (s) vs background (b) classification [@adam2015higgs],
 when the task becomes one of effectively estimating
-an approximation of $p_{S}(\boldsymbol{x})/p_{B}(\boldsymbol{x})$ which will
+an approximation of $p_{s}(\boldsymbol{x})/p_{b}(\boldsymbol{x})$ which will
 vary monotonically with the likelihood ratio.
 While the use of classifiers to learn a summary statistic can be effective and
 increase the discovery sensitivity, the simulations used to generate
@@ -183,9 +169,9 @@ parameters, classical sufficiency
 can be characterised by means of the factorisation
 criterion:
 $$
-p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{t}(D) | \boldsymbol{\omega} )
+p(D|\boldsymbol{\omega}) = q(D) r(\boldsymbol{t}(D) | \boldsymbol{\omega} )
 $$ {#eq:sufficiency}
-where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
+where $q$ and $r$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
 can be factorised as indicated, the
 summary statistic $\boldsymbol{t}(D)$ will yield the same inference about
 the parameters $\boldsymbol{\omega}$ as the full set of observations $D$.
@@ -203,12 +189,12 @@ For simplicity, let us consider a problem where we are only interested on
 statistical inference on a
 single one-dimensional model parameter $\boldsymbol{\omega} = \{ \omega_0\}$
 given some observed data.
-Be given a summary statistic $\boldsymbol{t}$ and a statistical procedure
+Let there be given a summary statistic $\boldsymbol{t}$ and a statistical procedure
 to obtain an unbiased interval estimate of the parameter of interest
 which accounts for the effect of nuisance parameters. The resulting interval
 can be characterised by its width
 $\Delta \omega_0 = \hat{\omega}^{+}_0- \hat{\omega}^{-}_0$, defined by some
-criterion so as to contain on average, upon repeated samping,
+criterion so as to contain on average, upon repeated sampling,
 a given fraction of the probability
 density, e.g. a central $68.3\%$ interval. The
 expected size of the interval depends
@@ -220,11 +206,9 @@ Under this figure of merit, the problem
 of choosing an optimal summary statistic
 can be formally expressed as finding a summary statistic $\boldsymbol{t}^{\ast}$
 that minimises the interval width:
-
 $$
 \boldsymbol{t}^{\ast} = \textrm{argmin}_{\boldsymbol{t}}  \Delta \omega_0.
 $$ {#eq:general_task}
-
 The above construction can be extended to several parameters of
 interest by considering the
 interval volume or any other function of the resulting
@@ -254,16 +238,15 @@ whose parameters $\boldsymbol{\phi}$ will be learned during training by means of
 stochastic gradient descent, as will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
-
 $$
 \boldsymbol{t} (D, \boldsymbol{\phi})
  = \boldsymbol{t} \left ( \: \{ \:  \boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
 $$ {#eq:summary}
-
-where $\boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi})$
-will reduce the dimensionality from the input observations space
-$\mathbb{R}^{d}$ to a lower-dimensional space $\mathbb{R}^{m}$.
+where the neural network $\boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi})$
+will reduce the dimensionality from the $d$-dimensional inputs to
+the $m$-dimensional outputs and will effectively define the summary
+statistic transformation.
 The next step is to map observation outputs to a
 dataset summary statistic, which will in turn be calibrated
 and optimised via a non-parametric likelihood
@@ -285,7 +268,6 @@ by simply assigning each observation $\boldsymbol{x}$ to a bin corresponding
 to the cardinality of the maximum element of
 $\boldsymbol{h}(\boldsymbol{x}; \boldsymbol{\phi})$, so each element of the
 sample summary will correspond to the following sum:
-
 $$
 t_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
 \begin{cases}
@@ -295,16 +277,13 @@ t_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
         (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
    \end{cases}
 $$ {#eq:argmax}
-
 which can in turn be used to build the following likelihood, where the
 expectation for each bin is taken from the simulated sample $G_\textrm{MC}$:
-
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^m
              \textrm{Pois} \left ( t_i (D; \boldsymbol{\phi}) \:  |
              \: \left ( \frac{n}{l} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
-
 where the $n/g$ factor accounts for the different number of
 observations in the simulated samples. In cases where the number of
 observations is itself a random variable providing information about
@@ -318,13 +297,11 @@ the $argmax$ operator, so gradient-based updates for the parameters
 cannot be computed. To work around this problem, a differentiable
 approximation $\hat{\boldsymbol{t}}(D ; \boldsymbol{\phi})$ is considered.
 This function is defined by means of a $softmax$ operator:
-
 $$
 \hat{t}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
   \frac{e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
   {\sum_{j=0}^{m} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
 $$ {#eq:soft_summary}
-
 where the temperature hyper-parameter
 $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the largest
@@ -341,14 +318,12 @@ when the observation for each bin is equal to its corresponding
 expectation based on
 the simulated sample $G_\textrm{MC}$, which is commonly denoted as the
 Asimov likelihood [@cowan2011asymptotic] $\hat{\mathcal{L}}_A$:
-
 $$
 \hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^m
              \textrm{Pois} \left ( \left ( \frac{n}{l} \right )
             \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{l} \right )
              \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood_asimov}
-
 for which it can be easily proven that
 $argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
 \boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_\textrm{MC}$,
@@ -363,7 +338,6 @@ By taking the negative logarithm and expanding in
 $\boldsymbol{\theta}$ around $\boldsymbol{\theta}_\textrm{MC}$, we can obtain
 the Fisher information matrix [@fisher_1925] for the
 Asimov likelihood:
-
 $$
 {\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
 = \mathop{\mathbb{E}} \left [
@@ -371,7 +345,6 @@ $$
  \left ( - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
  \boldsymbol{\phi}) \right ) \right ]
 $$ {#eq:fisher_info}
-
 which can be computed via automatic differentiation
 if the simulation is differentiable and
 included in
@@ -391,12 +364,10 @@ If $\hat{\boldsymbol{\theta}}$
 is an unbiased estimator of the values of $\boldsymbol{\theta}$,
 the covariance matrix fulfils the Cramér-Rao lower bound
 [@cramer2016mathematical; @rao1992information]:
-
 $$
 \textrm{cov}_{\boldsymbol{\theta}}(\hat{\boldsymbol{\theta}}) \geq
 I(\boldsymbol{\theta})^{-1}
 $$ {#eq:CRB}
-
 and the inverse of the Fisher information can be used as an
 approximate estimator of the expected variance, given that
 the bound would become
@@ -409,25 +380,21 @@ $\{\mathcal{L}_C^{0}(\boldsymbol{\theta}), ...,
 those constraints can also be easily included in the covariance
 estimation, simply by considering the augmented likelihood
 $\hat{\mathcal{L}}_A'$ instead of $\hat{\mathcal{L}}_A$ in [@Eq:fisher_info]:
-
 $$\hat{\mathcal{L}}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
 \hat{\mathcal{L}}_A(\boldsymbol{\theta} ; \boldsymbol{\phi})
 \prod_{i=0}^{c}\mathcal{L}_C^i(\boldsymbol{\theta}).
 $$ {#eq:add_constraint}
-
 In Bayesian
 terminology, this approach is referred to as the Laplace approximation
 [@laplace1986memoir] where the logarithm of the joint density (including the priors)
 is expanded around the MAP to a multi-dimensional normal
 approximation of the posterior
 density:
-
 $$
 p(\boldsymbol{\theta}|D) \approx \textrm{Normal}(
 \boldsymbol{\theta} ; \hat{\boldsymbol{\theta}},
 I(\hat{\boldsymbol{\theta})}^{-1} )
 $$ {#eq:normal_approx}
-
 which has already been approached by automatic differentiation in
 probabilistic programming frameworks [@tran2016edward]. While a
 histogram has been used to construct a Poisson count sample likelihood,
@@ -447,11 +414,9 @@ elements $I_{ii}^{-1}(\boldsymbol{\theta}_\textrm{MC})$ correspond to the expect
 variance of each of the $\phi_i$ under the normal approximation mentioned
 before, so if the aim is efficient inference about one of the parameters
 $\omega_0 = \theta_k$ a candidate loss function is:
-
 $$
 U = I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})
 $$ {#eq:example_loss}
-
 which corresponds to the expected width of the confidence interval
 for $\omega_0$ accounting also for the effect of the other nuisance
 parameters in $\boldsymbol{\theta}$. This approach can also be extended
@@ -571,16 +536,13 @@ an online repository [@code_repository], extensively using \textsc{TensorFlow}
 [@tensorflow2015-whitepaper]
 and \textsc{TensorFlow Probability} [@tran2016edward;@dillon2017tensorflow] software libraries.
 
-## 3D Synthetic Mixture
-
-In order to exemplify the usage of the proposed approach, evaluate its
+In order to demonstrate the usage of the proposed approach, evaluate its
 viability and test its performance by comparing to the use of
 a classification model proxy, a three-dimensional
 mixture example with two components is considered.
 One component will be referred as background $f_b(\boldsymbol{x} | \lambda)$ and
 the other as signal $f_s(\boldsymbol{x})$; their probability density functions
 are taken to correspond respectively to:
-
 $$
 f_b(\boldsymbol{x} | r, \lambda) =
 \mathcal{N} \left (
@@ -593,7 +555,6 @@ f_b(\boldsymbol{x} | r, \lambda) =
 \right)
 Exp (x_2 | \lambda)
 $$ {#eq:bkg_toy_pdf}
-
 $$
 f_s(\boldsymbol{x}) =
 \mathcal{N} \left (
@@ -606,7 +567,6 @@ f_s(\boldsymbol{x}) =
 \right)
 Exp (x_2 | 2)
 $$ {#eq:sig_toy_pdf}
-
 so that $(x_0,x_1)$ are distributed according to a multivariate normal
 distribution while $x_2$ follows an independent exponential distribution
 both for background and signal, as shown in [@Fig:subfigure_a].
@@ -618,12 +578,10 @@ the exponential rate in the third dimension. These parameters will be the
 treated as nuisance parameters when benchmarking different methods.
 Hence, the probability density
 function of observations has the following mixture structure:
-
 $$
 p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) 
                                       + \mu f_s(\boldsymbol{x})
 $$ {#eq:mixture_eq}
-
 where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
 background. The low-dimensional projections from samples from
@@ -657,36 +615,30 @@ predicts that the total number of observations are Poisson distributed with
 a mean $s+b$, where $s$ and $b$ are the expected number of signal
 and background observations. Thus the following parametrisation will be
 more convenient for building sample-based likelihoods:
-
 $$
 p(\boldsymbol{x}| s, r, \lambda, b) = \frac{b}{ s+b}
  f_b(\boldsymbol{x} | r, \lambda) +
  \frac{s}{s+b} f_s(\boldsymbol{x}).
 $$ {#eq:mixture_alt}
-
 This parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
 of observations. If the probability density is known, but the expectation for
 the number of observed events depends on the model parameters, the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
-
 $$
 \mathcal{L}(s, r, \lambda, b) = \textrm{Pois}(n | s+b) \prod^{n}
 p(\boldsymbol{x}| s,r, \lambda, b)
 $$ {#eq:ext_ll}
-
 which will be used to provide an optimal inference baseline when benchmarking
 the different approaches. Another quantity of relevance is the conditional
 density ratio, which would correspond to the optimal classifier (in the
 Bayes risk sense) separating
 signal and background events in a balanced dataset (equal priors):
-
 $$
 t_B(\boldsymbol{x} | r, \lambda) =
 \frac{f_s(\boldsymbol{x})}{
 f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $$ {#eq:opt_clf}
-
 noting that this quantity depends on the parameters that define the background
 distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
 the mixture coefficients. It can be proven (see [appendix @sec:sufficiency] )
@@ -737,7 +689,7 @@ background distribution. Furthermore, some kind  of non-parametric density estim
 model using the classification-based learned features, which  will in turn
 smooth and reduce the information available for inference.
 
-To exemplify the use of this family of classification-based summary statistics,
+To demonstrate the use of this family of classification-based summary statistics,
 a histogram of a deep neural network classifier output trained on simulated data
 and its variation computed for different values of $r$ and $\lambda$
 are shown in [@Fig:train_clf]. The details of the training procedure

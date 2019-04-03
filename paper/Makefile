@@ -5,20 +5,23 @@ BIBER=biber
 BIBTEX=bibtex
 
 pdf_draft: diagram appendices
-	$(PANDOC) draft.yaml paper.md -s -o paper.tex --include-after-body=appendices.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
+	$(PANDOC) draft.yaml paper.md -s -o paper.tex --include-after-body=appendices.tex \
+	--filter=pandoc-crossref --filter=pandoc-citeproc --biblatex --wrap=preserve
 	$(LATEX2PDF) paper.tex
 	$(BIBER) paper.bcf
 	$(LATEX2PDF) paper.tex
 
 appendices: appendices.md
-	$(PANDOC) appendices.md -o appendices.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
+	$(PANDOC) appendices.md -o appendices.tex --filter=pandoc-crossref \
+	--filter=pandoc-citeproc --biblatex --wrap=preserve
 
 diagram: diagram.tex
 	$(LATEX2PDF) diagram.tex
 	mv diagram.pdf gfx/figure1.pdf
 
 arxiv_tar: diagram appendices
-	$(PANDOC) arxiv.yaml paper.md -s -o paper.tex --include-after-body=appendices.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
+	$(PANDOC) arxiv.yaml paper.md -s -o paper.tex --include-after-body=appendices.tex \
+	--filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
 	mkdir -p arxiv
 	cp -r paper.tex arxiv/.
 	cp -r table.tex arxiv/.
@@ -39,7 +42,7 @@ cpc_tar: diagram appendices
 	--template cpc_inferno/cpc_article.latex \
 	--include-after-body=appendices.tex \
 	--filter=pandoc-crossref --filter=pandoc-citeproc \
-	--natbib
+	--natbib --wrap=preserve
 	cp -r table.tex cpc_inferno/.
 	cp -r gfx cpc_inferno/.
 	cp -r bibliography.bib cpc_inferno/.
@@ -48,12 +51,13 @@ cpc_tar: diagram appendices
 cpc_diff: cpc_tar
 	git show v2.1.0:paper/paper.md > paper_old.md
 	git show v2.1.0:paper/appendices.md > appendices_old.md
-	$(PANDOC) appendices_old.md -o appendices_old.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
+	$(PANDOC) appendices_old.md -o appendices_old.tex --filter=pandoc-crossref \
+	--filter=pandoc-citeproc --biblatex --wrap=preserve
 	$(PANDOC) paper_old.md -s -o cpc_inferno/paper_old.tex \
 	--template cpc_inferno/cpc_article.latex \
 	--include-after-body=appendices_old.tex \
 	--filter=pandoc-crossref --filter=pandoc-citeproc \
-	--natbib
+	--natbib --wrap=preserve
 	latexdiff cpc_inferno/paper_old.tex cpc_inferno/paper.tex > cpc_inferno/paper_diff.tex
 	cd cpc_inferno; $(LATEX2PDF) paper_diff.tex
 	cd cpc_inferno; $(BIBTEX) paper_diff
