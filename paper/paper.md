@@ -535,8 +535,6 @@ an online repository [@code_repository], extensively using \textsc{TensorFlow}
 [@tensorflow2015-whitepaper]
 and \textsc{TensorFlow Probability} [@tran2016edward;@dillon2017tensorflow] software libraries.
 
-## 3D Synthetic Mixture
-
 In order to exemplify the usage of the proposed approach, evaluate its
 viability and test its performance by comparing to the use of
 a classification model proxy, a three-dimensional
