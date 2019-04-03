@@ -49,8 +49,8 @@ cpc_tar: diagram appendices
 	tar --exclude='./cpc_inferno/*.latex' -czvf cpc_inferno.tar.gz cpc_inferno
 
 cpc_diff: cpc_tar
-	git show v2.1.0:paper/paper.md > paper_old.md
-	git show v2.1.0:paper/appendices.md > appendices_old.md
+	git show cpc_diff:paper/paper.md > paper_old.md
+	git show cpc_diff:paper/appendices.md > appendices_old.md
 	$(PANDOC) appendices_old.md -o appendices_old.tex --filter=pandoc-crossref \
 	--filter=pandoc-citeproc --biblatex --wrap=preserve
 	$(PANDOC) paper_old.md -s -o cpc_inferno/paper_old.tex \
