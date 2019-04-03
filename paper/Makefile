@@ -47,9 +47,11 @@ cpc_tar: diagram appendices
 
 cpc_diff: cpc_tar
 	git show v2.1.0:paper/paper.md > paper_old.md
+	git show v2.1.0:paper/appendices.md > appendices_old.md
+	$(PANDOC) appendices_old.md -o appendices_old.tex --filter=pandoc-crossref --filter=pandoc-citeproc --biblatex
 	$(PANDOC) paper_old.md -s -o cpc_inferno/paper_old.tex \
 	--template cpc_inferno/cpc_article.latex \
-	--include-after-body=appendices.tex \
+	--include-after-body=appendices_old.tex \
 	--filter=pandoc-crossref --filter=pandoc-citeproc \
 	--natbib
 	latexdiff cpc_inferno/paper_old.tex cpc_inferno/paper.tex > cpc_inferno/paper_diff.tex

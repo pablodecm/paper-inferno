@@ -182,11 +182,9 @@ summary statistics are informative. In the absence of nuisance
 parameters, classical sufficiency
 can be characterised by means of the factorisation
 criterion:
-
 $$
 p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{t}(D) | \boldsymbol{\omega} )
 $$ {#eq:sufficiency}
-
 where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
 can be factorised as indicated, the
 summary statistic $\boldsymbol{t}(D)$ will yield the same inference about
@@ -265,13 +263,13 @@ $$ {#eq:summary}
 
 where $\boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 will reduce the dimensionality from the input observations space
-$\mathbb{R}^{d}$ to a lower-dimensional space $\mathbb{R}^{m}$$.
+$\mathbb{R}^{d}$ to a lower-dimensional space $\mathbb{R}^{m}$.
 The next step is to map observation outputs to a
 dataset summary statistic, which will in turn be calibrated
 and optimised via a non-parametric likelihood
 $\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})$
-created using a set of simulated observations $G_\textrm{MC}=
-\{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$, generated at
+created using a set of $l$ simulated observations $G_\textrm{MC}=
+\{\boldsymbol{x}_0,...,\boldsymbol{x}_{l}\}$, generated at
 a certain instantiation of the simulator parameters
 $\boldsymbol{\theta}_\textrm{MC}$.
 
@@ -304,7 +302,7 @@ expectation for each bin is taken from the simulated sample $G_\textrm{MC}$:
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^m
              \textrm{Pois} \left ( t_i (D; \boldsymbol{\phi}) \:  |
-             \: \left ( \frac{n}{g} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
+             \: \left ( \frac{n}{l} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
 
 where the $n/g$ factor accounts for the different number of
@@ -346,8 +344,8 @@ Asimov likelihood [@cowan2011asymptotic] $\hat{\mathcal{L}}_A$:
 
 $$
 \hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^m
-             \textrm{Pois} \left ( \left ( \frac{n}{g} \right )
-            \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{g} \right )
+             \textrm{Pois} \left ( \left ( \frac{n}{l} \right )
+            \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{l} \right )
              \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood_asimov}
 
@@ -684,7 +682,7 @@ Bayes risk sense) separating
 signal and background events in a balanced dataset (equal priors):
 
 $$
-s^{*}(\boldsymbol{x} | r, \lambda) =
+t_B(\boldsymbol{x} | r, \lambda) =
 \frac{f_s(\boldsymbol{x})}{
 f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $$ {#eq:opt_clf}
@@ -692,7 +690,8 @@ $$ {#eq:opt_clf}
 noting that this quantity depends on the parameters that define the background
 distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
 the mixture coefficients. It can be proven (see [appendix @sec:sufficiency] )
-that $s^{*}(\boldsymbol{x})$ is a sufficient summary statistic with respect to an
+that $t_B(\boldsymbol{x} | r, \lambda)$ is a sufficient summary statistic with
+respect to an
 arbitrary two-component mixture model if the only unknown parameter
 is the signal mixture fraction $\mu$ (or alternatively $s$ in the chosen
 parametrisation).

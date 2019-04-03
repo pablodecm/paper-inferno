@@ -11,7 +11,7 @@ as High Energy Physics.
 While their functional form will not be explicitly specified to keep
 the formulation general, one of the components will be denoted as signal
 $f_s(\boldsymbol{x}| \boldsymbol{\theta})$ and the other as background
-$f_b(\boldsymbol{x} | \boldsymbol{\theta})$, where  $\boldsymbol{\theta}$ is
+$f_b(\boldsymbol{x} | \boldsymbol{\theta})$, where  $\boldsymbol{\theta}$
 are of all parameters the distributions might depend on. The probability
 distribution function of the mixture can then be expressed as:
 
