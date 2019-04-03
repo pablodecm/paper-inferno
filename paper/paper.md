@@ -167,11 +167,9 @@ summary statistics are informative. In the absence of nuisance
 parameters, classical sufficiency
 can be characterised by means of the factorisation
 criterion:
-
 $$
 p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
 $$ {#eq:sufficiency}
-
 where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
 can be factorised as indicated, the
 summary statistic $\boldsymbol{s}(D)$ will yield the same inference about
@@ -207,11 +205,9 @@ Under this figure of merit, the problem
 of choosing an optimal summary statistic
 can be formally expressed as finding a summary statistic $\boldsymbol{s}^{\ast}$
 that minimises the interval width:
-
 $$
 \boldsymbol{s}^{\ast} = \textrm{argmin}_{\boldsymbol{s}}  \Delta \omega_0.
 $$ {#eq:general_task}
-
 The above construction can be extended to several parameters of
 interest by considering the
 interval volume or any other function of the resulting
@@ -242,13 +238,11 @@ whose parameters $\boldsymbol{\phi}$ will be learned during training by means of
 stochastic gradient descent, as will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
-
 $$
 \boldsymbol{s} (D, \boldsymbol{\phi})
  = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
 $$ {#eq:summary}
-
 where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 will reduce the dimensionality from the input observations space
 $\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
@@ -273,7 +267,6 @@ by simply assigning each observation $\boldsymbol{x}$ to a bin corresponding
 to the cardinality of the maximum element of
 $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$, so each element of the
 sample summary will correspond to the following sum:
-
 $$
 s_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
 \begin{cases}
@@ -283,16 +276,13 @@ s_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
         (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
    \end{cases}
 $$ {#eq:argmax}
-
 which can in turn be used to build the following likelihood, where the
 expectation for each bin is taken from the simulated sample $G_s$:
-
 $$
 \mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois} \left ( s_i (D; \boldsymbol{\phi}) \:  |
              \: \left ( \frac{n}{g} \right ) s_i (G_s;\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
-
 where the $n/g$ factor accounts for the different number of
 observations in the simulated samples. In cases where the number of
 observations is itself a random variable providing information about
@@ -306,13 +296,11 @@ the $argmax$ operator, so gradient-based updates for the parameters
 cannot be computed. To work around this problem, a differentiable
 approximation $\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})$ is considered.
 This function is defined by means of a $softmax$ operator:
-
 $$
 \hat{s}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
   \frac{e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
   {\sum_{j=0}^{b} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
 $$ {#eq:soft_summary}
-
 where the temperature hyper-parameter
 $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the largest
@@ -329,14 +317,12 @@ when the observation for each bin is equal to its corresponding
 expectation based on
 the simulated sample $G_s$, which is commonly denoted as the
 Asimov likelihood [@cowan2011asymptotic] $\hat{\mathcal{L}}_A$:
-
 $$
 \hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^b
              \textrm{Pois} \left ( \left ( \frac{n}{g} \right )
             \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{g} \right )
              \hat{s}_i (G_s;\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood_asimov}
-
 for which it can be easily proven that
 $argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
 \boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$,
@@ -351,7 +337,6 @@ By taking the negative logarithm and expanding in
 $\boldsymbol{\theta}$ around $\boldsymbol{\theta}_s$, we can obtain
 the Fisher information matrix [@fisher_1925] for the
 Asimov likelihood:
-
 $$
 {\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
 = \mathop{\mathbb{E}} \left [
@@ -359,7 +344,6 @@ $$
  \left ( - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
  \boldsymbol{\phi}) \right ) \right ]
 $$ {#eq:fisher_info}
-
 which can be computed via automatic differentiation
 if the simulation is differentiable and
 included in
@@ -379,12 +363,10 @@ If $\hat{\boldsymbol{\theta}}$
 is an unbiased estimator of the values of $\boldsymbol{\theta}$,
 the covariance matrix fulfils the Cramér-Rao lower bound
 [@cramer2016mathematical; @rao1992information]:
-
 $$
 \textrm{cov}_{\boldsymbol{\theta}}(\hat{\boldsymbol{\theta}}) \geq
 I(\boldsymbol{\theta})^{-1}
 $$ {#eq:CRB}
-
 and the inverse of the Fisher information can be used as an
 approximate estimator of the expected variance, given that
 the bound would become
@@ -397,25 +379,21 @@ $\{\mathcal{L}_C^{0}(\boldsymbol{\theta}), ...,
 those constraints can also be easily included in the covariance
 estimation, simply by considering the augmented likelihood
 $\hat{\mathcal{L}}_A'$ instead of $\hat{\mathcal{L}}_A$ in [@Eq:fisher_info]:
-
 $$\hat{\mathcal{L}}_A'(\boldsymbol{\theta} ; \boldsymbol{\phi}) =
 \hat{\mathcal{L}}_A(\boldsymbol{\theta} ; \boldsymbol{\phi})
 \prod_{i=0}^{c}\mathcal{L}_C^i(\boldsymbol{\theta}).
 $$ {#eq:add_constraint}
-
 In Bayesian
 terminology, this approach is referred to as the Laplace approximation
 [@laplace1986memoir] where the logarithm of the joint density (including the priors)
 is expanded around the MAP to a multi-dimensional normal
 approximation of the posterior
 density:
-
 $$
 p(\boldsymbol{\theta}|D) \approx \textrm{Normal}(
 \boldsymbol{\theta} ; \hat{\boldsymbol{\theta}},
 I(\hat{\boldsymbol{\theta})}^{-1} )
 $$ {#eq:normal_approx}
-
 which has already been approached by automatic differentiation in
 probabilistic programming frameworks [@tran2016edward]. While a
 histogram has been used to construct a Poisson count sample likelihood,
@@ -435,11 +413,9 @@ elements $I_{ii}^{-1}(\boldsymbol{\theta}_s)$ correspond to the expected
 variance of each of the $\phi_i$ under the normal approximation mentioned
 before, so if the aim is efficient inference about one of the parameters
 $\omega_0 = \theta_k$ a candidate loss function is:
-
 $$
 U = I_{kk}^{-1}(\boldsymbol{\theta}_s)
 $$ {#eq:example_loss}
-
 which corresponds to the expected width of the confidence interval
 for $\omega_0$ accounting also for the effect of the other nuisance
 parameters in $\boldsymbol{\theta}$. This approach can also be extended
@@ -568,7 +544,6 @@ mixture example with two components is considered.
 One component will be referred as background $f_b(\boldsymbol{x} | \lambda)$ and
 the other as signal $f_s(\boldsymbol{x})$; their probability density functions
 are taken to correspond respectively to:
-
 $$
 f_b(\boldsymbol{x} | r, \lambda) =
 \mathcal{N} \left (
@@ -581,7 +556,6 @@ f_b(\boldsymbol{x} | r, \lambda) =
 \right)
 Exp (x_2 | \lambda)
 $$ {#eq:bkg_toy_pdf}
-
 $$
 f_s(\boldsymbol{x}) =
 \mathcal{N} \left (
@@ -594,7 +568,6 @@ f_s(\boldsymbol{x}) =
 \right)
 Exp (x_2 | 2)
 $$ {#eq:sig_toy_pdf}
-
 so that $(x_0,x_1)$ are distributed according to a multivariate normal
 distribution while $x_2$ follows an independent exponential distribution
 both for background and signal, as shown in [@Fig:subfigure_a].
@@ -606,12 +579,10 @@ the exponential rate in the third dimension. These parameters will be the
 treated as nuisance parameters when benchmarking different methods.
 Hence, the probability density
 function of observations has the following mixture structure:
-
 $$
 p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) 
                                       + \mu f_s(\boldsymbol{x})
 $$ {#eq:mixture_eq}
-
 where $\mu$ is the parameter corresponding to the mixture weight
 for the signal and consequently $(1-\mu)$ is the mixture weight for the
 background. The low-dimensional projections from samples from
@@ -645,36 +616,30 @@ predicts that the total number of observations are Poisson distributed with
 a mean $s+b$, where $s$ and $b$ are the expected number of signal
 and background observations. Thus the following parametrisation will be
 more convenient for building sample-based likelihoods:
-
 $$
 p(\boldsymbol{x}| s, r, \lambda, b) = \frac{b}{ s+b}
  f_b(\boldsymbol{x} | r, \lambda) +
  \frac{s}{s+b} f_s(\boldsymbol{x}).
 $$ {#eq:mixture_alt}
-
 This parametrisation is common for physics analyses at the LHC,
 because theoretical calculations provide information about the expected number
 of observations. If the probability density is known, but the expectation for
 the number of observed events depends on the model parameters, the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
-
 $$
 \mathcal{L}(s, r, \lambda, b) = \textrm{Pois}(n | s+b) \prod^{n}
 p(\boldsymbol{x}| s,r, \lambda, b)
 $$ {#eq:ext_ll}
-
 which will be used to provide an optimal inference baseline when benchmarking
 the different approaches. Another quantity of relevance is the conditional
 density ratio, which would correspond to the optimal classifier (in the
 Bayes risk sense) separating
 signal and background events in a balanced dataset (equal priors):
-
 $$
 s^{*}(\boldsymbol{x} | r, \lambda) =
 \frac{f_s(\boldsymbol{x})}{
 f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
 $$ {#eq:opt_clf}
-
 noting that this quantity depends on the parameters that define the background
 distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
 the mixture coefficients. It can be proven (see [appendix @sec:sufficiency] )
