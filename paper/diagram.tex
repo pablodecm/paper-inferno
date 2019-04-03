@@ -24,7 +24,7 @@
 
 \draw
   node [block] (g) {$g$}
-  node [var, right=0.7cm of g] (theta) {$\boldsymbol{\theta}_s$}
+  node [var, right=0.7cm of g] (theta) {$\boldsymbol{\theta}_\textrm{MC}$}
 ;
 
   \node [on chain=1,obs, below=1.5cm of g] (x_0) {$\boldsymbol{x}_0$};
@@ -48,11 +48,11 @@
   node [block, right=1.55cm of phi] (sum) {$\sum$}
   ;
 
-  \node [on chain=3,obs, right=3.8cm of y_g] (s_0) {$\hat{s}_0$};
-  \node [on chain=3,obs] (s_1) {$\hat{s}_1$};
-  \node [on chain=3,obs] (s_2) {$\hat{s}_{2}$};
+  \node [on chain=3,obs, right=3.8cm of y_g] (t_0) {$\hat{t}_0$};
+  \node [on chain=3,obs] (t_1) {$\hat{t}_1$};
+  \node [on chain=3,obs] (t_2) {$\hat{t}_{2}$};
   \node [on chain=3,obs] {...};
-  \node [on chain=3,obs] (s_b) {$\hat{s}_b$};
+  \node [on chain=3,obs] (t_m) {$\hat{t}_m$};
 
   \draw
   node [block, right=3.0cm of sum] (L) {$\log \hat{\mathcal{L}}_A$}
@@ -74,8 +74,8 @@
   \draw [arrow] (f.north) -- (y_0.south);
   \draw [arrow] (y_g.east) -- (softmax.west);
   \draw [arrow] (softmax.south) -- (sum.north);
-  \draw [arrow] (sum.east) to (s_0.west);
-  \draw [arrow] (s_b.east) |- (L.west);
+  \draw [arrow] (sum.east) to (t_0.west);
+  \draw [arrow] (t_m.east) |- (L.west);
   \draw [arrow] (L.north) -- (der.south);
   \draw [arrow] (der.east) -- (inv_hess.west);
   \draw [arrow] (inv_hess.south) -- (U.north);

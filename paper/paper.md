@@ -59,7 +59,7 @@ tend to be computationally expensive due to the need of repeated simulations
 to cover the parameter space. When data are
 high-dimensional, likelihood-free
 inference can rapidly become inefficient, so low-dimensional summary statistics
-$\boldsymbol{s}(D)$ are used instead of the raw data
+$\boldsymbol{t}(D)$ are used instead of the raw data
 for tractability. The choice of summary statistics for such cases becomes
 critical,
 given that naive choices might cause loss of
@@ -160,14 +160,14 @@ used to model the data. The generative model is a function of
 the vector of parameters $\boldsymbol{\theta} \in \mathcal{\Theta} \subseteq
 \mathbb{R}^p$, which includes both relevant and nuisance parameters.
 We want to learn a function
-$\boldsymbol{s} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
-\mathcal{S} \subseteq \mathbb{R}^{b}$ that computes a summary statistic
+$\boldsymbol{t} : \mathcal{D} \subseteq \mathbb{R}^{d\times n} \rightarrow
+\mathcal{S} \subseteq \mathbb{R}^{m}$ that computes a summary statistic
 of the dataset and reduces its dimensionality so likelihood-free inference
-methods can be applied effectively. From here onwards, $b$ will be used to
-denote the dimensionality of the summary statistic $\boldsymbol{s}(D)$.
+methods can be applied effectively. From here onwards, $m$ will be used to
+denote the dimensionality of the summary statistic $\boldsymbol{t}(D)$.
 
 While there might be infinite ways to construct a summary statistic
-$\boldsymbol{s} (D)$, we are
+$\boldsymbol{t} (D)$, we are
 only interested in those that are informative
 about the subset of interest
 $\boldsymbol{\omega} \in \mathcal{\Omega} \subseteq \mathcal{\Theta}$
@@ -179,12 +179,12 @@ can be characterised by means of the factorisation
 criterion:
 
 $$
-p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{s}(D) | \boldsymbol{\omega} )
+p(D|\boldsymbol{\omega}) = h(D) g(\boldsymbol{t}(D) | \boldsymbol{\omega} )
 $$ {#eq:sufficiency}
 
 where $h$ and $g$ are non-negative functions. If $p(D | \boldsymbol{\omega})$
 can be factorised as indicated, the
-summary statistic $\boldsymbol{s}(D)$ will yield the same inference about
+summary statistic $\boldsymbol{t}(D)$ will yield the same inference about
 the parameters $\boldsymbol{\omega}$ as the full set of observations $D$.
 When nuisance parameters have to be accounted in the inference procedure,
 alternative notions of sufficiency are commonly used, such as partial
@@ -200,7 +200,7 @@ For simplicity, let us consider a problem where we are only interested on
 statistical inference on a
 single one-dimensional model parameter $\boldsymbol{\omega} = \{ \omega_0\}$
 given some observed data.
-Be given a summary statistic $\boldsymbol{s}$ and a statistical procedure
+Be given a summary statistic $\boldsymbol{t}$ and a statistical procedure
 to obtain an unbiased interval estimate of the parameter of interest
 which accounts for the effect of nuisance parameters. The resulting interval
 can be characterised by its width
@@ -209,17 +209,17 @@ criterion so as to contain on average, upon repeated samping,
 a given fraction of the probability
 density, e.g. a central $68.3\%$ interval. The
 expected size of the interval depends
-on the summary statistic $\boldsymbol{s}$ chosen: in general,
+on the summary statistic $\boldsymbol{t}$ chosen: in general,
 summary statistics that are
 more informative about the parameters of interest will provide narrower
 confidence or credible intervals on their value.
 Under this figure of merit, the problem
 of choosing an optimal summary statistic
-can be formally expressed as finding a summary statistic $\boldsymbol{s}^{\ast}$
+can be formally expressed as finding a summary statistic $\boldsymbol{t}^{\ast}$
 that minimises the interval width:
 
 $$
-\boldsymbol{s}^{\ast} = \textrm{argmin}_{\boldsymbol{s}}  \Delta \omega_0.
+\boldsymbol{t}^{\ast} = \textrm{argmin}_{\boldsymbol{t}}  \Delta \omega_0.
 $$ {#eq:general_task}
 
 The above construction can be extended to several parameters of
@@ -243,33 +243,33 @@ the statistical model as well as the expected effect of nuisance parameters.
 ![Learning inference-aware summary statistics (see text for
   details).](gfx/figure1.pdf){#fig:diagram}
 
-The family of summary statistics $\boldsymbol{s}(D)$ considered in this
+The family of summary statistics $\boldsymbol{t}(D)$ considered in this
 work is composed by a neural network model applied to each dataset
-observation $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi}) :
+observation $\boldsymbol{h}(\boldsymbol{x}; \boldsymbol{\phi}) :
 \mathcal{X} \subseteq \mathbb{R}^{d} \rightarrow
-\mathcal{Y} \subseteq \mathbb{R}^{b}$,
+\mathcal{Y} \subseteq \mathbb{R}^{m}$,
 whose parameters $\boldsymbol{\phi}$ will be learned during training by means of
 stochastic gradient descent, as will be discussed later. Therefore,
 using set-builder notation the family of summary statistics considered
 can be denoted as:
 
 $$
-\boldsymbol{s} (D, \boldsymbol{\phi})
- = \boldsymbol{s} \left ( \: \{ \:  \boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
+\boldsymbol{t} (D, \boldsymbol{\phi})
+ = \boldsymbol{t} \left ( \: \{ \:  \boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi}) \:
   | \: \forall \: \boldsymbol{x}_i \in D \: \} \: \right )
 $$ {#eq:summary}
 
-where $\boldsymbol{f}(\boldsymbol{x}_i; \boldsymbol{\phi})$
+where $\boldsymbol{h}(\boldsymbol{x}_i; \boldsymbol{\phi})$
 will reduce the dimensionality from the input observations space
 $\mathcal{X}$ to a lower-dimensional space $\mathcal{Y}$.
 The next step is to map observation outputs to a
 dataset summary statistic, which will in turn be calibrated
 and optimised via a non-parametric likelihood
 $\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})$
-created using a set of simulated observations $G_s=
-\{\boldsymbol{x}_0,...,\boldsymbol{x}_g\}$, generated at
+created using a set of simulated observations $G_\textrm{MC}=
+\{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$, generated at
 a certain instantiation of the simulator parameters
-$\boldsymbol{\theta}_s$.
+$\boldsymbol{\theta}_\textrm{MC}$.
 
 In experimental high energy physics experiments, which are the scientific
 context that initially motivated this work, histograms of
@@ -281,11 +281,11 @@ the considered bins. A naive
 sample summary statistic can be built from the output of the neural network
 by simply assigning each observation $\boldsymbol{x}$ to a bin corresponding
 to the cardinality of the maximum element of
-$\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$, so each element of the
+$\boldsymbol{h}(\boldsymbol{x}; \boldsymbol{\phi})$, so each element of the
 sample summary will correspond to the following sum:
 
 $$
-s_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
+t_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
 \begin{cases}
       1 & i = {argmax}_{j=\{0,...,b\}}
         (f_j(\boldsymbol{x}; \boldsymbol{\phi})) \\
@@ -295,12 +295,12 @@ s_i(D;\boldsymbol{\phi})=\sum_{\boldsymbol{x} \in D}
 $$ {#eq:argmax}
 
 which can in turn be used to build the following likelihood, where the
-expectation for each bin is taken from the simulated sample $G_s$:
+expectation for each bin is taken from the simulated sample $G_\textrm{MC}$:
 
 $$
-\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^b
-             \textrm{Pois} \left ( s_i (D; \boldsymbol{\phi}) \:  |
-             \: \left ( \frac{n}{g} \right ) s_i (G_s;\boldsymbol{\phi}) \right )
+\mathcal{L}(D; \boldsymbol{\theta},\boldsymbol{\phi})=\prod_{i=0 }^m
+             \textrm{Pois} \left ( t_i (D; \boldsymbol{\phi}) \:  |
+             \: \left ( \frac{n}{g} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
 
 where the $n/g$ factor accounts for the different number of
@@ -314,51 +314,51 @@ In the above construction, the chosen
 family of summary statistics is non-differentiable due to
 the $argmax$ operator, so gradient-based updates for the parameters
 cannot be computed. To work around this problem, a differentiable
-approximation $\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})$ is considered.
+approximation $\hat{\boldsymbol{t}}(D ; \boldsymbol{\phi})$ is considered.
 This function is defined by means of a $softmax$ operator:
 
 $$
-\hat{s}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
+\hat{t}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
   \frac{e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
-  {\sum_{j=0}^{b} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
+  {\sum_{j=0}^{m} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
 $$ {#eq:soft_summary}
 
 where the temperature hyper-parameter
 $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the largest
 component will tend to 1 while others to 0, and therefore
-$\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})
-\rightarrow \boldsymbol{s}(D; \boldsymbol{\phi})$. Similarly, let us
+$\hat{\boldsymbol{t}}(D ; \boldsymbol{\phi})
+\rightarrow \boldsymbol{t}(D; \boldsymbol{\phi})$. Similarly, let us
 denote by $\hat{\mathcal{L}}(D; \boldsymbol{\theta}, \boldsymbol{\phi})$
 the differentiable approximation of the non-parametric likelihood
-obtained by substituting $\boldsymbol{s}(D ; \boldsymbol{\phi})$ with
-$\hat{\boldsymbol{s}}(D ; \boldsymbol{\phi})$. Instead
+obtained by substituting $\boldsymbol{t}(D ; \boldsymbol{\phi})$ with
+$\hat{\boldsymbol{t}}(D ; \boldsymbol{\phi})$. Instead
 of using the observed data $D$, the value of $\hat{\mathcal{L}}$
 may be computed
 when the observation for each bin is equal to its corresponding
 expectation based on
-the simulated sample $G_s$, which is commonly denoted as the
+the simulated sample $G_\textrm{MC}$, which is commonly denoted as the
 Asimov likelihood [@cowan2011asymptotic] $\hat{\mathcal{L}}_A$:
 
 $$
-\hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^b
+\hat{\mathcal{L}}_A(\boldsymbol{\theta}; \boldsymbol{\phi})=\prod_{i=0 }^m
              \textrm{Pois} \left ( \left ( \frac{n}{g} \right )
-            \hat{s}_i (G_s;\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{g} \right )
-             \hat{s}_i (G_s;\boldsymbol{\phi}) \right )
+            \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \:  | \: \left ( \frac{n}{g} \right )
+             \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood_asimov}
 
 for which it can be easily proven that
 $argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
-\boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_s$,
+\boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_\textrm{MC}$,
 so the maximum likelihood estimator (MLE)
-for the Asimov likelihood is the parameter vector $\boldsymbol{\theta}_s$
+for the Asimov likelihood is the parameter vector $\boldsymbol{\theta}_\textrm{MC}$
 used to generate
-the simulated dataset $G_s$. In Bayesian terms, if the prior over the parameters
+the simulated dataset $G_\textrm{MC}$. In Bayesian terms, if the prior over the parameters
 is flat in the chosen metric,
-then $\boldsymbol{\theta}_s$ is also the maximum a posteriori
+then $\boldsymbol{\theta}_\textrm{MC}$ is also the maximum a posteriori
 (MAP) estimator.
 By taking the negative logarithm and expanding in
-$\boldsymbol{\theta}$ around $\boldsymbol{\theta}_s$, we can obtain
+$\boldsymbol{\theta}$ around $\boldsymbol{\theta}_\textrm{MC}$, we can obtain
 the Fisher information matrix [@fisher_1925] for the
 Asimov likelihood:
 
@@ -375,7 +375,7 @@ if the simulation is differentiable and
 included in
 the computation graph or if the effect
 of varying $\boldsymbol{\theta}$ over the simulated
-dataset $G_s$ can be effectively approximated. While this
+dataset $G_\textrm{MC}$ can be effectively approximated. While this
 requirement does constrain the applicability of the proposed
 technique to a subset of likelihood-free inference
 problems, it is quite common for e.g. physical sciences
@@ -432,22 +432,22 @@ histogram has been used to construct a Poisson count sample likelihood,
 non-parametric density estimation techniques
 can be used in its place to construct a
 product of observation likelihoods based on the neural network
-output  $\boldsymbol{f}(\boldsymbol{x}; \boldsymbol{\phi})$ instead.
+output  $\boldsymbol{h}(\boldsymbol{x}; \boldsymbol{\phi})$ instead.
 For example, an extension of this technique to use
 kernel density estimation (KDE) should be straightforward, given its
 intrinsic differentiability.
 
 The loss function used for stochastic optimisation of the neural network
 parameters $\boldsymbol{\phi}$ can be any function of the inverse
-of the Fisher information matrix at $\boldsymbol{\theta}_s$, depending on the
+of the Fisher information matrix at $\boldsymbol{\theta}_\textrm{MC}$, depending on the
 ultimate inference aim. The diagonal
-elements $I_{ii}^{-1}(\boldsymbol{\theta}_s)$ correspond to the expected
+elements $I_{ii}^{-1}(\boldsymbol{\theta}_\textrm{MC})$ correspond to the expected
 variance of each of the $\phi_i$ under the normal approximation mentioned
 before, so if the aim is efficient inference about one of the parameters
 $\omega_0 = \theta_k$ a candidate loss function is:
 
 $$
-U = I_{kk}^{-1}(\boldsymbol{\theta}_s)
+U = I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})
 $$ {#eq:example_loss}
 
 which corresponds to the expected width of the confidence interval
@@ -466,25 +466,25 @@ employing an inference-aware loss is summarised in Algorithm
   \begin{flushleft}
     {\it Input 1:} differentiable simulator or variational
     approximation $g(\boldsymbol{\theta})$. \\
-    {\it Input 2:} initial parameter values $\boldsymbol{\theta}_s.$ \\
+    {\it Input 2:} initial parameter values $\boldsymbol{\theta}_\textrm{MC}.$ \\
     {\it Input 3:} parameter of interest $\omega_0=\theta_k$.
      \\
     {\it Output:} learned summary statistic
-      $\boldsymbol{s}(D; \boldsymbol{\phi})$.\\
+      $\boldsymbol{t}(D; \boldsymbol{\phi})$.\\
  \end{flushleft}
  \begin{algorithmic}[1]
  \For{$i=1$ to $N$ (number of SGD iterations)}
-  \State{Sample a representative mini-batch $G_s$ from
-  $g(\boldsymbol{\theta}_s)$.}
+  \State{Sample a representative mini-batch $G_\textrm{MC}$ from
+  $g(\boldsymbol{\theta}_\textrm{MC})$.}
   \State{Compute differentiable summary statistic
-    $\hat{\boldsymbol{s}}(G_s;\boldsymbol{\phi})$.}
+    $\hat{\boldsymbol{t}}(G_\textrm{MC};\boldsymbol{\phi})$.}
   \State{Construct Asimov likelihood
     $\mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi})$.}
   \State{Get information matrix inverse $I(\boldsymbol{\theta})^{-1}
   = \boldsymbol{H}_{\boldsymbol{\theta}}^{-1}(\log
   \mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi}))$.}
   \State{Obtain loss
-    $U= I_{kk}^{-1}(\boldsymbol{\theta}_s)$.}
+    $U= I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})$.}
   \State{Update network parameters $\boldsymbol{\phi} \rightarrow
   \textrm{SGD}(\nabla_{\boldsymbol{\phi}} U)$.}  
  \EndFor
@@ -924,7 +924,7 @@ classification and inference-aware technique. Results
 correspond to Benchmark 2.
 :::
 
-Given that a fixed value of the parameters $\boldsymbol{\theta}_s$
+Given that a fixed value of the parameters $\boldsymbol{\theta}_\textrm{MC}$
 was used to learn the summary statistics as described in
 Algorithm \ref{alg:simple_algorithm} while their true
 value is unknown in practical applications, the expected uncertainty
@@ -934,8 +934,8 @@ $\boldsymbol{\theta}_{\textrm{true}}$ differs. The
 variation of the expected uncertainty on $s$ when either $r$ or $\lambda$
 is varied for classification and inference-aware summary statistics is
 shown in [@Fig:validity_range] for Benchmark 2. The inference-aware summary
-statistics learnt for $\boldsymbol{\theta}_s$ work
-well when  $\boldsymbol{\theta}_{\textrm{true}} \neq \boldsymbol{\theta}_s$
+statistics learnt for $\boldsymbol{\theta}_\textrm{MC}$ work
+well when  $\boldsymbol{\theta}_{\textrm{true}} \neq \boldsymbol{\theta}_\textrm{MC}$
 in the range of variation explored. 
 
 This synthetic example demonstrates that the direct optimisation of inference-aware
