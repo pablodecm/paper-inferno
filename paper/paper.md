@@ -525,7 +525,7 @@ summary statistics learnt by our algorithm attempt to find a transformation
 that directly reduces the expected effect of nuisance parameters
 over the parameters of interest.
 
-# Experiments
+# Experiments {#sec:d-synthetic-mixture}
 
 In this section, we first study the effectiveness of the inference-aware
 optimisation in a synthetic mixture problem where the likelihood is known. We then

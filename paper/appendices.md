@@ -31,7 +31,7 @@ $s_{s/ b}= f_s(\boldsymbol{x} | \boldsymbol{\theta}) / f_b(\boldsymbol{x} | \bol
 (or alternatively its inverse) is a sufficient summary statistic for the
 mixture coefficient parameter $\mu$. This would also be the case for
 the parametrization using $s$ and $b$ if the alternative $\mu=s/(s+b)$
-formulation presented for the synthetic problem in Sec. \ref{d-synthetic-mixture}.
+formulation presented for the synthetic problem in Sec. \ref{sec:d-synthetic-mixture}.
 
 However, previously in this work (as well as for most studies using
 classifiers to construct summary statistics) we have been using the
