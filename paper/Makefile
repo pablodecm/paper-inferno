@@ -45,6 +45,19 @@ cpc_tar: diagram appendices
 	cp -r bibliography.bib cpc_inferno/.
 	tar --exclude='./cpc_inferno/*.latex' -czvf cpc_inferno.tar.gz cpc_inferno
 
+cpc_diff: cpc_tar
+	git show v2.1.0:paper/paper.md > paper_old.md
+	$(PANDOC) paper_old.md -s -o cpc_inferno/paper_old.tex \
+	--template cpc_inferno/cpc_article.latex \
+	--include-after-body=appendices.tex \
+	--filter=pandoc-crossref --filter=pandoc-citeproc \
+	--natbib
+	latexdiff cpc_inferno/paper_old.tex cpc_inferno/paper.tex > cpc_inferno/paper_diff.tex
+	cd cpc_inferno; $(LATEX2PDF) paper_diff.tex
+	cd cpc_inferno; $(BIBTEX) paper_diff
+	cd cpc_inferno; $(LATEX2PDF) paper_diff.tex; $(LATEX2PDF) paper_diff.tex
+
+
 cpc_pdf: cpc_tar
 	cd cpc_inferno; $(LATEX2PDF) paper.tex
 	cd cpc_inferno; $(BIBTEX) paper

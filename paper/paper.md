@@ -98,14 +98,24 @@ the null hypothesis when it is false, also known as Type II error rate.
 Due to the high dimensionality of the observed data, a low-dimensional summary
 statistic has to be constructed in order to perform inference. A
 well-known result of classical statistics,
-the Neyman-Pearson lemma[@NeymanPearson1933],
+the Neyman-Pearson lemma [@NeymanPearson1933],
 establishes that the likelihood-ratio
 $\Lambda(\boldsymbol{x})=p(\boldsymbol{x}| H_0)/p(\boldsymbol{x}| H_1)$ is
-the most powerful test  when two simple hypotheses are considered.
- As $p(\boldsymbol{x}| H_0)$ and
+the most powerful test  when two simple hypotheses $H_0$ (null) and
+$H_1$ (alternate) are considered.
+As $p(\boldsymbol{x}| H_0)$ and
 $p(\boldsymbol{x}| H_1)$ are not available, simulated samples are used in
 practice to obtain an approximation of the likelihood ratio by casting
 the problem as supervised learning classification.
+In high-energy physics, a one-dimensional
+summary - such as the output of a classifier - is often used for statistical
+inference on the parameters of interest through the use construction of a
+binned likelihood function. Given the already mentioned
+intractable form of the generative process
+$p(\boldsymbol{x}| \boldsymbol{\theta})$, the resulting
+likelihood does not correspond to the generative model but it is
+a non-parametric approximation based on the
+distribution of the summary statistic for simulated observations.
 
 In many cases,
 the nature of the generative model (a mixture of different processes)
