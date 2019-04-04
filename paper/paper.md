@@ -128,6 +128,9 @@ optimises the expected amount of information about the subset of
 parameters of interest using simulated samples, by explicitly
 and directly taking into account
 the effect of nuisance parameters.
+The optimisation procedure is carried out iteratively by stochastic gradient
+descent (SDG) [@DBLP:journals/corr/Ruder16] using small subsets
+of available simulated data.
 In addition, the learned
 summary statistics can be used to build synthetic
 sample-based likelihoods and perform robust and efficient classical or
@@ -500,7 +503,7 @@ latent-space space structure of generative models from complex scientific
 simulators. Additionally they proposed a family of approaches that include
 a direct regression of the likelihood ratio
 and/or likelihood score in the training losses.
-While extremely promising, the most performing solutions are designed for
+While extremely promising, the best performing solutions are designed for
 a subset of the inference problems at the LHC and they require considerable changes
 in the way the inference is carried out. The aim of this work is different,
 as we try to learn sample summary statistics that may act as a
@@ -518,7 +521,7 @@ then can be used directly as a summary statistic.
 
 A different path is taken by Louppe et al. [@louppe2017learning],
 where the authors present a adversarial training procedure to enforce a
-pivotal property on a predictive model. The main concern of this
+pivotal property on a predictive model. The main concern with this
 approach is that a classifier which is pivotal with respect
 to nuisance parameters might not be optimal, neither for classification
 nor for statistical inference. Instead of aiming for being pivotal, the
@@ -575,7 +578,8 @@ The signal distribution is fully specified while
 the background distribution depends on $r$, a parameter which
 shifts the mean of the background density, and a parameter $\lambda$ which
 specifies
-the exponential rate in the third dimension. These parameters will be the
+the exponential rate in the third dimension. The $r$ and $\lambda$
+parameters will be the
 treated as nuisance parameters when benchmarking different methods.
 Hence, the probability density
 function of observations has the following mixture structure:
@@ -646,13 +650,13 @@ the mixture coefficients. It can be proven (see [appendix @sec:sufficiency] )
 that $t_B(\boldsymbol{x} | r, \lambda)$ is a sufficient summary statistic with
 respect to an
 arbitrary two-component mixture model if the only unknown parameter
-is the signal mixture fraction $\mu$ (or alternatively $s$ in the chosen
-parametrisation).
+is the signal mixture fraction $\mu$ (or alternatively $s$ in the
+parametrisation of [@Eq:mixture_alt]).
 In practice, the probability density functions of signal and
 background are not known analytically, and only forward samples are available
 through simulation, so alternative approaches are required.
 
-While the synthetic nature of this example allows to rapidly generate
+While the synthetic nature of this example allows one to rapidly generate
 training data
 on demand,
 a training dataset of 200,000 simulated observations has been considered,
@@ -672,7 +676,7 @@ For simplicity, mini-batches for each training step are balanced so the same
 number of events from each component is taken both when using
 standard classification or inference-aware losses.
 
-An option is to pose the problem as one of classification
+Another option would be to pose the problem as one of classification
 based on a simulated dataset. A supervised machine learning model such a
 neural network can be trained to discriminate signal and background
 observations, considering parameters $r$ and $\lambda$ fixed.
@@ -725,7 +729,7 @@ the background mean shift $r$,
 the background exponential rate in the third dimension $\lambda$, and
 the expected number of background observations. The effect of the
 expected number of signal and background observations $s$ and $b$
-can be easily included in the computation graph by
+can be easily included in the computation graph by 
 weighting the signal and background observations.
 This is equivalent to scaling the resulting vector of Poisson counts (or its
 differentiable approximation)
@@ -734,8 +738,9 @@ Instead the effect of $r$ and $\lambda$, both nuisance parameters
 that will define the background distribution, is more easily modelled
 as a transformation of the input data $\boldsymbol{x}$. In particular,
 $r$ is a nuisance parameter that causes a shift on the background
-along the first dimension  and its effect can accounted for in the
-computation graph by simply adding $(r,0.0,0.0)$ to each observation
+along the first dimension  and its effect can accounted for
+in a differentiable manner by simply adding $(r,0.0,0.0)$ to
+each observation
 in the mini-batch generated from the background distribution.
 Similarly, the effect of $\lambda$ can be modelled by multiplying
 $x_2$ by the ratio between the $\lambda_0$ used for generation and the
@@ -775,7 +780,7 @@ For the approach
 presented in this work, inference-aware neural optimisation, the effect of the
 nuisance parameters and their constraints can be taken into account during training.
 Hence, 5 different training procedures for \textsc{INFERNO} will be considered,
-one for each of the benchmarks, denoted by the same number. 
+one for each of the benchmarks, denoted by the corresponding benchmark number. 
 
 The same basic network architecture is used both for cross-entropy and
 inference-aware training: two hidden layers of 100 nodes followed by
@@ -824,8 +829,13 @@ converge to summary statistics that provide low variance for the estimator of
 $s$ when the nuisance parameters are accounted for.
 
 To compare with alternative approaches and verify the validity of the results,
-the profiled likelihoods obtained for each model are shown
-in [@Fig:profile_likelihood]. The expected uncertainty if the trained models are
+the profiled likelihood [@tanabashi2018review] obtained both with
+the INFERNO-based and
+classifier-based
+summary statistics, accounting for the
+effect of nuisance parameters defined in Benchmark 2, are shown
+in [@Fig:profile_likelihood].
+The expected uncertainty of the trained models are
 used for subsequent inference on the value of $s$
 can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
 the average width for the profile likelihood using inference-aware training,
