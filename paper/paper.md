@@ -38,8 +38,9 @@ bibliography: bibliography.bib
 Simulator-based inference is currently at the core of many scientific
 fields, such as population genetics, epidemiology, and experimental
 particle physics.
-In many cases the implicit generative procedure defined in the simulation is
-stochastic and/or lacks a tractable probability density
+In these situations the generative procedure implicitly defined
+in the simulation may involve a large succession of stochastic steps,
+and/or lacks a tractable probability density
 $p(\boldsymbol{x}| \boldsymbol{\theta})$, where
 $\boldsymbol{\theta}$
 is the vector of model parameters. Given some experimental
@@ -74,7 +75,7 @@ about Nature from the large amounts of high-dimensional
 data on the subatomic particles produced by energetic collision of protons,
 and acquired by highly complex detectors built around the collision
 point.
-Accurate data modelling is only available via stochastic simulation
+Accurate data modelling is only available via Monte Carlo simulation
 of a complicated chain of physical processes, from the underlying
 fundamental interaction to the subsequent particle interactions with
 the detector elements and their readout.
