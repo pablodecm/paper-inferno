@@ -5,6 +5,7 @@
 - Pablo de Castro
 - Tommaso Dorigo
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pablodecm/paper-inferno/blob/improve_notebooks_readme/notebooks/3D_analytical_problem.ipynb)
 
 ## Setting Up the Environment
 
