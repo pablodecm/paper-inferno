@@ -6,6 +6,27 @@
 - Tommaso Dorigo
 
 
+## Setting Up the Environment
+
+If you are using `conda` to manage packages you can simply install set up all
+the required python packages by running the following command in the
+project directory:
+```
+conda env create -f environment.yml
+```
+if you have already set it up, you can activate the environment:
+```
+source activate inferno-env
+```
+alternatively you can manually install the dependencies listed in the
+`environment.yml` file using pip.
+
+**IMPORTANT:** if you are manually installing the dependencies,
+remember that only Python 3.6+ is supported, because f-strings and ordered
+dicts make code much more readable.
+
+## Citation
+
 Please cite using the following BibTex entry:
 ```
 @ARTICLE{de2018inferno,
