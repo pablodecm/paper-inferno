@@ -25,6 +25,9 @@ class FisherMatrix(object):
   def marginals(self, pars):
     diag_elems = np.sqrt(np.diag(np.linalg.inv(self.submatrix(pars))))
     return OrderedDict(zip(pars, diag_elems))
+    
+  def covariance_matrix(self, pars):
+    return np.linalg.inv(self.submatrix(pars))
 
   def add_matrix(self, matrix):
     return FisherMatrix(self.matrix + matrix, self.pars)
