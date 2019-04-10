@@ -112,8 +112,6 @@ class SummaryStatisticComputer(object):
        sess = tf.Session()
     with sess.as_default():
       k.backend.set_session(sess)
-      model.load_weights(f'{model_path}/model.h5')
-
       s_clf = transformation_f(self.data["sig"])
       shapes[("sig",)] = np.histogram(s_clf, bins)[0]
       for pars_val in it.product(*self.pars_scan.values()):
