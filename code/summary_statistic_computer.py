@@ -104,6 +104,32 @@ class SummaryStatisticComputer(object):
 
     return shapes
 
+  def generic_shapes(self, transformation_f, bins, sess=None):
+
+    shapes = {}
+
+    if sess is None:
+       sess = tf.Session()
+    with sess.as_default():
+      k.backend.set_session(sess)
+      model.load_weights(f'{model_path}/model.h5')
+
+      s_clf = transformation_f(self.data["sig"])
+      shapes[("sig",)] = np.histogram(s_clf, bins)[0]
+      for pars_val in it.product(*self.pars_scan.values()):
+        pars_phs = {par: val for par, val in zip(self.pars_scan.keys(),
+                                                 pars_val)}
+        b_vals_arr = sess.run(self.b_vals_shifted,
+                              {**pars_phs, **{self.b_vals: self.data["bkg"]}})
+        b_clf = transformation_f(b_vals_arr)
+        key = ("bkg",) + pars_val
+        b_clf_hist = np.histogram(b_clf, bins)[0]
+        shapes[key] = b_clf_hist
+
+      k.backend.set_session(None)
+
+    return shapes
+
   def inferno_shapes(self, model_path, sess=None):
 
     shapes = {}
