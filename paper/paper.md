@@ -109,7 +109,8 @@ the nature of the generative model (a mixture of different processes)
 allows the treatment of the problem as
 signal (s) vs background (b) classification [@adam2015higgs],
 when the task becomes one of effectively estimating
-an approximation of $p_{s}(\boldsymbol{x})/p_{b}(\boldsymbol{x})$ which will
+an approximation of $t_B(\boldsymbol{x}) = p_{s}(\boldsymbol{x})/(p_{s}(\boldsymbol{x})+
+p_{b}(\boldsymbol{x}))$, which will
 vary monotonically with the likelihood ratio.
 While the use of classifiers to learn a summary statistic can be effective and
 increase the discovery sensitivity, the simulations used to generate
@@ -516,7 +517,20 @@ some attempts to use neural network as a dimensionality reduction step to
 generate summary statistics. For example, Jiang et al. [@jiang2015learning]
 successfully employ a summary statistic by directly regressing the parameters of
 interest and therefore approximating the posterior mean given the data, which
-then can be used directly as a summary statistic.
+then can be used directly as a summary statistic. With the purpose
+of improving ABC-based inference for astrophysical observations,
+Charnock et al. [@charnock2018automatic] have developed information maximising neural
+networks (IMNNs) whose goal is also to learn non-linear transformations
+by directly optimising a function of the Fisher information. While IMNNs
+are the closest approach found in the literature to the one
+presented in this work, our approach is instead focussed on directly optimising
+the expected uncertainty on the parameter of interest and addressing directly
+the problem of nuisance parameters. Other differences between IMNNs
+and the way the Fisher information is approximated and the
+consideration a Poisson binned likelihood instead of a
+Gaussian approximation, which is motivated by the the differences between
+the inference problems in astrophysical observations with those
+within experimental particle physics.
 
 A different path is taken by Louppe et al. [@louppe2017learning],
 where the authors present a adversarial training procedure to enforce a
@@ -527,6 +541,44 @@ nor for statistical inference. Instead of aiming for being pivotal, the
 summary statistics learnt by our algorithm attempt to find a transformation
 that directly reduces the expected effect of nuisance parameters
 over the parameters of interest.
+
+Within High Energy Physics, there has been an effort
+to develop techniques that can learn directly from data instead of using
+simulated observations. In the simplest case, the are based in using
+data from a control region for modelling the background component
+in a supervised classification setting, but there have been also
+recent efforts exploiting weakly-supervised
+[@Dery:2017fap; @Metodiev:2017vrx; @Komiske:2018oaa; @Cohen:2017exh] or
+even fully unsupervised attempts
+[@DeSimone:2018efk; @Cerri:2018anq; @Hajer:2018kqm] to learn from directly from data.
+In our view, all
+these data-driven approaches can be useful to obtain good summaries
+when the simulated observations do not provide adequate modelling
+but cannot circumvent the problem of nuisance parameters.
+A statistical model has to be built for making quantitative statements
+about the model parameters given that data, in which nuisance parameters
+represent the modelling limitations, independently of the method used to
+construct the summary statistic.
+
+The limitation of the previously mentioned data-driven approaches
+is better shown using
+an example: let us suppose that we were able to use a weakly-supervised
+technique to obtain a classifier that approximates the quantity
+$t_B(\boldsymbol{x} | \boldsymbol{\theta}_t) = p_{s}(\boldsymbol{x} | \boldsymbol{\theta}_t )/(p_{s}(\boldsymbol{x}| \boldsymbol{\theta}_t )+ p_{b}(\boldsymbol{x}| \boldsymbol{\theta}_t))$,
+where $\boldsymbol{\theta}_t$ are the true value of the nuisance parameters.
+In order to use this summary for inference, a
+non-parametric likelihood based on simulated observations (or data from
+a control region) has to be built, and the effect of nuisance parameter
+has to be accounted for in the calibration of the statistical model even
+if the transformation is able to obtain the optimal classifier
+$t_B(\boldsymbol{x} | \boldsymbol{\theta}_t)$. Similar concerns apply to
+summary statistics obtained using unsupervised techniques
+or anomaly detection algorithms if they are to be used for statistical
+inference of model parameters.
+
+
+
+
 
 # Experiments {#sec:d-synthetic-mixture}
 
