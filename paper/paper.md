@@ -350,9 +350,8 @@ $$
  \boldsymbol{\phi}) \right ) \right ]
 $$ {#eq:fisher_info}
 which can be computed via automatic differentiation
-if the simulation is differentiable and
-included in
-the computation graph or if the effect
+if the simulation function $g(\boldsymbol{\theta}_\textrm{MC})$ is
+differentiable or if the effect
 of varying $\boldsymbol{\theta}$ over the simulated
 dataset $G_\textrm{MC}$ can be effectively approximated. While this
 requirement does constrain the applicability of the proposed
@@ -784,7 +783,8 @@ one for each of the benchmarks, denoted by the corresponding benchmark number.
 
 The same basic network architecture is used both for cross-entropy and
 inference-aware training: two hidden layers of 100 nodes followed by
-ReLU activations. The number of nodes on the output layer is two when
+rectified linear unit (ReLU) [@Goodfellow-et-al-2016]
+activations. The number of nodes on the output layer is two when
 classification proxies are used, matching the number of mixture classes
 in the problem considered. Instead, for inference-aware classification
 the number of output nodes can be arbitrary and will be denoted with $b$,
