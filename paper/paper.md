@@ -580,6 +580,8 @@ specifies
 the exponential rate in the third dimension. The $r$ and $\lambda$
 parameters will be the
 treated as nuisance parameters when benchmarking different methods.
+The functional form and parameter values of the problem chosen to
+as a basis of the benchmarks has been arbitrarily chosen.
 Hence, the probability density
 function of observations has the following mixture structure:
 $$
@@ -846,14 +848,29 @@ cross-entropy loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
 rate of $\gamma=0.001$.
 
-A more complete study of the improvement provided by the different INFERNO
-training procedures is provided in \autoref{tab:results_table},
+A more complete study of the improvement provided by the INFERNO
+training procedure is provided in \autoref{tab:results_table},
 where the median and 1-sigma
-percentiles on the expected uncertainty on $s$ are provided for 100
+percentiles on the expected absolute uncertainty on $s$ are provided for 100
 random-initialised instances of each model. In addition, results for 100
-random-initialised cross-entropy trained models and
-the optimal classifier and likelihood-based inference are also
-included for comparison. The confidence intervals obtained using INFERNO-based
+random-initialised cross-entropy neural network models trained as previously
+indicated, the optimal (Bayes) classifier
+$t_B(\boldsymbol{x} | r = 0.0 , \lambda = 3.0)$
+from [@Eq:opt_clf],
+and the analytical likelihood-based inference are also
+included for comparison.
+The expected uncertainties shown in
+\autoref{tab:results_table},
+with the exception of the analytical likelihood which was based on the
+extended likelihood of the generative model from [@Eq:ext_ll],
+where obtained by building a binned likelihood by interpolating
+the signal and background histograms when the nuisance parameters
+are varied. In all cases, the uncertainties quoted correspond
+with those obtained from the covariance matrix obtained using 
+the Hessian of the negative logarithm the log likelihood, which were found
+to match very those obtained by computing the profile likelihood width.
+
+The confidence intervals obtained using INFERNO-based
 summary statistics are considerably narrower than those using
 classification and tend to be much closer to those expected when using
 the true model likelihood for inference. Much smaller

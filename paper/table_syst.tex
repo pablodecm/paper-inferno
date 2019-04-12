@@ -1,0 +1,27 @@
+
+\begin{tabular}{llllll}
+\toprule
+{} &                       Benchmark 0 &                       Benchmark 1 &                       Benchmark 2 &                       Benchmark 3 &                       Benchmark 4 \\
+\midrule
+interest pars    &        1 ($s$) &
+1 ($s$)  &  1 ($s$) &
+1 ($s$) &   1 ($s$) \\
+
+nuisance pars        &         0 (all fixed)  &
+1 ($r$)  &  2 ($r$ and $\lambda$) &
+2 ($r$ and $\lambda$) &      3 ($r$, $\lambda$ and $b$) \\
+
+$r$ (bkg shift) &  0.0 (fixed) &
+free (init 0.0) & free (init 0.0) &
+$\mathcal{N} (\lambda| 0.0, 0.4)$ & $\mathcal{N} (\lambda| 0.0, 4.0)$ \\
+
+$\lambda$ (bkg exp rate)   &  3.0 (fixed)  &
+3.0 (fixed)  & free (init 3.0) &
+$\mathcal{N} (\lambda| 3.0, 1.0)$ &  $\mathcal{N} (\lambda| 3.0, 1.0)$  \\
+
+
+$b$ (bkg normalisation)   &  1000 (fixed)  &
+1000 (fixed)   & 1000 (fixed) &
+1000 (fixed)  &  $\mathcal{N} (b| 1000, 100)$  \\
+\bottomrule
+\end{tabular}
