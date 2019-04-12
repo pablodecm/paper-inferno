@@ -44,6 +44,7 @@ cpc_tar: diagram appendices
 	--filter=pandoc-crossref --filter=pandoc-citeproc \
 	--natbib --wrap=preserve
 	cp -r table.tex cpc_inferno/.
+	cp -r table_syst.tex cpc_inferno/.
 	cp -r gfx cpc_inferno/.
 	cp -r bibliography.bib cpc_inferno/.
 	tar --exclude='./cpc_inferno/*.latex' -czvf cpc_inferno.tar.gz cpc_inferno
