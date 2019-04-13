@@ -1004,10 +1004,10 @@ its omission.
 \begin{table}
   \caption{Expected uncertainty on the parameter of interest $s$
     for each of the inference benchmarks considered using a cross-entropy
-    trained neural network modelm INFERNO customised for each problem,
+    trained neural network model, a INFERNO model customised for each problem,
     the optimal classifier $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
-    from [@Eq:opt_clf] and the likelihood based results using
-    the analytical probability density function from [@Eq:mixture_alt]
+    from Eq.~\ref{eq:opt_clf} and the likelihood based results using
+    the analytical probability density function from Eq.~\ref{eq:mixture_alt}
     at the parameter values used for training. The last two rows are
     would not be available in a likelihood-free
     setting. The results
