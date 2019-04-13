@@ -27,7 +27,7 @@ p(\boldsymbol{x}| \mu, \boldsymbol{\theta} ) = f_b(\boldsymbol{x} | \boldsymbol{
                     \right )  
 $$ {#eq:mixture_div}
 from which we can already prove that the density ratio
-$s_{s/ b}= f_s(\boldsymbol{x} | \boldsymbol{\theta}) / f_b(\boldsymbol{x} | \boldsymbol{\theta})$
+$t_{s/ b}= f_s(\boldsymbol{x} | \boldsymbol{\theta}) / f_b(\boldsymbol{x} | \boldsymbol{\theta})$
 (or alternatively its inverse) is a sufficient summary statistic for the
 mixture coefficient parameter $\mu$. This would also be the case for
 the parametrization using $s$ and $b$ if the alternative $\mu=s/(s+b)$
@@ -35,9 +35,9 @@ formulation presented for the synthetic problem in Sec. \ref{sec:d-synthetic-mix
 
 However, previously in this work (as well as for most studies using
 classifiers to construct summary statistics) we have been using the
-summary statistic $s_{s/(s+b)}= f_s(\boldsymbol{x} | \boldsymbol{\theta}) /(
+summary statistic $t_B = f_s(\boldsymbol{x} | \boldsymbol{\theta}) /(
   f_s(\boldsymbol{x} | \boldsymbol{\theta}) + f_b(\boldsymbol{x} | \boldsymbol{\theta}))$
-instead of $s_{s/ b}$. The advantage of $s_{s/(s+b)}$ is that it represents
+instead of $t_{s/ b}$. The advantage of $t_B$ is that it represents
 the conditional probability of one observation $\boldsymbol{x}$ coming
 from the signal assuming a balanced mixture, and hence is bounded between
 zero and one. This greatly simplifies its visualisation and non-parametetric
@@ -55,16 +55,16 @@ p(\boldsymbol{x}| \mu, \boldsymbol{\theta} ) = f_b(\boldsymbol{x} | \boldsymbol{
                   +f_b(\boldsymbol{x} | \boldsymbol{\theta})} \right )^{-1}
                     \right )  
 $$ {#eq:mixture_suff}
-hence proving that $s_{s/(s+b)}$ is also a sufficient statistic and theoretically
-justifying its use for inference about $\mu$. The advantage of both $s_{s/(s+b)}$ 
-and $s_{s/b}$ is they are one-dimensional and do not depend on the
+hence proving that $t_B$ is also a sufficient statistic and theoretically
+justifying its use for inference about $\mu$. The advantage of both $t_B$ 
+and $t_{s/b}$ is they are one-dimensional and do not depend on the
 dimensionality of $\boldsymbol{x}$ hence allowing much more efficient
 non-parametric density estimation from simulated samples. Note that
 we have been only discussing sufficiency with respect to the mixture
 coefficients and not the additional distribution parameters
 $\boldsymbol{\theta}$. In fact, if a subset of $\boldsymbol{\theta}$ 
 parameters are also relevant for inference (e.g. they are nuisance
-parameters) then $s_{s/(s+b)}$ and $s_{s/b}$ are not sufficient statistics
+parameters) then $t_B$ and $t_{s/b}$ are not sufficient statistics
 unless the $f_s(\boldsymbol{x}| \boldsymbol{\theta})$ and
 $f_b(\boldsymbol{x}| \boldsymbol{\theta})$ have very specific functional
 form that allows a similar factorisation. 
