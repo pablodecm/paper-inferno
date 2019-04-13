@@ -350,7 +350,7 @@ $\boldsymbol{\theta}$ around $\boldsymbol{\theta}_\textrm{MC}$, we can obtain
 the Fisher information matrix [@fisher_1925] for the
 Asimov likelihood:
 $$
-{\boldsymbol{I}(\boldsymbol{\theta})}_{ij}
+{I(\boldsymbol{\theta})}_{ij}
 = \mathop{\mathbb{E}} \left [
 \frac{\partial^2}{\partial {\theta_i} \partial {\theta_j}}
  \left ( - \log \mathcal{\hat{L}}_A(\boldsymbol{\theta};
@@ -431,11 +431,28 @@ which corresponds to the expected width of the confidence interval
 for $\omega_0$ accounting also for the effect of the other nuisance
 parameters in $\boldsymbol{\theta}$. This approach can also be extended
 when the goal is inference over several parameters of interest
-$\boldsymbol{\omega} \subseteq \boldsymbol{\theta}$ (e.g. when
-considering a weighted sum of the relevant variances). A simple version
+$\boldsymbol{\omega} \subseteq \boldsymbol{\theta}$, e.g.
+considering a weighted sum of the relevant variances
+or using the sub-determinant
+of the covariance matrix for the parameters of interest:
+$$
+\tilde{U} = |\tilde{\Sigma}|
+$$ {#eq:multivariate_case}
+where $\tilde{\Sigma}$ is the determinant of the covariance
+matrix $\Sigma=I(\boldsymbol{\theta})^{-1}$ restricted to the
+elements corresponding to the set of parameters of interest.
+A simple version
 of the approach just described to learn a neural-network based summary statistic
 employing an inference-aware loss is summarised in Algorithm
-\ref{alg:simple_algorithm}.
+\ref{alg:simple_algorithm}. It is worth highlighting that the purpose of the
+algorithm is to use simulated examples to directly optimise the expected
+uncertainty on parameters of interest by constructing an appropriate summary
+statistic, in view of its later use on real data.
+In the current implementation the parameters of the model
+($\boldsymbol{\theta}_\textrm{MC}$
+in the algorithm description below) are kept fixed at some assumed initial
+values, and only their differential variation is accounted for in the
+training process.
 
 <!-- algorithm -->
 \begin{algorithm}[H]
@@ -774,7 +791,8 @@ in turn cause an important degradation on the subsequent statistical inference.
 ![optimal classifier $s(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
  ](gfx/figure3b.pdf){#fig:opt_clf width=48%}
 
-Histograms of summary statistics for signal and background (top) and
+Histograms of the classifier-based
+summary statistics for signal and background (top) and
 variation for different values of nuisance parameters compared
 with the expected signal relative to the nominal background magnitude (bottom).
 The
@@ -856,14 +874,16 @@ one for each of the benchmarks, denoted by the corresponding benchmark number.
 The same basic network architecture is used both for cross-entropy and
 inference-aware training: two hidden layers of 100 nodes followed by
 rectified linear unit (ReLU) [@Goodfellow-et-al-2016]
-activations. Because we are using the multiclass formulation of
-the cross entropy loss $L_\textrm{CE}=\sum_i y_i \log \hat{y}_i$,
+activations. Because we are using the multi-class formulation of
+the cross-entropy loss $L_\textrm{CE}=\sum_i y_i \log \hat{y}_i$,
 the number of nodes on the output
 layer is two when
 classification proxies are used, matching the number of mixture classes
 in the problem considered. Instead, for inference-aware classification
-the number of output nodes can be arbitrary and will be denoted with $b$,
-corresponding to the dimensionality of the sample summary statistics.
+the number of output nodes can be arbitrary and will be denoted with $m$,
+corresponding to the dimensionality of the sample summary statistics. For
+the experiments shown in this work using the INFERNO technique,
+an output size of $m=10$ has been used.
 The final layer is followed by a softmax activation function and
 a temperature $\tau = 0.1$ for inference-aware learning to ensure
 that the differentiable approximations are close to the true values
@@ -916,7 +936,11 @@ can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
 the average width for the profile likelihood using inference-aware training,
 $16.97\pm0.11$, can be
 compared with the corresponding one obtained by uniformly binning the output of
-classification-based models in 10 bins, $24.01\pm0.36$. The models based on
+classification-based models in 10 bins, $24.01\pm0.36$.
+The number of bins is the same as that of [@Fig:subfigs_clf_hists],
+and is chosen to match
+the dimensionality adopted for the summary statistic of INFERNO.
+The models based on
 cross-entropy loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
 rate of $\gamma=0.001$.
