@@ -186,9 +186,15 @@ or marginal sufficiency [@basu2011partial;@sprott1975marginal].
 Nonetheless, for the problems
 of relevance in this work, the probability density is not available in
 closed form so
-the general task of finding a sufficient summary statistic cannot be tackled
-directly. Hence, alternative methods to build summary statistics have
-to be followed.
+the general task of finding a low-dimensional
+sufficient summary statistic cannot be tackled directly. Furthermore,
+a low-dimensional summary statistic will not exist in general
+for a given problem. The concept of sufficiency is important to understand
+why probabilistic classification has been used as proxy task to obtain
+summary statistics for mixture-model problems when nuisance parameters
+are neglected,
+as shown in [appendix @sec:sufficiency]. In this work, we instead propose
+an alternative method to build summary statistics.
 
 For simplicity, let us consider a problem where we are only interested on
 statistical inference on a
@@ -809,9 +815,19 @@ the performance of inference-aware optimisation as described in
 [@Sec:method] will be compared with classification-based summary statistics for
 a series of inference benchmarks based on the synthetic problem described above
 that vary in the number of nuisance parameters considered and their constraints,
-as shown in \autoref{tab:benchmark_table}. In Benchmark 0 no nuisance
-parameters are considered, so the classification approach is expected
-to provide sufficient summary statistics.
+as shown in \autoref{tab:benchmark_table}. For Benchmark 0 no nuisance
+parameters are considered, thus the inference problem is that of
+determining the
+number of signal events $s$ given some data and a perfectly known signal
+and background model, so the classification approach is expected
+to provide sufficient summary statistics. The rest of the benchmarks
+correspond to the presence of nuisance parameters,
+differing among them in their number and constrains. The main figure of merit
+used to compared the different techniques will be the expected
+uncertainty in the parameter of interest $s$ for the inference problem
+defined for each benchmark and conditioned
+on the values for the true value of the parameters of $s=50$, $r=0.0$,
+$\lambda=3.0$ and $b=1000$.
 
 \begin{table}
   \caption{Definition of the different statistical
@@ -840,7 +856,10 @@ one for each of the benchmarks, denoted by the corresponding benchmark number.
 The same basic network architecture is used both for cross-entropy and
 inference-aware training: two hidden layers of 100 nodes followed by
 rectified linear unit (ReLU) [@Goodfellow-et-al-2016]
-activations. The number of nodes on the output layer is two when
+activations. Because we are using the multiclass formulation of
+the cross entropy loss $L_\textrm{CE}=\sum_i y_i \log \hat{y}_i$,
+the number of nodes on the output
+layer is two when
 classification proxies are used, matching the number of mixture classes
 in the problem considered. Instead, for inference-aware classification
 the number of output nodes can be arbitrary and will be denoted with $b$,
@@ -954,10 +973,12 @@ its omission.
 ![different $\lambda$ value
 ](gfx/figure5b.pdf){#fig:range_b_rate width=48%}
 
-Expected uncertainty when the value of the nuisance
-parameters is different for 10 learnt summary statistics
-(different random initialisation) based on cross-entropy
-classification and inference-aware technique. Results
+Expected uncertainty when the true value of the nuisance
+parameters $r$ and $\lambda$ is different for those used for training
+the model (i.e. $r=0.0$ and $\lambda=3.0$).
+The results for 10 randomly initialised 10 learnt summary statistics
+(different random initialisation) based either on cross-entropy
+classification and the inference-aware technique are shown. Results
 correspond to Benchmark 2.
 :::
 
