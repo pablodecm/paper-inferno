@@ -775,8 +775,9 @@ a histogram of a deep neural network classifier output trained on simulated data
 and its variation computed for different values of $r$ and $\lambda$
 are shown in [@Fig:train_clf]. The details of the training procedure
 will be provided later in this document. The classifier output can be directly
-compared with $s(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$ evaluated using the
-analytical distribution function of signal and background according to [@Eq:opt_clf],
+compared with $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$ evaluated using the
+analytical distribution function of signal and background 
+according to [@Eq:opt_clf],
 which is shown in [@Fig:opt_clf] and corresponds to the optimal classifier. The
 trained classifier approximates very well the optimal classifier. The
 summary statistic distribution for the background component
@@ -981,8 +982,13 @@ its omission.
 \begin{table}
   \caption{Expected uncertainty on the parameter of interest $s$
     for each of the inference benchmarks considered using a cross-entropy
-    trained neural network model, INFERNO customised for each problem
-    and the optimal classifier and likelihood based results. The results
+    trained neural network modelm INFERNO customised for each problem,
+    the optimal classifier $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
+    from [@Eq:opt_clf] and the likelihood based results using
+    the analytical probability density function from [@Eq:mixture_alt]
+    at the parameter values used for training. The last two rows are
+    would not be available in a likelihood-free
+    setting. The results
     for INFERNO matching each problem are shown with bold characters.}
   \label{tab:results_table}
   \centering
