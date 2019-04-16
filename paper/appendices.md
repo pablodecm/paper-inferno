@@ -42,23 +42,23 @@ the conditional probability of one observation $\boldsymbol{x}$ coming
 from the signal assuming a balanced mixture, and hence is bounded between
 zero and one. This greatly simplifies its visualisation and non-parametetric
 likelihood estimation. Taking [@Eq:mixture_div] and manipulating the
-subexpression depending on $\mu$ by adding and subtracting $2\mu$  we have:
+subexpression depending on $\mu$ by adding and subtracting $\mu$  we have:
 $$
-p(\boldsymbol{x}| \mu, \boldsymbol{\theta} ) = f_b(\boldsymbol{x} | \boldsymbol{\theta})   \left ( 1-3\mu
+p(\boldsymbol{x}| \mu, \boldsymbol{\theta} ) = f_b(\boldsymbol{x} | \boldsymbol{\theta})   \left ( 1-2\mu
                     + \mu \frac{f_s(\boldsymbol{x} | \boldsymbol{\theta}) + f_b(\boldsymbol{x} | \boldsymbol{\theta})}{f_b(\boldsymbol{x} | \boldsymbol{\theta})}
                     \right )  
 $$ {#eq:mixture_sub}
 which can in turn can be expressed as:
 $$
-p(\boldsymbol{x}| \mu, \boldsymbol{\theta} ) = f_b(\boldsymbol{x} | \boldsymbol{\theta})   \left ( 1-3\mu
+p(\boldsymbol{x}| \mu, \boldsymbol{\theta} ) = f_b(\boldsymbol{x} | \boldsymbol{\theta})   \left ( 1-2\mu
                     + \mu \left ( 1- \frac{f_s(\boldsymbol{x} | \boldsymbol{\theta})}{f_s(\boldsymbol{x} | \boldsymbol{\theta})
                   +f_b(\boldsymbol{x} | \boldsymbol{\theta})} \right )^{-1}
                     \right )  
 $$ {#eq:mixture_suff}
 hence proving that $t_B$ is also a sufficient statistic and theoretically
 justifying its use for inference about $\mu$. The advantage of both $t_B$ 
-and $t_{s/b}$ is they are one-dimensional and do not depend on the
-dimensionality of $\boldsymbol{x}$ hence allowing much more efficient
+and $t_{s/b}$ is that they are one-dimensional and do not depend on the
+dimensionality of $\boldsymbol{x}$, hence allowing for much more efficient
 non-parametric density estimation from simulated samples. Note that
 we have been only discussing sufficiency with respect to the mixture
 coefficients and not the additional distribution parameters

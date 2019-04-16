@@ -100,7 +100,7 @@ inference on the parameters of interest through the construction of a
 binned likelihood function. Given the already mentioned
 intractable form of the generative process
 $p(\boldsymbol{x}| \boldsymbol{\theta})$, the resulting
-likelihood does not correspond to the generative model but it is
+likelihood does not correspond to the generative model and is
 a non-parametric approximation based on the
 distribution of the summary statistic for simulated observations.
 
@@ -130,7 +130,7 @@ parameters of interest using simulated samples, by explicitly
 and directly taking into account
 the effect of nuisance parameters.
 The optimisation procedure is carried out iteratively by stochastic gradient
-descent (SDG) [@DBLP:journals/corr/Ruder16] using small subsets
+descent (SGD) [@DBLP:journals/corr/Ruder16] using small subsets
 of available simulated data.
 In addition, the learned
 summary statistics can be used to build synthetic
@@ -168,7 +168,7 @@ only interested in those that are informative
 about the subset of interest of the model parameters,
 which will be referred as $\boldsymbol{\omega}$.
 The concept of statistical
-sufficiency is especially useful to evaluate whether
+sufficiency is especially useful to assess whether
 summary statistics are informative. In the absence of nuisance
 parameters, classical sufficiency
 can be characterised by means of the factorisation
@@ -188,7 +188,7 @@ of relevance in this work, the probability density is not available in
 closed form so
 the general task of finding a low-dimensional
 sufficient summary statistic cannot be tackled directly. Furthermore,
-a low-dimensional summary statistic will not exist in general
+a low-dimensional sufficient statistic will not exist in general
 for a given problem. The concept of sufficiency is important to understand
 why probabilistic classification has been used as proxy task to obtain
 summary statistics for mixture-model problems when nuisance parameters
@@ -267,7 +267,7 @@ created using a set of $l$ simulated observations $G_\textrm{MC}=
 a certain instantiation of the simulator parameters
 $\boldsymbol{\theta}_\textrm{MC}$.
 
-In experimental high energy physics experiments, which are the scientific
+In experimental high-energy physics experiments, which are the scientific
 context that initially motivated this work, histograms of
 observation counts are the most
 commonly used non-parametric density estimator because the
@@ -295,7 +295,7 @@ $$
              \textrm{Pois} \left ( t_i (D; \boldsymbol{\phi}) \:  |
              \: \left ( \frac{n}{l} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
-where the $n/g$ factor accounts for the different number of
+where the $n/l$ factor accounts for the different number of
 observations in the simulated samples. In cases where the number of
 observations is itself a random variable providing information about
 the parameters of interest, or where the simulated observation are weighted, the
@@ -336,7 +336,7 @@ $$
              \hat{t}_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood_asimov}
 for which it can be easily proven that
-$argmax_{\boldsymbol{\theta} \in \mathcal{\theta}} (\hat{\mathcal{L}}_A(
+$argmax_{\boldsymbol{\theta}} (\hat{\mathcal{L}}_A(
 \boldsymbol{\theta; \boldsymbol{\phi}})) = \boldsymbol{\theta}_\textrm{MC}$,
 so the maximum likelihood estimator (MLE)
 for the Asimov likelihood is the parameter vector $\boldsymbol{\theta}_\textrm{MC}$
@@ -357,7 +357,8 @@ $$
  \boldsymbol{\phi}) \right ) \right ]
 $$ {#eq:fisher_info}
 which can be computed via automatic differentiation
-if the simulation function $g(\boldsymbol{\theta}_\textrm{MC})$ is
+if the simulation function, which
+we denote here and below as $g(\boldsymbol{\theta}_\textrm{MC})$, is
 differentiable or if the effect
 of varying $\boldsymbol{\theta}$ over the simulated
 dataset $G_\textrm{MC}$ can be effectively approximated. While this
@@ -383,7 +384,7 @@ approximate estimator of the expected variance, given that
 the bound would become
 an equality in the asymptotic limit for MLE.
 If some of the parameters
-$\boldsymbol{\theta}$ are constrained by independent measurements
+$\boldsymbol{\theta}$ are constrained by $c$ independent measurements
 characterised by their likelihoods
 $\{\mathcal{L}_C^{0}(\boldsymbol{\theta}), ...,
 \mathcal{L}_{C}^{c}(\boldsymbol{\theta})\}$,
@@ -503,7 +504,7 @@ The first known effort to include the effect of nuisance parameters
 in classification and explain the relation between classification
 and the likelihood ratio was by Neal [@neal2008computing]. In the mentioned
 work, Neal proposes training of classifier including a function of
-nuisance parameter as additional input together with a per-observation
+nuisance parameters as additional input together with a per-observation
 regression model of the expectation value for inference. Cranmer et al.
 [@cranmer2015approximating] improved on this concept
 by using a parametrised classifier to approximate the
@@ -546,11 +547,11 @@ Charnock et al. [@charnock2018automatic] have developed information maximising n
 networks (IMNNs) whose goal is also to learn non-linear transformations
 by directly optimising a function of the Fisher information. While IMNNs
 are the closest approach found in the literature to the one
-presented in this work, our approach is instead focussed on directly optimising
+presented in this work, our approach differs from it by directly optimising
 the expected uncertainty on the parameter of interest and addressing directly
 the problem of nuisance parameters. Other differences between IMNNs
-and the way the Fisher information is approximated and the
-consideration a Poisson binned likelihood instead of a
+and our approach is the way the Fisher information is approximated and the
+consideration of a Poisson binned likelihood instead of a
 Gaussian approximation, which is motivated by the the differences between
 the inference problems in astrophysical observations with those
 within experimental particle physics.
@@ -565,19 +566,19 @@ summary statistics learnt by our algorithm attempt to find a transformation
 that directly reduces the expected effect of nuisance parameters
 over the parameters of interest.
 
-Within High Energy Physics, there has been an effort
+Within high-energy Physics, there has been an effort
 to develop techniques that can learn directly from data instead of using
-simulated observations. In the simplest case, the are based in using
+simulated observations. In the simplest case, they are based on using
 data from a control region for modelling the background component
 in a supervised classification setting, but there have been also
 recent efforts exploiting weakly-supervised
 [@Dery:2017fap; @Metodiev:2017vrx; @Komiske:2018oaa; @Cohen:2017exh] or
 even fully unsupervised attempts
-[@DeSimone:2018efk; @Cerri:2018anq; @Hajer:2018kqm] to learn from directly from data.
+[@DeSimone:2018efk; @Cerri:2018anq; @Hajer:2018kqm] to learn directly from data.
 In our view, all
 these data-driven approaches can be useful to obtain good summaries
 when the simulated observations do not provide adequate modelling
-but cannot circumvent the problem of nuisance parameters.
+yet they cannot circumvent the problem of nuisance parameters.
 A statistical model has to be built for making quantitative statements
 about the model parameters given that data, in which nuisance parameters
 represent the modelling limitations, independently of the method used to
@@ -591,7 +592,7 @@ $t_B(\boldsymbol{x} | \boldsymbol{\theta}_t) = p_{s}(\boldsymbol{x} | \boldsymbo
 where $\boldsymbol{\theta}_t$ are the true value of the nuisance parameters.
 In order to use this summary for inference, a
 non-parametric likelihood based on simulated observations (or data from
-a control region) has to be built, and the effect of nuisance parameter
+a control region) has to be built, and the effect of nuisance parameters
 has to be accounted for in the calibration of the statistical model even
 if the transformation is able to obtain the optimal classifier
 $t_B(\boldsymbol{x} | \boldsymbol{\theta}_t)$. Similar concerns apply to
@@ -845,7 +846,7 @@ differing among them in their number and constrains. The main figure of merit
 used to compared the different techniques will be the expected
 uncertainty in the parameter of interest $s$ for the inference problem
 defined for each benchmark and conditioned
-on the values for the true value of the parameters of $s=50$, $r=0.0$,
+on the true value of the parameters of $s=50$, $r=0.0$,
 $\lambda=3.0$ and $b=1000$.
 
 \begin{table}
@@ -889,7 +890,7 @@ The final layer is followed by a softmax activation function and
 a temperature $\tau = 0.1$ for inference-aware learning to ensure
 that the differentiable approximations are close to the true values
 (see approximation from [@Eq:soft_summary]). Standard
-mini-batch stochastic gradient descent (SGD) is used for training and
+mini-batch stochastic gradient descent is used for training and
 the optimal learning rate is fixed and decided by means of a
 simple scan; the best choice found is specified together with the results.
 
@@ -961,11 +962,11 @@ The expected uncertainties shown in
 \autoref{tab:results_table},
 with the exception of the analytical likelihood which was based on the
 extended likelihood of the generative model from [@Eq:ext_ll],
-where obtained by building a binned likelihood by interpolating
+were obtained by building a binned likelihood by interpolating
 the signal and background histograms when the nuisance parameters
 are varied. In all cases, the uncertainties quoted are in correspondence
 with those obtained from the covariance matrix obtained using 
-the Hessian of the negative logarithm the log likelihood, which were found
+the Hessian of the negative logarithm of the log likelihood, which were found
 to match very closely with those obtained by computing the profile
 likelihood width.
 
@@ -976,8 +977,9 @@ classification and tend to be much closer to those expected when using
 the true model likelihood for inference. The results for Benchmark 0,
 when no nuisance parameters are considered and thus the mixture components
 are perfectly known, show that classification-based summaries in this simplified
-setting can outperform the INFERNO technique, which was anticipated
-based on the fact that classification will be very efficiently approximating
+setting can outperform the INFERNO technique. This result could be anticipated
+based on the fact that probabilistic classification is very
+efficiently approximating
 a sufficient summary statistic (the optimal classifier $t_B$)
 as discussed in [appendix @sec:sufficiency]. This factor also
 explains why for Benchmark 0 the optimal classifier $t_B$ outperforms the
@@ -987,7 +989,7 @@ when nuisance parameters are important and thus the sufficiency condition
 is not guaranteed.
 
 The analytical likelihood, which amounts to use the true generative likelihood
-for inference can be thought of an upper bound for the likelihood-free
+for inference, can be thought of an upper bound for the likelihood-free
 setting (i.e. both classification and INFERNO based trained summaries),
 because it most effectively uses all the information of the data to constrain
 all the model parameters. Much smaller
@@ -1010,7 +1012,7 @@ its omission.
     the optimal classifier $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
     from Eq.~\ref{eq:opt_clf} and the likelihood based results using
     the analytical probability density function from Eq.~\ref{eq:mixture_alt}
-    at the parameter values used for training. The last two rows are
+    at the parameter values used for training. The last two rows
     would not be available in a likelihood-free
     setting. The results
     for INFERNO matching each problem are shown with bold characters.}
@@ -1030,7 +1032,7 @@ its omission.
 Expected uncertainty when the true value of the nuisance
 parameters $r$ and $\lambda$ is different for those used for training
 the model (i.e. $r=0.0$ and $\lambda=3.0$).
-The results for 10 randomly initialised 10 learnt summary statistics
+The results for 10 randomly initialised learnt summary statistics
 (different random initialisation) based either on cross-entropy
 classification and the inference-aware technique are shown. Results
 correspond to Benchmark 2.
@@ -1057,7 +1059,7 @@ learnt accounting for the effect of nuisance parameters compare very favourably
 to those obtained by using a classification proxy to approximate the
 likelihood ratio.  Of course, more experiments are needed to benchmark the
 usefulness of this technique for real-world inference problems as those
-found in High Energy Physics analyses at the LHC.
+found in high-energy Physics analyses at the LHC.
 
 # Conclusions
 
@@ -1104,7 +1106,7 @@ directly related to this work.
 
 This work is part of a more general effort to develop new statistical
 and machine learning techniques
-to use in High Energy Physics analyses within within the  AMVA4NewPhysics
+to use in high-energy Physics analyses within within the  AMVA4NewPhysics
 project, which is supported by the European Union's Horizon 2020 research
 and innovation programme under Grant Agreement number 675440. CloudVeneto
 is also acknowledged for the use of computing and storage facilities provided.
