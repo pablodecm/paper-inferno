@@ -25,6 +25,7 @@ arxiv_tar: diagram appendices
 	mkdir -p arxiv
 	cp -r paper.tex arxiv/.
 	cp -r table.tex arxiv/.
+	cp -r table_syst.tex arxiv/.
 	cp -r gfx arxiv/.
 	cp -r bibliography.bib arxiv/.
 	cp nips_2018.sty arxiv/.
