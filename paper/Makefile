@@ -80,12 +80,12 @@ acat_pdf: diagram appendices
 	--template acat_proceedings/acat_proceedings.latex \
 	--include-after-body=appendices.tex \
 	--filter=pandoc-crossref --filter=pandoc-citeproc \
-  --wrap=preserve --biblatex
+  --wrap=preserve --natbib
 	cp -r table.tex acat_proceedings/.
 	cp -r table_syst.tex acat_proceedings/.
 	cp -r gfx acat_proceedings/.
 	cp -r bibliography.bib acat_proceedings/.
 	cd acat_proceedings; $(LATEX2PDF) paper.tex
-	cd acat_proceedings; $(BIBER) paper
+	cd acat_proceedings; $(BIBTEX) paper
 	cd acat_proceedings; $(LATEX2PDF) paper.tex; $(LATEX2PDF) paper.tex
 	

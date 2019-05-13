@@ -12,7 +12,8 @@ author: |
 numbersections: true
 abstract: >-
   Complex computer simulations are commonly required for accurate
-  data modelling in many scientific disciplines, making statistical
+  data modelling in many scientific disciplines, including experimental
+  High Energy Physics, making statistical
   inference challenging due to the intractability of the likelihood
   evaluation for the observed data.
   Furthermore, sometimes one is interested on inference drawn over

@@ -21,11 +21,9 @@
 % using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
 
-$if(biblatex)$
-\usepackage{biblatex}
-$for(bibliography)$
-\addbibresource{$bibliography$}
-$endfor$
+$if(natbib)$
+\bibliographystyle{iopart-num}
+\usepackage[square,sort&compress,numbers]{natbib}
 $endif$
 
 % some missing math symbols
@@ -47,7 +45,7 @@ $endif$
 
 \author{Pablo de Castro and Tommaso Dorigo}
 \address{INFN - Sezione di Padova, Via Marzolo 8, 35131 Padova - Italy}
-\ead{pablo.de.castro@cern.ch \& tommaso.dorigo@cern.ch}
+\ead{pablo.de.castro@cern.ch , tommaso.dorigo@cern.ch}
 
 \begin{abstract}
 $abstract$
@@ -59,8 +57,10 @@ $endfor$
 
 $body$
 
-$if(biblatex)$
-\printbibliography
+$if(natbib)$
+$if(bibliography)$
+\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+$endif$
 $endif$
 
 $for(include-after)$
