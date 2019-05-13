@@ -74,3 +74,18 @@ cpc_pdf: cpc_tar
 cpc_clean:
 	cd cpc_inferno; rm -f *.pdf *.out *.aux *.bbl *.blg *.log *.toc \
 	                      *.ptb *.tod *.fls *.fdb_latexmk *.lof *.spl
+												
+acat_pdf: diagram appendices
+	$(PANDOC) paper.md -s -o acat_proceedings/paper.tex \
+	--template acat_proceedings/acat_proceedings.latex \
+	--include-after-body=appendices.tex \
+	--filter=pandoc-crossref --filter=pandoc-citeproc \
+  --wrap=preserve --biblatex
+	cp -r table.tex acat_proceedings/.
+	cp -r table_syst.tex acat_proceedings/.
+	cp -r gfx acat_proceedings/.
+	cp -r bibliography.bib acat_proceedings/.
+	cd acat_proceedings; $(LATEX2PDF) paper.tex
+	cd acat_proceedings; $(BIBER) paper
+	cd acat_proceedings; $(LATEX2PDF) paper.tex; $(LATEX2PDF) paper.tex
+	
