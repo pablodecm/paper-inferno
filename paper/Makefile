@@ -78,7 +78,6 @@ cpc_clean:
 acat_pdf: diagram appendices
 	$(PANDOC) paper.md -s -o acat_proceedings/paper.tex \
 	--template acat_proceedings/acat_proceedings.latex \
-	--include-after-body=appendices.tex \
 	--filter=pandoc-crossref --filter=pandoc-citeproc \
   --wrap=preserve --natbib
 	cp -r table.tex acat_proceedings/.
