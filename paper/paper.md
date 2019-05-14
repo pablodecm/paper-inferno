@@ -105,63 +105,6 @@ Bayesian inference from the observed data, so they can be readily applied
 in place of current classification-based or domain-motivated summary statistics
 in current scientific data analysis workflows.
 
-
-# Problem Statement
-
-Let us consider a set of $n$ i.i.d. $d$-dimensional observations $D =
-\{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$ where
-$\boldsymbol{x} \in \mathbb{R}^d$, and a generative model
-which implicitly defines a
-probability density $p(\boldsymbol{x} | \boldsymbol{\theta})$
-used to model the data. The generative model is a function of
-the $p$-dimensional vector of parameters
-$\boldsymbol{\theta} \in \mathbb{R}^p$, which includes both relevant and nuisance parameters.
-We want to learn a function
-$\boldsymbol{t} : \mathbb{R}^{d\times n} \rightarrow
-\mathbb{R}^{m}$ that computes a low-dimensional
-summary statistic
-of the dataset and greatly reduces its dimensionality (i.e. $m \ll d \times n$),
-so likelihood-free inference
-methods can be applied effectively.
-From here onwards, $m$
-will be used to denote the dimensionality of the summary
-statistic $\boldsymbol{t}(D)$.
-
-
-There might be infinite ways to construct a summary statistic
-$\boldsymbol{t} (D)$, but we are
-only interested in those that are informative
-about the subset of interest of the model parameters,
-which will be referred as $\boldsymbol{\omega}$.
-For simplicity, let us consider a problem where we are only interested on
-statistical inference on a
-single one-dimensional model parameter $\boldsymbol{\omega} = \{ \omega_0\}$
-given some observed data.
-Let there be given a summary statistic $\boldsymbol{t}$ and a statistical procedure
-to obtain an unbiased interval estimate of the parameter of interest
-which accounts for the effect of nuisance parameters. The resulting interval
-can be characterised by its width
-$\Delta \omega_0 = \hat{\omega}^{+}_0- \hat{\omega}^{-}_0$, defined by some
-criterion so as to contain on average, upon repeated sampling,
-a given fraction of the probability
-density, e.g. a central $68.3\%$ interval. The
-expected size of the interval depends
-on the summary statistic $\boldsymbol{t}$ chosen: in general,
-summary statistics that are
-more informative about the parameters of interest will provide narrower
-confidence or credible intervals on their value.
-Under this figure of merit, the problem
-of choosing an optimal summary statistic
-can be formally expressed as finding a summary statistic $\boldsymbol{t}^{\ast}$
-that minimises the interval width:
-$$
-\boldsymbol{t}^{\ast} = \textrm{argmin}_{\boldsymbol{t}}  \Delta \omega_0.
-$$ {#eq:general_task}
-The above construction can be extended to several parameters of
-interest by considering the
-interval volume or any other function of the resulting
-confidence or credible regions.
-
 # Method {#sec:method}
 
 In this section, a machine learning technique to learn non-linear
@@ -215,24 +158,17 @@ $$
              \textrm{Pois} \left ( t_i (D; \boldsymbol{\phi}) \:  |
              \: \left ( \frac{n}{l} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
-where the $n/l$ factor accounts for the different number of
-observations in the simulated samples. In cases where the number of
-observations is itself a random variable providing information about
-the parameters of interest, or where the simulated observation are weighted, the
-choice of normalisation of $\mathcal{L}$ may be slightly more involved and
-problem specific, but nevertheless amenable.
-
+where $t_i (D; \boldsymbol{\phi})$ are the sum of observation
+for which the maximum is at the bin $j$ and
+the $n/l$ factor accounts for the different number of
+observations in the simulated samples.
 In the above construction, the chosen
 family of summary statistics is non-differentiable due to
 the $argmax$ operator, so gradient-based updates for the parameters
 cannot be computed. To work around this problem, a differentiable
 approximation $\hat{\boldsymbol{t}}(D ; \boldsymbol{\phi})$ is considered.
-This function is defined by means of a $softmax$ operator:
-$$
-\hat{t}_i(D;\boldsymbol{\phi})=\sum_{x \in D}
-  \frac{e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
-  {\sum_{j=0}^{m} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}}
-$$ {#eq:soft_summary}
+This function is defined by means of a *softmax* operator
+$\hat{t}_i(D;\boldsymbol{\phi})=\sum_{x \in D} e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}  \ \sum_{j=0}^{m} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}$,
 where the temperature hyper-parameter
 $\tau$ will regulate the softness of the operator.
 In the limit of $\tau \rightarrow 0^{+}$, the probability of the largest
@@ -272,7 +208,7 @@ approximate estimator of the expected covariance matrix of the
 parameters $\boldsymbol{\theta}$ for an unbiased estimator.
 In Bayesian
 terminology, this approach is referred to as the Laplace approximation
-[@laplace1986memoir] where the logarithm of the joint density (including the priors)
+[@laplace1986memoir] where the logarithm of the joint density
 is expanded around the MAP to a multi-dimensional normal
 approximation of the posterior
 density.
@@ -283,10 +219,7 @@ ultimate inference aim. The diagonal
 elements $I_{ii}^{-1}(\boldsymbol{\theta}_\textrm{MC})$ correspond to the expected
 variance of each of the $\phi_i$ under the normal approximation mentioned
 before, so if the aim is efficient inference about one of the parameters
-$\omega_0 = \theta_k$ a candidate loss function is:
-$$
-U = I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})
-$$ {#eq:example_loss}
+$\omega_0 = \theta_k$ a candidate loss function is $U = I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})$
 which corresponds to the expected width of the confidence interval
 for $\omega_0$ accounting also for the effect of the other nuisance
 parameters in $\boldsymbol{\theta}$.
@@ -339,13 +272,6 @@ $$ {#eq:sig_toy_pdf}
 so that $(x_0,x_1)$ are distributed according to a multivariate normal
 distribution while $x_2$ follows an independent exponential distribution
 both for background and signal.
-The signal distribution is fully specified while
-the background distribution depends on $r$, a parameter which
-shifts the mean of the background density, and a parameter $\lambda$ which
-specifies
-the exponential rate in the third dimension. The $r$ and $\lambda$
-parameters will be the
-treated as nuisance parameters when benchmarking different methods.
 
 In this toy problem, we consider a case where the underlying model
 predicts that the total number of observations are Poisson distributed with
@@ -362,10 +288,7 @@ because theoretical calculations provide information about the expected number
 of observations. If the probability density is known, but the expectation for
 the number of observed events depends on the model parameters, the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
-$$
-\mathcal{L}(s, r, \lambda, b) = \textrm{Pois}(n | s+b) \prod^{n}
-p(\boldsymbol{x}| s,r, \lambda, b)
-$$ {#eq:ext_ll}
+$\mathcal{L}(s, r, \lambda, b) = \textrm{Pois}(n | s+b) \prod^{n} p(\boldsymbol{x}| s,r, \lambda, b)$
 which will be used to provide an optimal inference baseline when benchmarking
 the different approaches. Another quantity of relevance is the conditional
 density ratio, which would correspond to the optimal classifier (in the
