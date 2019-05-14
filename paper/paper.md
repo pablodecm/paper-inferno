@@ -176,7 +176,7 @@ framework, where the considered loss function accounts for the details of
 the statistical model as well as the expected effect of nuisance parameters.
 
 ![Learning inference-aware summary statistics (see text for
-  details).](gfx/figure1.pdf){#fig:diagram}
+  details).](gfx/figure1.pdf){#fig:diagram width=80%}
 
 The family of summary statistics $\boldsymbol{t}(D)$ considered in this
 work is composed by a neural network model applied to each dataset
@@ -290,46 +290,6 @@ $$ {#eq:example_loss}
 which corresponds to the expected width of the confidence interval
 for $\omega_0$ accounting also for the effect of the other nuisance
 parameters in $\boldsymbol{\theta}$.
-A simple version
-of the approach just described to learn a neural-network based summary statistic
-employing an inference-aware loss is summarised in Algorithm
-\ref{alg:simple_algorithm}. It is worth highlighting that the purpose of the
-algorithm is to use simulated examples to directly optimise the expected
-uncertainty on parameters of interest by constructing an appropriate summary
-statistic, in view of its later use on real data.
-
-<!-- algorithm -->
-\begin{algorithm}[H]
-  \caption{Inference-Aware Neural Optimisation.}
-  \begin{flushleft}
-    {\it Input 1:} differentiable simulator or variational
-    approximation $g(\boldsymbol{\theta})$. \\
-    {\it Input 2:} initial parameter values $\boldsymbol{\theta}_\textrm{MC}.$ \\
-    {\it Input 3:} parameter of interest $\omega_0=\theta_k$.
-     \\
-    {\it Output:} learned summary statistic
-      $\boldsymbol{t}(D; \boldsymbol{\phi})$.\\
- \end{flushleft}
- \begin{algorithmic}[1]
- \For{$i=1$ to $N$ (number of SGD iterations)}
-  \State{Sample a representative mini-batch $G_\textrm{MC}$ from
-  $g(\boldsymbol{\theta}_\textrm{MC})$.}
-  \State{Compute differentiable summary statistic
-    $\hat{\boldsymbol{t}}(G_\textrm{MC};\boldsymbol{\phi})$.}
-  \State{Construct Asimov likelihood
-    $\mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi})$.}
-  \State{Get information matrix inverse $I(\boldsymbol{\theta})^{-1}
-  = \boldsymbol{H}_{\boldsymbol{\theta}}^{-1}(\log
-  \mathcal{L}_A(\boldsymbol{\theta}, \boldsymbol{\phi}))$.}
-  \State{Obtain loss
-    $U= I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})$.}
-  \State{Update network parameters $\boldsymbol{\phi} \rightarrow
-  \textrm{SGD}(\nabla_{\boldsymbol{\phi}} U)$.}  
- \EndFor
- \end{algorithmic}
- \label{alg:simple_algorithm}
-\end{algorithm}
-
 
 # Experiments {#sec:d-synthetic-mixture}
 
@@ -552,9 +512,9 @@ simple scan; the best choice found is specified together with the results.
 
 ::: {#fig:subfigs_training .subfigures}
 ![inference-aware training loss
-](gfx/figure4a.pdf){#fig:training_dynamics width=48%}
+](gfx/figure4a.pdf){#fig:training_dynamics width=39%}
 ![profile-likelihood comparison
-](gfx/figure4b.pdf){#fig:profile_likelihood width=48%}
+](gfx/figure4b.pdf){#fig:profile_likelihood width=40%}
  
 Dynamics and results of inference-aware optimisation: (a) square root of
 inference-loss (i.e. approximated standard deviation of the parameter
@@ -633,11 +593,7 @@ classification and tend to be much closer to those expected when using
 the true model likelihood for inference. The results for Benchmark 0,
 when no nuisance parameters are considered and thus the mixture components
 are perfectly known, show that classification-based summaries in this simplified
-setting can outperform the INFERNO technique. This result could be anticipated
-based on the fact that probabilistic classification is very
-efficiently approximating
-a sufficient summary statistic (the optimal classifier $t_B$)
-as discussed in [appendix @sec:sufficiency]. This factor also
+setting can outperform the INFERNO technique. This factor also
 explains why for Benchmark 0 the optimal classifier $t_B$ outperforms the
 trained model approximation when it is a sufficient statistic, 
 while it does not provide better inference that the approximation
@@ -677,36 +633,6 @@ its omission.
   \footnotesize
   \input{table.tex}
 \end{table}
-
-
-::: {#fig:validity_range .subfigures}
-![different $r$ value
-](gfx/figure5a.pdf){#fig:range_r_dist width=48%}
-![different $\lambda$ value
-](gfx/figure5b.pdf){#fig:range_b_rate width=48%}
-
-Expected uncertainty when the true value of the nuisance
-parameters $r$ and $\lambda$ is different for those used for training
-the model (i.e. $r=0.0$ and $\lambda=3.0$).
-The results for 10 randomly initialised learnt summary statistics
-(different random initialisation) based either on cross-entropy
-classification and the inference-aware technique are shown. Results
-correspond to Benchmark 2.
-:::
-
-Given that a fixed value of the parameters $\boldsymbol{\theta}_\textrm{MC}$
-was used to learn the summary statistics as described in
-Algorithm \ref{alg:simple_algorithm} while their true
-value is unknown in practical applications, the expected uncertainty
-on $s$ has also been
-computed for cases when the true value of the parameters
-$\boldsymbol{\theta}_{\textrm{true}}$ differs. The
-variation of the expected uncertainty on $s$ when either $r$ or $\lambda$
-is varied for classification and inference-aware summary statistics is
-shown in [@Fig:validity_range] for Benchmark 2. The inference-aware summary
-statistics learnt for $\boldsymbol{\theta}_\textrm{MC}$ work
-well when  $\boldsymbol{\theta}_{\textrm{true}} \neq \boldsymbol{\theta}_\textrm{MC}$
-in the range of variation explored. 
 
 This synthetic example demonstrates that the direct optimisation of inference-aware
 losses as those described in the [@Sec:method] is effective.
