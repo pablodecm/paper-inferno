@@ -8,7 +8,7 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{booktabs} 
-\usepackage{subfig}
+\usepackage[labelfont=bf]{caption,subfig}
 \usepackage{graphicx}
 
 % this is to keep keep aspect ratio by default
