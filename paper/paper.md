@@ -93,7 +93,7 @@ parameters of interest using simulated samples, by explicitly
 and directly taking into account
 the effect of nuisance parameters.
 The optimisation procedure is carried out iteratively by stochastic gradient
-descent (SGD) [@DBLP:journals/corr/Ruder16] using small subsets
+descent (SGD) [@Goodfellow-et-al-2016] using small subsets
 of available simulated data.
 The learned
 summary statistics can be used to
