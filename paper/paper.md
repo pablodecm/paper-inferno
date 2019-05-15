@@ -137,13 +137,11 @@ created using a set of $l$ simulated observations $G_\textrm{MC}=
 a certain instantiation of the simulator parameters
 $\boldsymbol{\theta}_\textrm{MC}$.
 
-In experimental high-energy physics experiments, which are the scientific
-context that initially motivated this work, histograms of
+In experimental high-energy physics, histograms of
 observation counts are the most
 commonly used non-parametric density estimator because the
 resulting likelihoods
-can be expressed as the product of Poisson factors, one for each of
-the considered bins. A naive
+can be expressed as the product of Poisson factors. A naive
 sample summary statistic can be built from the output of the neural network
 by simply assigning each observation $\boldsymbol{x}$ to a bin corresponding
 to the cardinality of the maximum element of
@@ -191,11 +189,12 @@ $$
  \boldsymbol{\phi}) \right ) \right ]
 $$ {#eq:fisher_info}
 which can be computed via automatic differentiation
-if the simulation function, which
-we denote here and below as $g(\boldsymbol{\theta}_\textrm{MC})$, is
-differentiable or if the effect
+if the simulation function $g(\boldsymbol{\theta}_\textrm{MC})$
+or an approximation
+of the effect
 of varying $\boldsymbol{\theta}$ over the simulated
-dataset $G_\textrm{MC}$ can be effectively approximated.
+dataset $G_\textrm{MC}$ are
+differentiable.
 
 The inverse of the Fisher information can be used as an
 approximate estimator of the expected covariance matrix of the
@@ -220,13 +219,12 @@ parameters in $\boldsymbol{\theta}$.
 In this section, we first study the effectiveness of the inference-aware
 optimisation in a synthetic mixture problem where the likelihood is known. We then
 compare our results with those obtained by standard classification-based
-summary statistics. All the code needed to reproduce the results
-presented the results presented here is available in
-an online repository [@code_repository], extensively using \textsc{TensorFlow}
+summary statistics. The code for reproducing the results
+is available online [@code_repository], using \textsc{TensorFlow}
 [@tensorflow2015-whitepaper]
-and \textsc{TensorFlow Probability} [@tran2016edward;@dillon2017tensorflow] software libraries.
+and \textsc{TensorFlow Probability} [@tran2016edward;@dillon2017tensorflow].
 
-To demonstrate the usage of the proposed approach a three-dimensional
+To demonstrate the usage of the proposed approach, a three-dimensional
 mixture example with two components
 $p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) 
 + \mu f_s(\boldsymbol{x})$
@@ -283,11 +281,8 @@ signal and background events in a balanced dataset (equal priors):
 $$
 t_B(\boldsymbol{x} | r, \lambda) =
 \frac{f_s(\boldsymbol{x})}{
-f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }
+f_s(\boldsymbol{x}) + f_b(\boldsymbol{x} | r, \lambda) }.
 $$ {#eq:opt_clf}
-noting that this quantity depends on the parameters that define the background
-distribution $r$ and $\lambda$, but not on $s$  or $b$ that are a function of
-the mixture coefficients.
 
 While the synthetic nature of this example allows one to rapidly generate
 training data
@@ -305,21 +300,16 @@ training and
 to control over-fitting. The final figures of merit that allow to
 compare different approaches are computed
 using a larger dataset of 1,000,000 observations.
-For simplicity, mini-batches for each training step are balanced so the same
-number of events from each component is taken both when using
-standard classification or inference-aware losses.
 
 Another option would be to pose the problem as one of classification.
-A supervised machine learning model such a
-neural network can be trained to discriminate signal and background
-observations, considering parameters $r$ and $\lambda$ fixed.
-The output of such a model typically consists in class probabilities
+A supervised machine learning model can be trained to discriminate signal and background, considering parameters $r$ and $\lambda$ fixed.
+The output of such a model are class probabilities
 $c_b$ and $c_s$ given an observation $\boldsymbol{x}$, the latter will
 asymptotically tend to the optimal classifier from [@Eq:opt_clf] given
 enough data and a flexible enough model.
 The classification output is a powerful
-learned feature that can be used as summary statistics; however
-their construction
+learned feature that can be used as a summary statistic; but
+its construction
 ignores the effect of the nuisance parameters.
 
 The statistical model described above has up to four unknown parameters: the
@@ -340,9 +330,9 @@ $x_2$ by the ratio between the $\lambda_0$ used for generation and the
 one being modelled.
 
 For this problem, we are interested in carrying out statistical
-inference on the parameter of interest $s$. In fact,
-the performance of inference-aware optimisation as described in
-[@Sec:method] will be compared with classification-based summary statistics for
+inference on the parameter of interest $s$. 
+The performance of inference-aware optimisation
+will be compared with classification-based summary statistics for
 a series of inference benchmarks based on the synthetic problem described above
 that vary in the number of nuisance parameters considered and their constraints,
 as shown in \autoref{tab:benchmark_table}. For Benchmark 0 no nuisance
@@ -369,35 +359,28 @@ $\lambda=3.0$ and $b=1000$.
 
 When using classification-based summary statistics, the construction of
 a summary statistic does depend on the presence of nuisance parameters, so the same
-model is trained independently of the benchmark considered. In real-world
-inference scenarios, nuisance parameters have often to be accounted for and
-typically are constrained by prior information or auxiliary measurements.
+model is trained independently of the benchmark considered.
 For the approach
 presented in this work, inference-aware neural optimisation, the effect of the
 nuisance parameters and their constraints can be taken into account during training.
 Hence, 5 different training procedures for \textsc{INFERNO} will be considered,
 one for each of the benchmarks, denoted by the corresponding benchmark number. 
 
-The same basic network architecture is used both for cross-entropy and
+The same basic network architecture is used both for cross-entropy (CE)
+$L_\textrm{CE}=\sum_i y_i \log \hat{y}_i$ and
 inference-aware training: two hidden layers of 100 nodes followed by
 rectified linear unit (ReLU) [@Goodfellow-et-al-2016]
-activations. Because we are using the multi-class formulation of
-the cross-entropy loss $L_\textrm{CE}=\sum_i y_i \log \hat{y}_i$,
-the number of nodes on the output
+activations.
+The number of nodes on the output
 layer is two when
-classification proxies are used, matching the number of mixture classes
-in the problem considered. Instead, for inference-aware classification
-the number of output nodes can be arbitrary and will be denoted with $m$,
-corresponding to the dimensionality of the sample summary statistics. For
+classification proxies are used, while for inference-aware classification
+the number of output nodes
+corresponds to the dimensionality of the sample summary statistics. For
 the experiments shown in this work using the INFERNO technique,
 an output size of $m=10$ has been used.
 The final layer is followed by a softmax activation function and
 a temperature $\tau = 0.1$ for inference-aware learning to ensure
 that the differentiable approximations are close to the true values.
-Standard
-mini-batch stochastic gradient descent is used for training and
-the optimal learning rate is fixed and decided by means of a
-simple scan; the best choice found is specified together with the results.
 
 ::: {#fig:subfigs_training .subfigures}
 ![inference-aware training loss
@@ -411,23 +394,23 @@ of interest) as a function
 of the training step for 10 different random initialisations of the neural
 network parameters; (b) profiled likelihood around the expectation value
 for the parameter of interest $s$ of 10 trained inference-aware models and 10
-trained cross-entropy loss based models. All results
+trained CE loss based models. All results
 correspond to Benchmark 2.
 :::
 
 
-In [@Fig:training_dynamics], the dynamics of inference-aware optimisation
+In [@Fig:training_dynamics], the training dynamics of inference-aware optimisation
 are shown by the validation loss, which corresponds
 to the approximate expected variance
-of parameter $s$, as a function of the training step for 10 random-initialised
+of parameter $s$, as a function of the step for 10 random-initialised
 instances of the \textsc{INFERNO} model corresponding to Benchmark 2.
 All inference-aware models were trained during 200 epochs with SGD using
 mini-batches of 2000 observations
 and a learning rate $\gamma=10^{-6}$. All the model initialisations
 converge to summary statistics that provide low variance for the estimator of
-$s$ when the nuisance parameters are accounted for.
+$s$.
 
-To compare with alternative approaches and verify the validity of the results,
+To compare with alternative approaches,
 the profiled likelihood [@tanabashi2018review] obtained both with
 the INFERNO-based and
 classifier-based
@@ -436,13 +419,13 @@ effect of nuisance parameters defined in Benchmark 2, are shown
 in [@Fig:profile_likelihood].
 The expected uncertainty of the trained models are
 used for subsequent inference on the value of $s$
-can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$. Hence,
-the average width for the profile likelihood using inference-aware training,
+can be estimated from the profile width when $\Delta \mathcal{L} = 0.5$.
+The average width for the profile likelihood with inference-aware,
 $16.97\pm0.11$, can be
-compared with the corresponding one obtained by uniformly binning the output of
+compared with the one obtained by uniformly binning the output of
 classification-based models in 10 bins, $24.01\pm0.36$.
 The models based on
-cross-entropy loss were
+CE loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
 rate of $\gamma=0.001$.
 
@@ -451,46 +434,46 @@ training procedure is provided in \autoref{tab:results_table},
 where the median and 1-sigma
 percentiles on the expected absolute uncertainty on $s$ are provided for 100
 random-initialised instances of each model. In addition, results for 100
-random-initialised cross-entropy neural network models trained as previously
+random-initialised CE neural network models trained as previously
 indicated, the optimal (Bayes) classifier
 $t_B(\boldsymbol{x} | r = 0.0 , \lambda = 3.0)$
 from [@Eq:opt_clf],
 and the analytical likelihood-based inference are also
-included for comparison.
-The expected uncertainties shown in
+included.
+The uncertainties shown in
 \autoref{tab:results_table},
 with the exception of the analytical likelihood which was based on the
 extended analytical likelihood,
-were obtained by building a binned likelihood by interpolating
-the signal and background histograms when the nuisance parameters
-are varied. In all cases, the uncertainties quoted are in correspondence
-with those obtained from the covariance matrix obtained using 
-the Hessian of the negative logarithm of the log likelihood, which were found
-to match very closely with those obtained by computing the profile
-likelihood width.
+were obtained with a binned likelihood by interpolating
+the histograms when the nuisance parameters
+are varied.
+
+\begin{table}
+  \caption{Expected uncertainty on the parameter of interest $s$
+    for each of the inference benchmarks considered using a CE
+    trained model, a INFERNO model customised for each problem,
+    the optimal classifier $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
+    and the analytical likelihood.}
+  \label{tab:results_table}
+  \centering
+  \footnotesize
+  \input{table.tex}
+\end{table}
 
 Except for Benchmark 0, the confidence intervals obtained using
 INFERNO-based
-summary statistics are considerably narrower than those using
+summary statistics are narrower than those using
 classification and tend to be much closer to those expected when using
 the true model likelihood for inference. The results for Benchmark 0,
 when no nuisance parameters are considered and thus the mixture components
 are perfectly known, show that classification-based summaries in this simplified
-setting can outperform the INFERNO technique. This factor also
-explains why for Benchmark 0 the optimal classifier $t_B$ outperforms the
-trained model approximation when it is a sufficient statistic, 
-while it does not provide better inference that the approximation
-when nuisance parameters are important and thus the sufficiency condition
-is not guaranteed.
+setting can outperform the INFERNO technique.
 
 The analytical likelihood, which amounts to use the true generative likelihood
 for inference, can be thought of an upper bound for the likelihood-free
-setting (i.e. both classification and INFERNO based trained summaries),
+setting
 because it most effectively uses all the information of the data to constrain
-all the model parameters. Much smaller
-fluctuations between initialisations are observed for the INFERNO-based
-cases than for classification-based summary statistics when nuisance
-parameters are relevant. The relative improvement over classification
+all the model parameters. The relative improvement over classification
 increases when more nuisance parameters are considered.
 As shown in \autoref{tab:results_table}, the constraining power of the summary
 statistic generated by INFERNO is stronger when it is constructed to solve
@@ -500,20 +483,6 @@ seem to suggest the inclusion of the detailed information about the inference
 problem in the INFERNO technique leads to comparable or better results than
 its omission.
 
-\begin{table}
-  \caption{Expected uncertainty on the parameter of interest $s$
-    for each of the inference benchmarks considered using a cross-entropy
-    trained neural network model, a INFERNO model customised for each problem,
-    the optimal classifier $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
-    from Eq.~\ref{eq:opt_clf} and the analytical likelihood.
-    The results
-    for INFERNO matching each problem are shown in bold.}
-  \label{tab:results_table}
-  \centering
-  \footnotesize
-  \input{table.tex}
-\end{table}
-
 # Conclusions
 
 In this work we have described a new approach for building
@@ -521,8 +490,8 @@ non-linear summary statistics for
 likelihood-free inference that directly minimises the expected
 variance of the parameters of interest, which is considerably more
 effective than the use of classification surrogates when nuisance
-parameters are present. The application of INFERNO to non-synthetic examples
-where nuisance parameters are relevant, such as the systematic-extended
+parameters are present. The application of INFERNO to non-synthetic examples,
+such as the systematic-extended
 Higgs dataset [@estrade2017adversarial], are left for future studies.
 
 
