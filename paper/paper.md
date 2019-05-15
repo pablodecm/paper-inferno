@@ -74,11 +74,8 @@ allows the treatment of the problem as
 signal (s) vs background (b) classification [@adam2015higgs],
 when the task becomes one of effectively estimating
 an approximation of $t_B(\boldsymbol{x}) = p_{s}(\boldsymbol{x})/(p_{s}(\boldsymbol{x})+
-p_{b}(\boldsymbol{x}))$ by means of probabilistic classification. The
-aforementioned quantity
-varies monotonically with the likelihood ratio and is a sufficient summary
-statistic if we are only interested in the mixture fraction parameter.
-While the use of classifiers to learn a summary statistic can be effective and
+p_{b}(\boldsymbol{x}))$ by means of probabilistic classification.
+While the use of classifiers to learn a summary statistic can
 increase the discovery sensitivity, the simulations used to generate
 the samples which are needed to train the classifier often depend on additional
 uncertain parameters (commonly referred as nuisance parameters).
@@ -98,9 +95,9 @@ the effect of nuisance parameters.
 The optimisation procedure is carried out iteratively by stochastic gradient
 descent (SGD) [@DBLP:journals/corr/Ruder16] using small subsets
 of available simulated data.
-In addition, the learned
-summary statistics can be used to build synthetic
-sample-based likelihoods and perform robust and efficient classical or
+The learned
+summary statistics can be used to
+perform robust and efficient classical or
 Bayesian inference from the observed data, so they can be readily applied
 in place of current classification-based or domain-motivated summary statistics
 in current scientific data analysis workflows.
@@ -108,13 +105,13 @@ in current scientific data analysis workflows.
 # Method {#sec:method}
 
 In this section, a machine learning technique to learn non-linear
-sample summary statistics is described in detail.
+sample summary statistics is described
 The method seeks to minimise the expected variance
 of the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood. A graphical description of the
 technique  is depicted on [@Fig:diagram].
 The parameters of a neural network are
-optimised by stochastic gradient descent within an automatic differentiation
+optimised by SGD within an automatic differentiation
 framework, where the considered loss function accounts for the details of
 the statistical model as well as the expected effect of nuisance parameters.
 
@@ -171,10 +168,7 @@ This function is defined by means of a *softmax* operator
 $\hat{t}_i(D;\boldsymbol{\phi})=\sum_{x \in D} e^{f_i(\boldsymbol{x}; \boldsymbol{\phi})/\tau}  \ \sum_{j=0}^{m} e^{f_j(\boldsymbol{x}; \boldsymbol{\phi})/\tau}$,
 where the temperature hyper-parameter
 $\tau$ will regulate the softness of the operator.
-In the limit of $\tau \rightarrow 0^{+}$, the probability of the largest
-component will tend to 1 while others to 0, and therefore
-$\hat{\boldsymbol{t}}(D ; \boldsymbol{\phi})
-\rightarrow \boldsymbol{t}(D; \boldsymbol{\phi})$. Similarly, let us
+Similarly, let us
 denote by $\hat{\mathcal{L}}(D; \boldsymbol{\theta}, \boldsymbol{\phi})$
 the differentiable approximation of the non-parametric likelihood
 obtained by substituting $\boldsymbol{t}(D ; \boldsymbol{\phi})$ with
@@ -208,16 +202,13 @@ approximate estimator of the expected covariance matrix of the
 parameters $\boldsymbol{\theta}$ for an unbiased estimator.
 In Bayesian
 terminology, this approach is referred to as the Laplace approximation
-[@laplace1986memoir] where the logarithm of the joint density
-is expanded around the MAP to a multi-dimensional normal
-approximation of the posterior
-density.
+[@laplace1986memoir].
 The loss function used for stochastic optimisation of the neural network
 parameters $\boldsymbol{\phi}$ can be any function of the inverse
 of the Fisher information matrix at $\boldsymbol{\theta}_\textrm{MC}$, depending on the
 ultimate inference aim. The diagonal
 elements $I_{ii}^{-1}(\boldsymbol{\theta}_\textrm{MC})$ correspond to the expected
-variance of each of the $\phi_i$ under the normal approximation mentioned
+variance of each of the $\phi_i$ under the approximation mentioned
 before, so if the aim is efficient inference about one of the parameters
 $\omega_0 = \theta_k$ a candidate loss function is $U = I_{kk}^{-1}(\boldsymbol{\theta}_\textrm{MC})$
 which corresponds to the expected width of the confidence interval
@@ -235,18 +226,16 @@ an online repository [@code_repository], extensively using \textsc{TensorFlow}
 [@tensorflow2015-whitepaper]
 and \textsc{TensorFlow Probability} [@tran2016edward;@dillon2017tensorflow] software libraries.
 
-In order to demonstrate the usage of the proposed approach, evaluate its
-viability and test its performance by comparing to the use of
-a classification model proxy, a three-dimensional
+To demonstrate the usage of the proposed approach a three-dimensional
 mixture example with two components
 $p(\boldsymbol{x}| \mu, r, \lambda) = (1-\mu) f_b(\boldsymbol{x} | r, \lambda) 
 + \mu f_s(\boldsymbol{x})$
 is considered.
-One component will be referred as background $f_b(\boldsymbol{x} | \lambda)$ and
+One component will be referred as background $f_b(\boldsymbol{x} | r, \lambda)$ and
 the other as signal $f_s(\boldsymbol{x})$; their probability density functions
 are taken to correspond respectively to:
 $$
-f_b(\boldsymbol{x} | r, \lambda) =
+\scriptstyle f_b(\boldsymbol{x} | r, \lambda) =
 \mathcal{N} \left (
   (x_0, x_1) \, \middle | \,
   (2+r, 0),
@@ -256,8 +245,7 @@ f_b(\boldsymbol{x} | r, \lambda) =
    \end{bmatrix}
 \right)
 Exp (x_2 | \lambda)
-$$ {#eq:bkg_toy_pdf}
-$$
+\quad
 f_s(\boldsymbol{x}) =
 \mathcal{N} \left (
   (x_0, x_1) \, \middle | \,
@@ -268,7 +256,7 @@ f_s(\boldsymbol{x}) =
    \end{bmatrix}
 \right)
 Exp (x_2 | 2)
-$$ {#eq:sig_toy_pdf}
+$$ {#eq:sig_bkg_den}
 so that $(x_0,x_1)$ are distributed according to a multivariate normal
 distribution while $x_2$ follows an independent exponential distribution
 both for background and signal.
@@ -283,9 +271,7 @@ p(\boldsymbol{x}| s, r, \lambda, b) = \frac{b}{ s+b}
  f_b(\boldsymbol{x} | r, \lambda) +
  \frac{s}{s+b} f_s(\boldsymbol{x}).
 $$ {#eq:mixture_alt}
-This parametrisation is common for physics analyses at the LHC,
-because theoretical calculations provide information about the expected number
-of observations. If the probability density is known, but the expectation for
+If the probability density is known, but the expectation for
 the number of observed events depends on the model parameters, the likelihood
 can be extended [@barlow1990extended] with a Poisson count term as:
 $\mathcal{L}(s, r, \lambda, b) = \textrm{Pois}(n | s+b) \prod^{n} p(\boldsymbol{x}| s,r, \lambda, b)$
@@ -323,23 +309,18 @@ For simplicity, mini-batches for each training step are balanced so the same
 number of events from each component is taken both when using
 standard classification or inference-aware losses.
 
-Another option would be to pose the problem as one of classification
-based on a simulated dataset. A supervised machine learning model such a
+Another option would be to pose the problem as one of classification.
+A supervised machine learning model such a
 neural network can be trained to discriminate signal and background
 observations, considering parameters $r$ and $\lambda$ fixed.
 The output of such a model typically consists in class probabilities
-$c_s$ and $c_b$ given an observation $\boldsymbol{x}$, which will tend
-asymptotically to the optimal classifier from [@Eq:opt_clf] given
-enough data, a flexible enough model and a powerful learning rule.
-The conditional class probabilities (or alternatively the likelihood ratio 
-$f_s(\boldsymbol{x})/f_b(\boldsymbol{x})$) are powerful
-learned features that can be used as summary statistics; however
+$c_b$ and $c_s$ given an observation $\boldsymbol{x}$, the latter will
+asymptotically tend to the optimal classifier from [@Eq:opt_clf] given
+enough data and a flexible enough model.
+The classification output is a powerful
+learned feature that can be used as summary statistics; however
 their construction
-ignores the effect of the nuisance parameters $r$ and $\lambda$ on the
-background distribution. Furthermore, some kind  of non-parametric density estimation
-(e.g. a histogram) has to be considered in order to build a calibrated statistical
-model using the classification-based learned features, which  will in turn
-smooth and reduce the information available for inference.
+ignores the effect of the nuisance parameters.
 
 The statistical model described above has up to four unknown parameters: the
 expected number of signal observations $s$,
@@ -349,24 +330,14 @@ the expected number of background observations. The effect of the
 expected number of signal and background observations $s$ and $b$
 can be easily included in the computation graph by 
 weighting the signal and background observations.
-This is equivalent to scaling the resulting vector of Poisson counts (or its
-differentiable approximation)
-if a non-parametric counting model as the one described in [@Sec:method] is used.
 Instead the effect of $r$ and $\lambda$, both nuisance parameters
 that will define the background distribution, is more easily modelled
 as a transformation of the input data $\boldsymbol{x}$. In particular,
 $r$ is a nuisance parameter that causes a shift on the background
-along the first dimension  and its effect can accounted for
-in a differentiable manner by simply adding $(r,0.0,0.0)$ to
-each observation
-in the mini-batch generated from the background distribution.
-Similarly, the effect of $\lambda$ can be modelled by multiplying
+along the first dimension  adn
+the effect of $\lambda$ can be modelled by multiplying
 $x_2$ by the ratio between the $\lambda_0$ used for generation and the
 one being modelled.
-These transformations are specific for this example,
-but alternative transformations depending on
-parameters could also be accounted for as long as they are
-differentiable or substituted by a differentiable approximation.
 
 For this problem, we are interested in carrying out statistical
 inference on the parameter of interest $s$. In fact,
@@ -375,14 +346,11 @@ the performance of inference-aware optimisation as described in
 a series of inference benchmarks based on the synthetic problem described above
 that vary in the number of nuisance parameters considered and their constraints,
 as shown in \autoref{tab:benchmark_table}. For Benchmark 0 no nuisance
-parameters are considered, thus the inference problem is that of
-determining the
-number of signal events $s$ given some data and a perfectly known signal
-and background model, so the classification approach is expected
-to provide sufficient summary statistics. The rest of the benchmarks
+parameters are considered, so the classification approach is expected
+to provide near optimal summary statistics. The rest of the benchmarks
 correspond to the presence of nuisance parameters,
 differing among them in their number and constrains. The main figure of merit
-used to compared the different techniques will be the expected
+will be the expected
 uncertainty in the parameter of interest $s$ for the inference problem
 defined for each benchmark and conditioned
 on the true value of the parameters of $s=50$, $r=0.0$,
@@ -392,9 +360,7 @@ $\lambda=3.0$ and $b=1000$.
   \caption{Definition of the different statistical
   inference benchmark problems that will be
   considered when comparing different techniques to obtain
-  summary statistics. The number of signal events $s$ will be the parameter
-  of interest in all cases, where each benchmark differs on the nuisance
-  parameters considered and their constraints.}
+  summary statistics.}
   \label{tab:benchmark_table}
   \centering
   \footnotesize
@@ -427,28 +393,25 @@ the experiments shown in this work using the INFERNO technique,
 an output size of $m=10$ has been used.
 The final layer is followed by a softmax activation function and
 a temperature $\tau = 0.1$ for inference-aware learning to ensure
-that the differentiable approximations are close to the true values
-(see approximation from [@Eq:soft_summary]). Standard
+that the differentiable approximations are close to the true values.
+Standard
 mini-batch stochastic gradient descent is used for training and
 the optimal learning rate is fixed and decided by means of a
 simple scan; the best choice found is specified together with the results.
 
 ::: {#fig:subfigs_training .subfigures}
 ![inference-aware training loss
-](gfx/figure4a.pdf){#fig:training_dynamics width=39%}
+](gfx/figure4a.pdf){#fig:training_dynamics width=37%}
 ![profile-likelihood comparison
-](gfx/figure4b.pdf){#fig:profile_likelihood width=40%}
+](gfx/figure4b.pdf){#fig:profile_likelihood width=38%}
  
 Dynamics and results of inference-aware optimisation: (a) square root of
-inference-loss (i.e. approximated standard deviation of the parameter
+inference-loss (i.e. approximated uncertainty of the parameter
 of interest) as a function
 of the training step for 10 different random initialisations of the neural
 network parameters; (b) profiled likelihood around the expectation value
-for the parameter of interest $s$ (i.e. number of signal events
-in the sample) of 10 trained inference-aware models and 10
-trained cross-entropy loss based models. The latter are constructed by
-building a uniformly binned Poisson count likelihood of the conditional
-signal probability output.  All results
+for the parameter of interest $s$ of 10 trained inference-aware models and 10
+trained cross-entropy loss based models. All results
 correspond to Benchmark 2.
 :::
 
@@ -478,9 +441,6 @@ the average width for the profile likelihood using inference-aware training,
 $16.97\pm0.11$, can be
 compared with the corresponding one obtained by uniformly binning the output of
 classification-based models in 10 bins, $24.01\pm0.36$.
-The number of bins is the same as that of [@Fig:subfigs_clf_hists],
-and is chosen to match
-the dimensionality adopted for the summary statistic of INFERNO.
 The models based on
 cross-entropy loss were
 trained during 200 epochs using a mini-batch size of 64 and a fixed learning
@@ -500,7 +460,7 @@ included for comparison.
 The expected uncertainties shown in
 \autoref{tab:results_table},
 with the exception of the analytical likelihood which was based on the
-extended likelihood of the generative model from [@Eq:ext_ll],
+extended analytical likelihood,
 were obtained by building a binned likelihood by interpolating
 the signal and background histograms when the nuisance parameters
 are varied. In all cases, the uncertainties quoted are in correspondence
@@ -545,60 +505,26 @@ its omission.
     for each of the inference benchmarks considered using a cross-entropy
     trained neural network model, a INFERNO model customised for each problem,
     the optimal classifier $t_B(\boldsymbol{x} | r = 0.0, \lambda = 3.0)$
-    from Eq.~\ref{eq:opt_clf} and the likelihood based results using
-    the analytical probability density function from Eq.~\ref{eq:mixture_alt}
-    at the parameter values used for training. The last two rows
-    would not be available in a likelihood-free
-    setting. The results
-    for INFERNO matching each problem are shown with bold characters.}
+    from Eq.~\ref{eq:opt_clf} and the analytical likelihood.
+    The results
+    for INFERNO matching each problem are shown in bold.}
   \label{tab:results_table}
   \centering
   \footnotesize
   \input{table.tex}
 \end{table}
 
-This synthetic example demonstrates that the direct optimisation of inference-aware
-losses as those described in the [@Sec:method] is effective.
-The summary statistics
-learnt accounting for the effect of nuisance parameters compare very favourably
-to those obtained by using a classification proxy to approximate the
-likelihood ratio.  Of course, more experiments are needed to benchmark the
-usefulness of this technique for real-world inference problems as those
-found in high-energy Physics analyses at the LHC.
-
 # Conclusions
-
-Classification-based summary statistics for mixture models
-often suffer from the need of specifying
-a fixed model of the data, thus neglecting the effect of nuisance parameters
-in the learning process. The effect of nuisance parameters is only considered
-downstream of the learning phase, resulting in sub-optimal inference on
-the parameters of interest.
 
 In this work we have described a new approach for building
 non-linear summary statistics for
 likelihood-free inference that directly minimises the expected
 variance of the parameters of interest, which is considerably more
 effective than the use of classification surrogates when nuisance
-parameters are present.
-
-The results obtained for the synthetic experiment considered clearly
-demonstrate that machine learning techniques, in particular neural networks,
-can be adapted for learning summary statistics that match the particularities
-of the inference problem  at hand, greatly increasing the information available
-for subsequent inference. The application of INFERNO to non-synthetic examples
+parameters are present. The application of INFERNO to non-synthetic examples
 where nuisance parameters are relevant, such as the systematic-extended
 Higgs dataset [@estrade2017adversarial], are left for future studies.
 
-
-
-Furthermore, the technique presented can be applied to arbitrary
-likelihood-free problems as long as the effect of parameters
-over the simulated data can be implemented as a differentiable
-transformations. As a possible extension,
-alternative non-parametric density estimation
-techniques such as kernel density could very well be used in
-place Poisson count models.
 
 # Acknowledgments {.unnumbered}
 
