@@ -27,11 +27,11 @@ abstract: >-
   use case, the problem of confidence interval estimation for
   the mixture coefficient in a multi-dimensional two-component mixture
   model (i.e. signal vs background) is considered, where the proposed technique
-  clearly outperforms summary statistics based on probabilistic
+  outperforms summary statistics based on probabilistic
   classification,
   a commonly used alternative which does not account for the presence
   of nuisance
-  parameters.
+  parameters in the optimisation.
 bibliography: bibliography.bib
 ---
 
@@ -62,7 +62,7 @@ to cover the parameter space. When data are
 high-dimensional, likelihood-free
 inference can rapidly become inefficient, so low-dimensional summary statistics
 $\boldsymbol{t}(D)$ are used instead of the raw data
-for tractability. The choice of summary statistics for such cases becomes
+for tractability. The choice of summary statistic for such cases becomes
 critical,
 given that naive choices might cause loss of
 relevant information and a corresponding degradation of the power
@@ -88,9 +88,10 @@ cannot easily account for those effects, so their inference power is degraded
 when nuisance parameters are finally taken into account.
 
 In this work, a new machine learning method referred to as
-Inference-Aware Neural Optimisation (INFERNO) is presented, to
-construct non-linear summary statistics that directly
-optimise the expected amount of information about the subset of
+Inference-Aware Neural Optimisation (INFERNO) [@de2018inferno] is presented,
+that
+constructs non-linear summary statistics directly
+optimising the expected amount of information about the subset of
 parameters of interest, by explicitly
 and taking into account
 the effect of nuisance parameters.
@@ -107,7 +108,7 @@ in current scientific data analyses.
 # Method {#sec:method}
 
 In this section, a machine learning technique to learn non-linear
-sample summary statistics is described
+sample summary statistics is described.
 The method seeks to minimise the expected variance
 of the parameters of interest obtained via a non-parametric
 simulation-based synthetic likelihood. A graphical description of the
@@ -303,17 +304,6 @@ to control over-fitting. The final figures of merit that allow to
 compare different approaches are computed
 using a larger dataset of 1,000,000 observations.
 
-Another option would be to pose the problem as one of classification.
-A supervised machine learning model can be trained to discriminate signal and background, considering parameters $r$ and $\lambda$ fixed.
-The output of such a model are class probabilities
-$c_b$ and $c_s$ given an observation $\boldsymbol{x}$, the latter will
-asymptotically tend to the optimal classifier from [@Eq:opt_clf] given
-enough data and a flexible enough model.
-The classification output is a powerful
-learned feature that can be used as a summary statistic; but
-its construction
-ignores the effect of the nuisance parameters.
-
 The statistical model described above has up to four unknown parameters: the
 expected number of signal observations $s$,
 the background mean shift $r$,
@@ -347,6 +337,19 @@ uncertainty in the parameter of interest $s$ for the inference problem
 defined for each benchmark and conditioned
 on the true value of the parameters of $s=50$, $r=0.0$,
 $\lambda=3.0$ and $b=1000$.
+
+A supervised machine learning model can be trained to discriminate signal
+and background, considering parameters $r$ and $\lambda$ fixed, as a way
+to obtain a variable transformation that is informative about the
+mixture fraction or $s$.
+The output of such a model are class probabilities
+$c_b$ and $c_s$ given an observation $\boldsymbol{x}$, the latter will
+asymptotically tend to the optimal classifier from [@Eq:opt_clf] given
+enough data and a flexible enough model.
+The classification output is a powerful
+learned feature that can be used as a summary statistic; but
+its construction
+ignores the effect of the nuisance parameters.
 
 \begin{table}
   \caption{Definition of the different statistical
@@ -466,7 +469,8 @@ Except for Benchmark 0, the confidence intervals obtained using
 INFERNO-based
 summary statistics are narrower than those using
 classification and tend to be much closer to those expected when using
-the true model likelihood for inference. The results for Benchmark 0,
+the true model likelihood for inference. Unsurprinsingly,
+the results for Benchmark 0,
 when no nuisance parameters are considered and thus the mixture components
 are perfectly known, show that classification-based summaries in this simplified
 setting can outperform the INFERNO technique.
