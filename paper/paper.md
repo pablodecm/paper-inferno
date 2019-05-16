@@ -1,6 +1,7 @@
 ---
 title: |
-  INFERNO: Inference-Aware Neural Optimisation
+  Reducing the impact of systematic uncertainties with
+  inference-aware summary statistics
 author: |
  Pablo de Castro \
  INFN - Sezione di Padova \
@@ -86,11 +87,12 @@ Classification-based summary statistics
 cannot easily account for those effects, so their inference power is degraded
 when nuisance parameters are finally taken into account.
 
-In this work, we present a new machine learning method to
-construct non-linear sample summary statistics that directly
-optimises the expected amount of information about the subset of
-parameters of interest using simulated samples, by explicitly
-and directly taking into account
+In this work, a new machine learning method referred to as
+Inference-Aware Neural Optimisation (INFERNO) is presented, to
+construct non-linear summary statistics that directly
+optimise the expected amount of information about the subset of
+parameters of interest, by explicitly
+and taking into account
 the effect of nuisance parameters.
 The optimisation procedure is carried out iteratively by stochastic gradient
 descent (SGD) [@Goodfellow-et-al-2016] using small subsets
@@ -99,8 +101,8 @@ The learned
 summary statistics can be used to
 perform robust and efficient classical or
 Bayesian inference from the observed data, so they can be readily applied
-in place of current classification-based or domain-motivated summary statistics
-in current scientific data analysis workflows.
+in place of current classification-based or domain-motivated summaries
+in current scientific data analyses.
 
 # Method {#sec:method}
 
