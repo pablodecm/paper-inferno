@@ -14,7 +14,7 @@ numbersections: true
 abstract: >-
   Complex computer simulations are commonly required for accurate
   data modelling in many scientific disciplines, including experimental
-  High Energy Physics, making statistical
+  high-energy physics, making statistical
   inference challenging due to the intractability of the likelihood
   evaluation for the observed data.
   Furthermore, sometimes one is interested on inference drawn over
@@ -44,7 +44,7 @@ In these situations the generative procedure implicitly defined
 in the simulation often lacks a tractable probability density
 $p(\boldsymbol{x}| \boldsymbol{\theta})$, where
 $\boldsymbol{\theta}$
-is the vector of model parameters. Given some experimental
+is the vector of model parameters. Given $n$ experimental
 observations $D = \{\boldsymbol{x}_0,...,\boldsymbol{x}_n\}$,
 a problem of special relevance for these
 disciplines is statistical inference on a subset of model parameters
@@ -73,7 +73,7 @@ the nature of the generative model (i.e. a mixture of different
 processes)
 allows the treatment of the problem as
 signal (s) vs background (b) classification [@adam2015higgs],
-when the task becomes one of effectively estimating
+when the task becomes the one of effectively estimating
 an approximation of $t_B(\boldsymbol{x}) = p_{s}(\boldsymbol{x})/(p_{s}(\boldsymbol{x})+
 p_{b}(\boldsymbol{x}))$ by means of probabilistic classification.
 While the use of classifiers to learn a summary statistic can
@@ -92,8 +92,7 @@ Inference-Aware Neural Optimisation (INFERNO) [@de2018inferno] is presented,
 that
 constructs non-linear summary statistics directly
 optimising the expected amount of information about the subset of
-parameters of interest, by explicitly
-and taking into account
+parameters of interest, by taking into account
 the effect of nuisance parameters.
 The optimisation procedure is carried out iteratively by stochastic gradient
 descent (SGD) [@Goodfellow-et-al-2016] using small subsets
@@ -156,8 +155,8 @@ $$
              \textrm{Pois} \left ( t_i (D; \boldsymbol{\phi}) \:  |
              \: \left ( \frac{n}{l} \right ) t_i (G_\textrm{MC};\boldsymbol{\phi}) \right )
 $$ {#eq:likelihood}
-where $t_i (D; \boldsymbol{\phi})$ are the sum of observation
-for which the maximum is at the bin $j$ and
+where $t_i (D; \boldsymbol{\phi})$ are the sum of observations
+for which the maximum is at the bin $i$ and
 the $n/l$ factor accounts for the different number of
 observations in the simulated samples.
 In the above construction, the chosen
@@ -316,7 +315,7 @@ Instead the effect of $r$ and $\lambda$, both nuisance parameters
 that will define the background distribution, is more easily modelled
 as a transformation of the input data $\boldsymbol{x}$. In particular,
 $r$ is a nuisance parameter that causes a shift on the background
-along the first dimension  adn
+along the first dimension and
 the effect of $\lambda$ can be modelled by multiplying
 $x_2$ by the ratio between the $\lambda_0$ used for generation and the
 one being modelled.
@@ -343,7 +342,7 @@ and background, considering parameters $r$ and $\lambda$ fixed, as a way
 to obtain a variable transformation that is informative about the
 mixture fraction or $s$.
 The output of such a model are class probabilities
-$c_b$ and $c_s$ given an observation $\boldsymbol{x}$, the latter will
+$c_b$ and $c_s$ given an observation $\boldsymbol{x}$, where the latter will
 asymptotically tend to the optimal classifier from [@Eq:opt_clf] given
 enough data and a flexible enough model.
 The classification output is a powerful
@@ -369,7 +368,9 @@ For the approach
 presented in this work, inference-aware neural optimisation, the effect of the
 nuisance parameters and their constraints can be taken into account during training.
 Hence, 5 different training procedures for \textsc{INFERNO} will be considered,
-one for each of the benchmarks, denoted by the corresponding benchmark number. 
+each one using as training loss function the final expected uncertainty of
+the actual inference problem for each of the benchmarks listed in \autoref{tab:benchmark_table}.
+These models are denoted by the name \textsc{INFERNO} followed the corresponding benchmark number.
 
 The same basic network architecture is used both for cross-entropy (CE)
 $L_\textrm{CE}=\sum_i y_i \log \hat{y}_i$ and
@@ -445,13 +446,16 @@ $t_B(\boldsymbol{x} | r = 0.0 , \lambda = 3.0)$
 from [@Eq:opt_clf],
 and the analytical likelihood-based inference are also
 included.
-The uncertainties shown in
+The median expected uncertainties shown in
 \autoref{tab:results_table},
 with the exception of the analytical likelihood which was based on the
 extended analytical likelihood,
-were obtained with a binned likelihood by interpolating
-the histograms when the nuisance parameters
-are varied.
+were obtained by constructing a binned likelihood for the resulting
+histograms of the two mixture components. The binned models for
+the inference problems with nuisance parameters were obtained by interpolating
+the histograms when the nuisance parameters are varied one standard
+deviation in each direction, which is a common practice in
+high-energy physics statistical inference.
 
 \begin{table}
   \caption{Expected uncertainty on the parameter of interest $s$
