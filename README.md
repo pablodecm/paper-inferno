@@ -8,10 +8,16 @@
 
 Please cite using the following BibTex entry:
 ```
-@ARTICLE{de2018inferno,
-  title={INFERNO: Inference-Aware Neural Optimisation},
-  author={de Castro, Pablo and Dorigo, Tommaso},
-  journal={arXiv preprint arXiv:1806.04743},
-  year={2018}
+@article{deCastro:2018mgh,
+    author = "De Castro, Pablo and Dorigo, Tommaso",
+    title = "{INFERNO: Inference-Aware Neural Optimisation}",
+    eprint = "1806.04743",
+    archivePrefix = "arXiv",
+    primaryClass = "stat.ML",
+    doi = "10.1016/j.cpc.2019.06.007",
+    journal = "Comput. Phys. Commun.",
+    volume = "244",
+    pages = "170--179",
+    year = "2019"
 }
 ```
